@@ -30,9 +30,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #172554);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: #050505;
             color: var(--text-primary);
             display: flex;
             flex-direction: column;
@@ -41,12 +39,23 @@
             margin: 0;
             padding: 40px 20px;
             box-sizing: border-box;
+            overflow-x: hidden;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 300px; height: 300px; background: var(--accent-primary); top: 10%; left: 10%; }
+        .orb-2 { width: 400px; height: 400px; background: var(--accent-secondary); bottom: 10%; right: 10%; animation-delay: -10s; }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.2); }
         }
 
         .container {
@@ -92,13 +101,15 @@
         }
 
         .feedback-form {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
             margin-bottom: 40px;
         }
 
@@ -167,8 +178,12 @@
         }
 
         .review-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 16px;
             padding: 20px;
             animation: slideIn 0.4s ease;
@@ -213,6 +228,8 @@
     </style>
 </head>
 <body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
 
     <div class="container">
         <div class="header">

@@ -17,6 +17,7 @@
     <title>Receiver Dashboard</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,9 +33,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #172554);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: #050505;
             color: var(--text-primary);
             display: flex;
             align-items: center;
@@ -44,21 +43,33 @@
             overflow: hidden;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 300px; height: 300px; background: var(--accent-primary); top: 10%; left: 10%; }
+        .orb-2 { width: 400px; height: 400px; background: var(--accent-secondary); bottom: 10%; right: 10%; animation-delay: -10s; }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.2); }
         }
 
         .container {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 24px;
             padding: 40px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
             max-width: 450px;
             width: 90%;
             transition: transform 0.3s ease;
@@ -95,14 +106,21 @@
         }
 
         .qr-wrapper {
-            background: white;
+            position: relative;
+            background: rgba(255, 255, 255, 0.9);
             padding: 15px;
             border-radius: 16px;
             display: inline-block;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             margin-bottom: 20px;
             align-self: center;
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
+            to { box-shadow: 0 0 50px rgba(129, 140, 248, 0.6); }
         }
 
         .qr-wrapper:hover {
@@ -273,7 +291,10 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
         <div class="header">
             <a href="/" class="back-btn" title="Back to Home">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
