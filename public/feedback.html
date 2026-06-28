@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RSVYPTE9QZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-RSVYPTE9QZ');
+    </script>
+    <!-- Ad Network Script -->
+    <script src="https://quge5.com/88/tag.min.js" data-zone="254169" async data-cfasync="false"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anonymous Feedback</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #38bdf8;
+            --accent-secondary: #818cf8;
+            --success: #34d399;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #172554);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
+            color: white;
+            border-radius: 12px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-right: 20px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin: 0;
+            background: linear-gradient(to right, var(--accent-primary), #e879f9);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .feedback-form {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 40px;
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            min-height: 120px;
+            resize: vertical;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px var(--accent-primary);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .reviews-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .review-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .review-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .review-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 0;
+            font-style: italic;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </a>
+            <h1>Feedback</h1>
+        </div>
+
+        <div class="feedback-form">
+            <textarea id="feedbackText" placeholder="Share your anonymous thoughts, feature requests, or bugs..."></textarea>
+            <button id="submitBtn" class="submit-btn" onclick="submitFeedback()">Submit Anonymously</button>
+        </div>
+
+        <div class="reviews-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Recent Feedback
+        </div>
+        
+        <div class="reviews-list" id="reviewsList">
+            <div class="empty-state">Loading feedback...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api/reviews';
+        const reviewsList = document.getElementById('reviewsList');
+        const submitBtn = document.getElementById('submitBtn');
+        const feedbackText = document.getElementById('feedbackText');
+
+        // Fetch and display reviews on load
+        async function loadReviews() {
+            try {
+                const res = await fetch(API_URL);
+                const reviews = await res.json();
+                renderReviews(reviews);
+            } catch (err) {
+                console.error("Failed to load reviews", err);
+                reviewsList.innerHTML = `<div class="empty-state">Failed to load feedback.</div>`;
+            }
+        }
+
+        function renderReviews(reviews) {
+            if (reviews.length === 0) {
+                reviewsList.innerHTML = `<div class="empty-state">No feedback yet. Be the first!</div>`;
+                return;
+            }
+
+            reviewsList.innerHTML = '';
+            reviews.forEach(review => {
+                const card = createReviewCard(review);
+                reviewsList.appendChild(card);
+            });
+        }
+
+        function createReviewCard(review) {
+            const div = document.createElement('div');
+            div.className = 'review-card';
+            
+            // Format date nicely
+            const date = new Date(review.date);
+            const formattedDate = date.toLocaleDateString(undefined, { 
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+            });
+
+            div.innerHTML = `
+                <div class="review-meta">
+                    <span class="review-badge">Anonymous</span>
+                    <span>${formattedDate}</span>
+                </div>
+                <div class="review-content">${escapeHTML(review.content)}</div>
+            `;
+            return div;
+        }
+
+        async function submitFeedback() {
+            const content = feedbackText.value.trim();
+            if (!content) return;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+
+                if (res.ok) {
+                    const newReview = await res.json();
+                    
+                    // Remove empty state if present
+                    if (reviewsList.querySelector('.empty-state')) {
+                        reviewsList.innerHTML = '';
+                    }
+
+                    // Prepend new review with animation
+                    const card = createReviewCard(newReview);
+                    reviewsList.insertBefore(card, reviewsList.firstChild);
+
+                    // Reset form
+                    feedbackText.value = '';
+                    
+                    // Show success
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Submitted!';
+                    submitBtn.style.background = 'var(--success)';
+                    
+                    setTimeout(() => {
+                        submitBtn.textContent = 'Submit Anonymously';
+                        submitBtn.style.background = '';
+                        submitBtn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error("Server error");
+                }
+            } catch (err) {
+                alert("Failed to submit feedback. Please try again.");
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Anonymously';
+            }
+        }
+
+        // Basic XSS prevention
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag])
+            );
+        }
+
+        // Load initially
+        loadReviews();
+    </script>
+</body>
+</html>
