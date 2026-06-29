@@ -388,11 +388,17 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
 // -----------------------
 // --- Cashfree Payment Gateway & Settings ---
 const { Cashfree, CFEnvironment } = require('cashfree-pg');
-Cashfree.XClientId = process.env.CASHFREE_APP_ID || 'TEST_APP_ID';
-Cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY || 'TEST_SECRET_KEY';
-Cashfree.XEnvironment = (process.env.CASHFREE_ENV || '').toUpperCase() === 'PRODUCTION' 
+
+const cashfreeEnv = (process.env.CASHFREE_ENV || '').toUpperCase() === 'PRODUCTION' 
     ? CFEnvironment.PRODUCTION 
     : CFEnvironment.SANDBOX;
+
+const cashfree = new Cashfree(
+    cashfreeEnv,
+    '2023-08-01',
+    process.env.CASHFREE_APP_ID || 'TEST_APP_ID',
+    process.env.CASHFREE_SECRET_KEY || 'TEST_SECRET_KEY'
+);
 
 // 1. Create Payment Session (Cashfree Order)
 app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
@@ -418,7 +424,7 @@ app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
             }
         };
 
-        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+        const response = await cashfree.PGCreateOrder(request);
         res.json({
             payment_session_id: response.data.payment_session_id,
             order_id: orderId
@@ -437,7 +443,7 @@ app.post('/api/payment/verify', authenticateToken, async (req, res) => {
         const { order_id, plan } = req.body;
         if (!order_id) return res.status(400).json({ error: "Order ID required" });
 
-        const response = await Cashfree.PGFetchOrder("2023-08-01", order_id);
+        const response = await cashfree.PGFetchOrder(order_id);
         if (response.data.order_status === "PAID") {
             const user = await User.findById(req.user.id);
             const now = new Date();
