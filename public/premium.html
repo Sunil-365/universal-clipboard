@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         .dashboard-container { width: 100%; max-width: 900px; margin: 80px auto 40px auto; padding: 0 20px; box-sizing: border-box; }
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; background: var(--card-bg); padding: 20px 30px; border-radius: 16px; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
@@ -38,6 +40,10 @@
         #auth-guard { text-align: center; margin-top: 100px; display: none; }
         .spinner { width: 40px; height: 40px; border: 4px solid var(--card-border); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .received-items { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-right: 5px; max-height: 250px; text-align: left; margin-top: 15px; width: 100%; box-sizing: border-box; }
+        .received-card { background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; text-align: left; width: 100%; box-sizing: border-box; }
+        .received-content { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 15px; color: var(--text-primary); font-weight: 500; font-size: 0.95rem; }
     </style>
 </head>
 <body>
@@ -68,9 +74,15 @@
                     <button class="btn" id="claim-room-btn" style="width: 100%;">Claim Room</button>
                 </div>
                 <div id="room-active-section" style="display: none; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Leave this open on your desk monitor. The QR code never expires.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Leave this open. The QR code never expires.</p>
                     <img id="persistent-qr" src="" alt="QR Code" style="width: 140px; height: 140px; margin-bottom: 20px; border-radius: 8px; padding: 10px; background: white; border: 1px solid var(--card-border);">
-                    <a href="#" id="open-receiver-btn" target="_blank" class="btn" style="background: var(--success); border-color: var(--success); width: 100%; text-align: center; text-decoration: none; box-sizing: border-box;">Open Display Link</a>
+                    <div style="width: 100%; border-top: 1px solid var(--card-border); margin-top: 10px; padding-top: 15px;">
+                        <div class="received-items" id="dashboard-receiver">
+                            <div id="dashboard-empty" style="color: var(--text-secondary); text-align: center; font-style: italic; font-size: 0.9rem;">
+                                Waiting for incoming items...
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,14 +152,58 @@
                         const claimSection = document.getElementById('room-claim-section');
                         const activeSection = document.getElementById('room-active-section');
                         const qrImg = document.getElementById('persistent-qr');
-                        const receiverBtn = document.getElementById('open-receiver-btn');
                         
                         if (customRoomId) {
                             claimSection.style.display = 'none';
                             activeSection.style.display = 'flex';
                             
                             qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + customRoomId)}`;
-                            receiverBtn.href = `receiver.html?room=${customRoomId}`;
+                            
+                            // Initialize integrated receiver
+                            if (!window.roomSocket) {
+                                window.roomSocket = io();
+                                window.roomSocket.emit('join-room', customRoomId);
+                                
+                                window.roomSocket.on('receive-data', (data) => {
+                                    const bytes = CryptoJS.AES.decrypt(data.content, customRoomId);
+                                    const originalText = bytes.toString(CryptoJS.enc.Utf8);
+                                    
+                                    if (originalText) {
+                                        const receiverBox = document.getElementById('dashboard-receiver');
+                                        const empty = document.getElementById('dashboard-empty');
+                                        if(empty) empty.style.display = 'none';
+                                        
+                                        const card = document.createElement('div');
+                                        card.className = 'received-card';
+                                        
+                                        const contentDiv = document.createElement('div');
+                                        contentDiv.className = 'received-content';
+                                        
+                                        if (data.type === 'url') {
+                                            contentDiv.innerHTML = `<a href="${originalText}" target="_blank" style="color: var(--accent-primary);">${originalText}</a>`;
+                                        } else {
+                                            contentDiv.textContent = originalText;
+                                        }
+                                        
+                                        const copyBtn = document.createElement('button');
+                                        copyBtn.className = 'btn';
+                                        copyBtn.style.padding = '6px 12px';
+                                        copyBtn.style.width = 'auto';
+                                        copyBtn.style.fontSize = '0.85rem';
+                                        copyBtn.innerHTML = 'Copy';
+                                        copyBtn.onclick = () => {
+                                            navigator.clipboard.writeText(originalText);
+                                            copyBtn.innerHTML = 'Copied!';
+                                            setTimeout(() => copyBtn.innerHTML = 'Copy', 2000);
+                                        };
+                                        
+                                        card.appendChild(contentDiv);
+                                        card.appendChild(copyBtn);
+                                        
+                                        receiverBox.insertBefore(card, receiverBox.firstChild);
+                                    }
+                                });
+                            }
                         } else {
                             claimSection.style.display = 'flex';
                             activeSection.style.display = 'none';
