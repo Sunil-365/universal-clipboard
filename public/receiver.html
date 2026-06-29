@@ -1,301 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RSVYPTE9QZ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-RSVYPTE9QZ');
     </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receiver Dashboard</title>
+    <title>Desk Display</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --card-border: #e2e8f0;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --accent-primary: #4f46e5;
-            --success: #10b981;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            max-width: 450px;
-            width: 90%;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: 90vh;
-        }
-        
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 4px;
-            background: var(--accent-primary);
-        }
-
-        h2 {
-            font-weight: 800;
-            margin-top: 0;
-            margin-bottom: 8px;
-            font-size: 1.8rem;
-            color: var(--accent-primary);
-        }
-
-        p.subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-        }
-
-        .qr-wrapper {
-            position: relative;
-            background: #ffffff;
-            padding: 15px;
-            border-radius: 12px;
-            display: inline-block;
-            border: 1px solid var(--card-border);
-            margin-bottom: 20px;
-            align-self: center;
-        }
-
-        #qrcode {
-            display: block;
-            border-radius: 4px;
-            width: 180px;
-            height: 180px;
-            background: #ffffff;
-        }
-
-        .status-box {
-            background: #f8fafc;
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--card-border);
-            position: relative;
-            overflow: hidden;
-            min-height: 24px;
-            margin-bottom: 15px;
-        }
-
-        #status {
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        #status.success {
-            color: var(--success);
-        }
-
-        .loader {
-            border: 2px solid rgba(0,0,0,0.1);
-            border-left-color: var(--accent-primary);
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .timer-bar-container {
-            width: 100%;
-            height: 4px;
-            background: #e2e8f0;
-            border-radius: 2px;
-            margin-top: 15px;
-            overflow: hidden;
-        }
-
-        .timer-bar {
-            height: 100%;
-            width: 100%;
-            background: var(--accent-primary);
-            transform-origin: left;
-        }
-
-        @keyframes countdown {
-            from { transform: scaleX(1); }
-            to { transform: scaleX(0); }
-        }
-
-        .received-items {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 5px;
-        }
-
-        .received-items::-webkit-scrollbar {
-            width: 6px;
-        }
-        .received-items::-webkit-scrollbar-thumb {
-            background: var(--card-border);
-            border-radius: 3px;
-        }
-
-        .received-card {
-            background: #f8fafc;
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            text-align: left;
-        }
-
-        .received-content {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            margin-right: 15px;
-            color: var(--text-primary);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .action-btn {
-            background: var(--accent-primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 14px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .action-btn:hover {
-            background: #4338ca;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .back-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-            border-radius: 8px;
-            padding: 8px 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: background 0.2s;
-            flex-shrink: 0;
-        }
-
-        .back-btn:hover {
-            background: #f1f5f9;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js"></script>
+    <script src="navbar.js"></script>
+    <style>
+        .qr-wrapper { position: relative; background: #ffffff; padding: 15px; border-radius: 12px; display: inline-block; border: 1px solid var(--card-border); margin-bottom: 20px; align-self: center; }
+        #qrcode { display: block; border-radius: 4px; width: 180px; height: 180px; background: #ffffff; }
+        .status-box { background: var(--bg-color); padding: 16px; border-radius: 8px; border: 1px solid var(--card-border); position: relative; overflow: hidden; min-height: 24px; margin-bottom: 15px; }
+        #status { color: var(--text-secondary); font-weight: 600; font-size: 0.95rem; margin: 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        #status.success { color: var(--success); }
+        .loader { border: 2px solid rgba(0,0,0,0.1); border-left-color: var(--accent-primary); border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .timer-bar-container { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 15px; overflow: hidden; }
+        .timer-bar { height: 100%; width: 100%; background: var(--accent-primary); transform-origin: left; }
+        @keyframes countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+        .received-items { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-right: 5px; max-height: 250px; }
+        .received-card { background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; text-align: left; }
+        .received-content { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 15px; color: var(--text-primary); font-weight: 500; font-size: 0.95rem; }
+    </style>
 </head>
 <body>
+    
+    <!-- PIN Modal for Premium Custom Rooms -->
+    <div id="pinModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 10px;">Secure Room</h2>
+            <p class="subtitle" style="font-size: 0.9rem;">Please enter the room PIN to decrypt incoming messages.</p>
+            <input type="password" id="roomPinInput" placeholder="4-Digit PIN">
+            <button class="btn" id="submitPinBtn">Unlock Session</button>
+        </div>
+    </div>
 
-    <div class="container" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
-        <div class="header">
-            <a href="/" class="back-btn" title="Back to Home">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-            </a>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <h2 style="margin: 0; font-size: 1.4rem;">Connect Device</h2>
-                <div style="background: rgba(52, 211, 153, 0.2); color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; border: 1px solid var(--success); display: flex; align-items: center; gap: 4px;">
+    <div class="container" style="margin-top: 40px; padding: 0;">
+        <div class="card" data-tilt data-tilt-max="2" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1" style="display: flex; flex-direction: column; max-height: 80vh;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
+                <h2 style="margin: 0; font-size: 1.4rem;">Desk Display</h2>
+                <div style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 4px;">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     E2EE
                 </div>
             </div>
-            <div style="width: 44px; height: 40px;"></div>
-        </div>
-        <p class="subtitle">Scan the QR code with your phone to establish a secure connection.</p>
-        
-        <div class="qr-wrapper">
-            <img id="qrcode" src="" alt="Loading QR..." />
-            <div class="timer-bar-container">
-                <div class="timer-bar" id="timerBar"></div>
+            <p class="subtitle" style="margin-bottom: 20px;">Scan the QR code with your phone to establish a secure connection.</p>
+            
+            <div class="qr-wrapper">
+                <img id="qrcode" src="" alt="Loading QR..." />
+                <div class="timer-bar-container">
+                    <div class="timer-bar" id="timerBar"></div>
+                </div>
             </div>
-        </div>
-        
-        <div class="status-box">
-            <p id="status"><span class="loader" id="loader"></span> Waiting for connection...</p>
-        </div>
+            
+            <div class="status-box">
+                <p id="status"><span class="loader" id="loader"></span> Waiting for connection...</p>
+            </div>
 
-        <div class="received-items" id="receivedItems">
-            <div id="emptyState" style="color: var(--text-secondary); text-align: center; margin-top: 30px; font-style: italic; animation: slideIn 0.5s ease;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.3;">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                </svg><br/>
-                No items received yet.<br/>Scan the QR code to start!
+            <div class="received-items" id="receivedItems">
+                <div id="emptyState" style="color: var(--text-secondary); text-align: center; margin-top: 30px; font-style: italic; animation: slideIn 0.5s ease;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.3;">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg><br/>
+                    No items received yet.<br/>Scan the QR code to start!
+                </div>
             </div>
-        </div>
-        
-        <div class="ad-banner" id="receiver-ad-banner" style="margin-top: 20px; width: 100%; height: 50px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-secondary); font-size: 0.8rem; border: 1px dashed #cbd5e1; flex-shrink: 0;">
-            Ad Placement Placeholder
+            
+            <div class="ad-banner" id="receiver-ad-banner" style="margin-top: 20px; width: 100%; height: 50px; background: var(--bg-color); display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-secondary); font-size: 0.8rem; border: 1px dashed var(--card-border); flex-shrink: 0;">
+                Ad Placement Placeholder
+            </div>
         </div>
     </div>
 
     <script>
         const socket = io();
         const statusEl = document.getElementById('status');
-        const loaderEl = document.getElementById('loader');
         const receivedItemsEl = document.getElementById('receivedItems');
         const timerBar = document.getElementById('timerBar');
 
@@ -304,11 +96,24 @@
         const persistentRoomId = urlParams.get('room');
 
         if (persistentRoomId) {
-            // It's a Premium Custom Room. Ask for PIN to decrypt incoming data.
-            const userPin = prompt("Secure Premium Room: Please enter your room PIN to decrypt incoming messages.");
-            if (userPin) {
-                encryptionKey = userPin;
-            }
+            // It's a Premium Custom Room. Ask for PIN via custom modal
+            const pinModal = document.getElementById('pinModal');
+            const pinInput = document.getElementById('roomPinInput');
+            const submitPinBtn = document.getElementById('submitPinBtn');
+            
+            pinModal.classList.add('active');
+            pinInput.focus();
+            
+            submitPinBtn.addEventListener('click', () => {
+                if (pinInput.value) {
+                    encryptionKey = pinInput.value;
+                    pinModal.classList.remove('active');
+                }
+            });
+            
+            pinInput.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') submitPinBtn.click();
+            });
             
             // Hide Ads for Custom Rooms (Premium only)
             const adBanner = document.getElementById('receiver-ad-banner');
@@ -333,32 +138,21 @@
                 return; // Stop here, no timer needed
             }
 
-            // 1. Generate a new random session ID and Encryption Key
             const newSessionId = Math.random().toString(36).substring(2, 10);
             encryptionKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-
-            // 2. Create the URL that Device 2 will visit (Key stays in hash fragment so server never sees it)
             const currentUrl = window.location.origin;
             const senderUrl = `${currentUrl}/sender.html?room=${newSessionId}#key=${encryptionKey}`;
 
-            // 3. Display the new QR code
             document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
-
-            // 4. Join the new WebSocket room
-            // We purposely don't leave old rooms. If someone scanned a code at the 29th second, 
-            // we still want them to be able to send messages without getting suddenly disconnected!
             socket.emit('join-room', newSessionId);
 
-            // 5. Reset the visual timer bar
             timerBar.style.animation = 'none';
-            timerBar.offsetHeight; /* trigger reflow */
+            timerBar.offsetHeight; 
             timerBar.style.animation = 'countdown 30s linear forwards';
         }
 
-        // Initialize the first QR code
         refreshQRCode();
 
-        // Refresh the QR code every 30 seconds (only if NOT a persistent room)
         if (!persistentRoomId) {
             setInterval(refreshQRCode, 30000);
         }
@@ -378,9 +172,12 @@
             }, 3000);
         }
 
-        // 5. Listen for incoming data from Device 2
         socket.on('receive-data', async (data) => {
-            // DECRYPT THE DATA FIRST!
+            if (!encryptionKey) {
+                showSuccess("Awaiting PIN entry...");
+                return;
+            }
+            
             try {
                 const bytes = CryptoJS.AES.decrypt(data.content, encryptionKey);
                 const originalText = bytes.toString(CryptoJS.enc.Utf8);
@@ -404,18 +201,15 @@
             contentDiv.textContent = data.content;
             
             const btn = document.createElement('button');
-            btn.className = 'action-btn';
+            btn.className = 'btn';
+            btn.style.width = 'auto';
+            btn.style.padding = '8px 14px';
+            btn.style.fontSize = '0.85rem';
             
             if (data.type === 'url') {
                 showSuccess("URL Received!");
                 btn.textContent = 'Open Link';
                 btn.onclick = () => window.open(data.content, '_blank');
-                
-                // Still try to auto-open, but browser popup blockers usually block this
-                const newWindow = window.open(data.content, '_blank');
-                if(!newWindow || newWindow.closed || typeof newWindow.closed=='undefined') {
-                    console.log("Auto-popup blocked by browser.");
-                }
             } else {
                 showSuccess("Text Received!");
                 btn.textContent = 'Copy Text';
@@ -427,27 +221,17 @@
                         btn.style.background = 'var(--success)';
                         setTimeout(() => {
                             btn.textContent = 'Copy Text';
-                            btn.style.background = 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))';
+                            btn.style.background = '';
                         }, 2000);
                     } catch(e) {
                         alert("Failed to copy text. Please try again.");
                     }
                 };
-                
-                // Still try auto-copy (might be blocked without user gesture)
-                try {
-                    await navigator.clipboard.writeText(data.content);
-                    btn.textContent = 'Copied!';
-                    btn.style.background = 'var(--success)';
-                } catch (err) {
-                    console.log('Auto-copy blocked by browser due to lack of user interaction.');
-                }
             }
             
             card.appendChild(contentDiv);
             card.appendChild(btn);
             
-            // Add to top of list
             receivedItemsEl.insertBefore(card, receivedItemsEl.firstChild);
         });
     </script>

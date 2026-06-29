@@ -1,4 +1,21 @@
-/* Dark Mode Overrides */
+/* Base Variables & Theme */
+:root {
+    --bg-color: #f8fafc;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --accent-primary: #4f46e5;
+    --accent-hover: #4338ca;
+    --success: #10b981;
+    --danger: #ef4444;
+    --nav-height: 70px;
+    --radius-lg: 16px;
+    --radius-md: 8px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
 body.dark-theme {
     --bg-color: #0f172a;
     --card-bg: #1e293b;
@@ -6,41 +23,181 @@ body.dark-theme {
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --accent-primary: #6366f1;
+    --accent-hover: #818cf8;
 }
 
-body.dark-theme input, 
-body.dark-theme textarea, 
-body.dark-theme .status-box, 
-body.dark-theme .received-card,
-body.dark-theme .skeleton-card {
-    background: #0f172a !important;
-    border-color: var(--card-border);
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    padding-top: var(--nav-height);
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-body.dark-theme .qr-wrapper {
-    background: #ffffff;
-    box-shadow: none;
+/* Universal Navbar */
+.navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-height);
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    z-index: 1000;
+    box-sizing: border-box;
 }
 
-body.dark-theme .back-btn, body.dark-theme .feedback-link {
-    background: #334155;
-    border-color: #475569;
-}
-body.dark-theme .back-btn:hover, body.dark-theme .feedback-link:hover {
-    background: #475569;
+.nav-brand {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--accent-primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-body.dark-theme .skeleton {
-    background: #334155;
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover {
+    color: var(--text-primary);
+}
+
+.nav-btn {
+    background: var(--accent-primary);
+    color: white !important;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    transition: background 0.2s;
+}
+.nav-btn:hover { background: var(--accent-hover); }
+
+/* Layouts */
+.container {
+    width: 100%;
+    max-width: 500px;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container-wide {
+    width: 100%;
+    max-width: 900px;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Typography */
+h1 { font-size: 2.5rem; font-weight: 800; color: var(--text-primary); margin-top: 0; margin-bottom: 10px; text-align: center; letter-spacing: -1px; }
+h2 { font-size: 1.5rem; font-weight: 700; margin-top: 0; margin-bottom: 20px; color: var(--text-primary); text-align: center; }
+p.subtitle { color: var(--text-secondary); text-align: center; margin-top: 0; margin-bottom: 30px; line-height: 1.5; font-size: 1.05rem; }
+
+/* Inputs & Buttons */
+input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    background: var(--bg-color);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    transition: border-color 0.2s;
+}
+input:focus { outline: none; border-color: var(--accent-primary); }
+
+.btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+.btn:hover { background: var(--accent-hover); }
+.btn:active { transform: scale(0.98); }
+.btn-outline { background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); }
+.btn-outline:hover { background: var(--bg-color); }
+
+/* Utilities */
+.divider { display: flex; align-items: center; margin: 20px 0; color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; font-weight: 600; }
+.divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--card-border); }
+.divider::before { margin-right: 15px; } .divider::after { margin-left: 15px; }
+
+/* Modals */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2000;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    width: 90%; max-width: 400px;
+    box-shadow: var(--shadow-md);
+    transform: translateY(20px); transition: transform 0.2s;
+    border: 1px solid var(--card-border);
+}
+.modal-overlay.active .modal-content { transform: translateY(0); }
 
 /* Theme Toggle Button Styles */
 .theme-toggle-btn {
     position: fixed;
     bottom: 25px;
     right: 25px;
-    width: 55px;
-    height: 55px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -61,8 +218,8 @@ body.dark-theme .skeleton {
     transform: scale(0.95);
 }
 .theme-toggle-btn svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     fill: none;
     stroke: currentColor;
     stroke-width: 2;
