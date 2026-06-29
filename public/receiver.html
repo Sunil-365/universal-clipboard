@@ -296,8 +296,28 @@
         const timerBar = document.getElementById('timerBar');
 
         let encryptionKey = '';
+        const urlParams = new URLSearchParams(window.location.search);
+        const persistentRoomId = urlParams.get('room');
+
+        socket.on('session-expired', () => {
+            alert("Free session expired (10 minutes max). Please refresh for a new session or upgrade to Premium.");
+            window.location.reload();
+        });
 
         function refreshQRCode() {
+            if (persistentRoomId) {
+                // Persistent Premium Room
+                encryptionKey = persistentRoomId + "_static_key"; // Basic static key
+                const currentUrl = window.location.origin;
+                const senderUrl = `${currentUrl}/sender.html?room=${persistentRoomId}#key=${encryptionKey}`;
+                
+                document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
+                socket.emit('join-room', persistentRoomId);
+                
+                document.querySelector('.timer-bar-container').style.display = 'none';
+                return; // Stop here, no timer needed
+            }
+
             // 1. Generate a new random session ID and Encryption Key
             const newSessionId = Math.random().toString(36).substring(2, 10);
             encryptionKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -323,8 +343,10 @@
         // Initialize the first QR code
         refreshQRCode();
 
-        // Refresh the QR code every 30 seconds
-        setInterval(refreshQRCode, 30000);
+        // Refresh the QR code every 30 seconds (only if NOT a persistent room)
+        if (!persistentRoomId) {
+            setInterval(refreshQRCode, 30000);
+        }
 
         function showSuccess(message) {
             statusEl.className = 'success';
@@ -343,17 +365,19 @@
 
         // 5. Listen for incoming data from Device 2
         socket.on('receive-data', async (data) => {
-            // DECRYPT THE DATA FIRST!
-            try {
-                const bytes = CryptoJS.AES.decrypt(data.content, encryptionKey);
-                const originalText = bytes.toString(CryptoJS.enc.Utf8);
-                
-                if (!originalText) throw new Error('Decryption resulted in empty string');
-                data.content = originalText;
-            } catch (err) {
-                console.error("Decryption failed:", err);
-                showSuccess("Decryption Failed! Bad Key.");
-                return;
+            // DECRYPT THE DATA FIRST! (Unless it's a file URL which is unencrypted)
+            if (data.type !== 'file') {
+                try {
+                    const bytes = CryptoJS.AES.decrypt(data.content, encryptionKey);
+                    const originalText = bytes.toString(CryptoJS.enc.Utf8);
+                    
+                    if (!originalText) throw new Error('Decryption resulted in empty string');
+                    data.content = originalText;
+                } catch (err) {
+                    console.error("Decryption failed:", err);
+                    showSuccess("Decryption Failed! Bad Key.");
+                    return;
+                }
             }
 
             const emptyState = document.getElementById('emptyState');
@@ -369,7 +393,12 @@
             const btn = document.createElement('button');
             btn.className = 'action-btn';
             
-            if (data.type === 'url') {
+            if (data.type === 'file') {
+                showSuccess("File Received!");
+                btn.textContent = 'Download File';
+                btn.onclick = () => window.open(data.content, '_blank');
+                contentDiv.textContent = '📁 ' + (data.filename || 'File');
+            } else if (data.type === 'url') {
                 showSuccess("URL Received!");
                 btn.textContent = 'Open Link';
                 btn.onclick = () => window.open(data.content, '_blank');

@@ -10,6 +10,8 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('./models/User');
 const Clip = require('./models/Clip');
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -32,6 +34,8 @@ app.use(limiter);
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
+const roomTimeouts = {};
+
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
@@ -39,12 +43,41 @@ io.on('connection', (socket) => {
     socket.on('join-room', (roomId) => {
         socket.join(roomId);
         console.log(`Socket ${socket.id} joined room ${roomId}`);
+        
+        // If it's a new standard random room (Free Tier), set a 10 min timeout
+        if (roomId && !roomId.startsWith('desk-')) { 
+            if (!roomTimeouts[roomId]) {
+                roomTimeouts[roomId] = setTimeout(() => {
+                    io.to(roomId).emit('session-expired');
+                    io.in(roomId).socketsLeave(roomId);
+                    delete roomTimeouts[roomId];
+                    console.log(`Room ${roomId} expired and destroyed.`);
+                }, 10 * 60 * 1000); // 10 minutes
+            }
+        }
     });
 
     // Receive data from Device 2 and forward it to Device 1 in the same room
-    socket.on('send-data', (data) => {
-        // data contains { roomId, type: 'text'|'url', content: '...' }
+    socket.on('send-data', async (data) => {
+        // data contains { roomId, type: 'text'|'url'|'file', content: '...', token?: '...' }
         socket.to(data.roomId).emit('receive-data', data);
+        
+        // History Log Integration
+        if (data.token) {
+            try {
+                // Verify the JWT synchronously
+                const decodedUser = jwt.verify(data.token, process.env.JWT_SECRET || 'fallback_secret_for_dev_mode');
+                if (decodedUser && decodedUser.isPremium) {
+                    const newClip = new Clip({
+                        userId: decodedUser.id,
+                        content: data.type === 'file' ? `[File Shared] ${data.content}` : data.content
+                    });
+                    await newClip.save();
+                }
+            } catch (err) {
+                console.error("Token verification failed for history log", err);
+            }
+        }
     });
 });
 
@@ -269,6 +302,46 @@ app.delete('/api/clips/:id', authenticateToken, async (req, res) => {
         console.error("Error deleting clip:", err);
         res.status(500).json({ error: "Server error" });
     }
+});
+// -----------------------
+// --- Advanced Freemium Features ---
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/uploads/');
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
+});
+
+// Endpoint for Persistent Room
+app.get('/api/room', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+        let user = await User.findById(req.user.id);
+        if (!user.persistentRoomId) {
+            user.persistentRoomId = 'desk-' + user._id.toString().substring(0, 8);
+            await user.save();
+        }
+        res.json({ roomId: user.persistentRoomId });
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+// Endpoint for File Uploads
+app.post('/api/upload', authenticateToken, upload.single('file'), (req, res) => {
+    if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+    
+    // Return the URL to access the file
+    const fileUrl = `/uploads/${req.file.filename}`;
+    res.json({ url: fileUrl, filename: req.file.originalname, mimetype: req.file.mimetype });
 });
 // -----------------------
 

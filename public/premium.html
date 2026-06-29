@@ -66,9 +66,19 @@
             </div>
         </div>
 
-        <div class="input-card">
-            <textarea id="clip-input" placeholder="Paste or type something to permanently save to your account..."></textarea>
-            <button class="btn" id="save-btn">Save to Cloud</button>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div class="input-card" style="margin-bottom: 0;">
+                <h3 style="margin-top: 0;">Cloud Clipboard</h3>
+                <textarea id="clip-input" placeholder="Paste or type something to permanently save to your account..."></textarea>
+                <button class="btn" id="save-btn">Save to Cloud</button>
+            </div>
+            
+            <div class="input-card" style="margin-bottom: 0; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h3 style="margin-top: 0;">Permanent Desk Receiver</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Leave this Receiver open on your desk monitor. The QR code never expires.</p>
+                <img id="persistent-qr" src="" alt="QR Code" style="width: 120px; height: 120px; display: none; margin-bottom: 15px; border-radius: 8px;">
+                <a href="#" id="open-receiver-btn" target="_blank" class="btn" style="background: #059669; display: none;">Open Receiver Mode</a>
+            </div>
         </div>
 
         <div class="clips-header">
@@ -114,6 +124,7 @@
                 authGuard.style.display = 'none';
                 dashboard.style.display = 'block';
                 fetchClips();
+                fetchPersistentRoom();
             } catch (err) {
                 localStorage.removeItem('token');
                 window.location.href = 'login.html';
@@ -123,6 +134,25 @@
                 localStorage.removeItem('token');
                 window.location.href = 'index.html';
             });
+
+            async function fetchPersistentRoom() {
+                try {
+                    const roomRes = await fetch('/api/room', { headers: { 'Authorization': `Bearer ${token}` }});
+                    if (roomRes.ok) {
+                        const { roomId } = await roomRes.json();
+                        const qrImg = document.getElementById('persistent-qr');
+                        const receiverBtn = document.getElementById('open-receiver-btn');
+                        
+                        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + roomId)}`;
+                        qrImg.style.display = 'block';
+                        
+                        receiverBtn.href = `receiver.html?room=${roomId}`;
+                        receiverBtn.style.display = 'inline-block';
+                    }
+                } catch (e) {
+                    console.error("Failed to load persistent room");
+                }
+            }
 
             async function fetchClips() {
                 try {
