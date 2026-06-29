@@ -469,7 +469,51 @@ app.post('/api/payment/verify', authenticateToken, async (req, res) => {
     }
 });
 
-// 3. Get User Profile & Subscription Status
+// 3. Cashfree Webhook Listener
+app.post('/api/webhooks/cashfree', express.json(), async (req, res) => {
+    try {
+        const event = req.body;
+        console.log('Cashfree Webhook Event received:', event.type);
+
+        // Handle payment success (one-time or initial order)
+        if (event.type === 'PAYMENT_SUCCESS_WEBHOOK') {
+            const customerId = event.data?.customer_details?.customer_id;
+            if (customerId) {
+                const user = await User.findById(customerId);
+                if (user) {
+                    const now = new Date();
+                    user.isPremium = true;
+                    user.subscriptionStatus = 'active';
+                    user.subscriptionEndsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+                    await user.save();
+                    console.log(`Updated user ${user.email} subscription status via webhook`);
+                }
+            }
+        }
+
+        // Handle subscription recurring charges
+        if (event.type === 'SUBSCRIPTION_CHARGED') {
+            const customerId = event.data?.customer_details?.customer_id;
+            if (customerId) {
+                const user = await User.findById(customerId);
+                if (user) {
+                    const now = new Date();
+                    user.isPremium = true;
+                    user.subscriptionStatus = 'active';
+                    user.subscriptionEndsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+                    await user.save();
+                }
+            }
+        }
+
+        res.status(200).send('Webhook Received');
+    } catch (err) {
+        console.error('Webhook processing error:', err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// 4. Get User Profile & Subscription Status
 app.get('/api/user/profile', authenticateToken, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
