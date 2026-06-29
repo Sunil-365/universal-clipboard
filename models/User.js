@@ -30,9 +30,6 @@ const userSchema = new mongoose.Schema({
         unique: true,
         sparse: true
     },
-    roomPin: {
-        type: String
-    },
     createdAt: {
         type: Date,
         default: Date.now

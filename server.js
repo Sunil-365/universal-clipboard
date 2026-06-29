@@ -309,8 +309,8 @@ app.post('/api/room/claim', authenticateToken, async (req, res) => {
     try {
         if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
         
-        const { customRoomId, roomPin } = req.body;
-        if (!customRoomId || !roomPin) return res.status(400).json({ error: "Room name and PIN required." });
+        const { customRoomId } = req.body;
+        if (!customRoomId) return res.status(400).json({ error: "Room name required." });
         
         // Clean the custom room ID (letters and numbers only)
         const cleanRoomId = customRoomId.replace(/[^a-zA-Z0-9]/g, '');
@@ -324,7 +324,6 @@ app.post('/api/room/claim', authenticateToken, async (req, res) => {
 
         let user = await User.findById(req.user.id);
         user.customRoomId = cleanRoomId;
-        user.roomPin = roomPin;
         await user.save();
         
         res.json({ message: "Room claimed successfully!", customRoomId: user.customRoomId });
@@ -339,7 +338,7 @@ app.get('/api/room', authenticateToken, async (req, res) => {
     try {
         if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
         let user = await User.findById(req.user.id);
-        res.json({ customRoomId: user.customRoomId || null, hasPin: !!user.roomPin });
+        res.json({ customRoomId: user.customRoomId || null });
     } catch (err) {
         res.status(500).json({ error: "Server error" });
     }

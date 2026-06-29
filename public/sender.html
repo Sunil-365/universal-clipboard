@@ -29,15 +29,6 @@
 </head>
 <body>
 
-    <!-- PIN Modal for Missing Keys / Custom Rooms -->
-    <div id="pinModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 10px;">Secure Room</h2>
-            <p class="subtitle" style="font-size: 0.9rem;">Please enter the room PIN to connect and send messages.</p>
-            <input type="password" id="roomPinInput" placeholder="4-Digit PIN">
-            <button class="btn" id="submitPinBtn">Unlock Session</button>
-        </div>
-    </div>
 
     <div class="container" style="margin-top: 40px; padding: 0;">
         <div class="card" data-tilt data-tilt-max="2" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1" style="display: flex; flex-direction: column;">
@@ -104,23 +95,8 @@
         if (window.location.hash.startsWith('#key=')) {
             encryptionKey = window.location.hash.substring(5);
         } else if (roomId) {
-            // Missing key for Custom Room. Use Modal instead of prompt
-            const pinModal = document.getElementById('pinModal');
-            const pinInput = document.getElementById('roomPinInput');
-            const submitPinBtn = document.getElementById('submitPinBtn');
-            
-            pinModal.classList.add('active');
-            pinInput.focus();
-            
-            submitPinBtn.addEventListener('click', () => {
-                if (pinInput.value) {
-                    encryptionKey = pinInput.value;
-                    pinModal.classList.remove('active');
-                }
-            });
-            pinInput.addEventListener('keypress', (e) => {
-                if(e.key === 'Enter') submitPinBtn.click();
-            });
+            // Missing key for Custom Room. Use the room ID as the encryption key
+            encryptionKey = roomId;
         }
         
         const premiumSection = document.getElementById('premium-banner-section');
@@ -155,13 +131,7 @@
                 }
 
                 if (!encryptionKey) {
-                    const pinModal = document.getElementById('pinModal');
-                    if (pinModal) {
-                        pinModal.classList.add('active');
-                        document.getElementById('roomPinInput').focus();
-                    } else {
-                        alert("Encryption key missing! Please scan a QR code first.");
-                    }
+                    alert("Encryption key missing! Please scan a QR code first.");
                     return;
                 }
                 

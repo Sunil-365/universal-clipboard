@@ -36,15 +36,6 @@
 </head>
 <body>
     
-    <!-- PIN Modal for Premium Custom Rooms -->
-    <div id="pinModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 10px;">Secure Room</h2>
-            <p class="subtitle" style="font-size: 0.9rem;">Please enter the room PIN to decrypt incoming messages.</p>
-            <input type="password" id="roomPinInput" placeholder="4-Digit PIN">
-            <button class="btn" id="submitPinBtn">Unlock Session</button>
-        </div>
-    </div>
 
     <div class="container" style="margin-top: 40px; padding: 0;">
         <div class="card" data-tilt data-tilt-max="2" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1" style="display: flex; flex-direction: column; max-height: 80vh;">
@@ -96,24 +87,8 @@
         const persistentRoomId = urlParams.get('room');
 
         if (persistentRoomId) {
-            // It's a Premium Custom Room. Ask for PIN via custom modal
-            const pinModal = document.getElementById('pinModal');
-            const pinInput = document.getElementById('roomPinInput');
-            const submitPinBtn = document.getElementById('submitPinBtn');
-            
-            pinModal.classList.add('active');
-            pinInput.focus();
-            
-            submitPinBtn.addEventListener('click', () => {
-                if (pinInput.value) {
-                    encryptionKey = pinInput.value;
-                    pinModal.classList.remove('active');
-                }
-            });
-            
-            pinInput.addEventListener('keypress', (e) => {
-                if(e.key === 'Enter') submitPinBtn.click();
-            });
+            // It's a Premium Custom Room. Use the room ID as the encryption key
+            encryptionKey = persistentRoomId;
             
             // Hide Ads for Custom Rooms (Premium only)
             const adBanner = document.getElementById('receiver-ad-banner');
