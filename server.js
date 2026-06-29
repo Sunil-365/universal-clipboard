@@ -3,10 +3,26 @@ const express = require('express');
 const mongoose = require('mongoose');
 const http = require('http');
 const { Server } = require("socket.io");
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+// --- Security Middleware ---
+// 1. Helmet sets various secure HTTP headers. We disable CSP to allow inline scripts & CDNs.
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// 2. Rate Limiting prevents brute-force / DDoS attacks.
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 200, // Limit each IP to 200 requests per windowMs
+    message: "Too many requests from this IP, please try again later.",
+    standardHeaders: true, 
+    legacyHeaders: false,
+});
+app.use(limiter);
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));

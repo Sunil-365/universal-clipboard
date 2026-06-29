@@ -38,3 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Append to body
     document.body.appendChild(toggleBtn);
 });
+
+// --- Anti-Copy & Anti-Inspect Protections ---
+// 1. Disable Right-Click context menu
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// 2. Disable common developer keyboard shortcuts
+document.addEventListener('keydown', e => {
+    // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U (and Mac equivalents)
+    if (
+        e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+        (e.ctrlKey && e.key.toUpperCase() === 'U') ||
+        (e.metaKey && e.altKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
+        (e.metaKey && e.key.toUpperCase() === 'U')
+    ) {
+        e.preventDefault();
+        return false;
+    }
+});
