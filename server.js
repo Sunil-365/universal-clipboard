@@ -10,8 +10,7 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('./models/User');
 const Clip = require('./models/Clip');
-const multer = require('multer');
-const path = require('path');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -70,7 +69,7 @@ io.on('connection', (socket) => {
                 if (decodedUser && decodedUser.isPremium) {
                     const newClip = new Clip({
                         userId: decodedUser.id,
-                        content: data.type === 'file' ? `[File Shared] ${data.content}` : data.content
+                        content: data.content
                     });
                     await newClip.save();
                 }
@@ -305,43 +304,45 @@ app.delete('/api/clips/:id', authenticateToken, async (req, res) => {
 });
 // -----------------------
 // --- Advanced Freemium Features ---
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/uploads/');
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
-const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
-});
-
-// Endpoint for Persistent Room
-app.get('/api/room', authenticateToken, async (req, res) => {
+// Endpoint for Custom Persistent Room Claim
+app.post('/api/room/claim', authenticateToken, async (req, res) => {
     try {
         if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
-        let user = await User.findById(req.user.id);
-        if (!user.persistentRoomId) {
-            user.persistentRoomId = 'desk-' + user._id.toString().substring(0, 8);
-            await user.save();
+        
+        const { customRoomId, roomPin } = req.body;
+        if (!customRoomId || !roomPin) return res.status(400).json({ error: "Room name and PIN required." });
+        
+        // Clean the custom room ID (letters and numbers only)
+        const cleanRoomId = customRoomId.replace(/[^a-zA-Z0-9]/g, '');
+        if (cleanRoomId.length < 3) return res.status(400).json({ error: "Room name must be at least 3 alphanumeric characters." });
+
+        // Check if room is already taken by someone else
+        const existing = await User.findOne({ customRoomId: cleanRoomId });
+        if (existing && existing._id.toString() !== req.user.id) {
+            return res.status(400).json({ error: "Room name already taken." });
         }
-        res.json({ roomId: user.persistentRoomId });
+
+        let user = await User.findById(req.user.id);
+        user.customRoomId = cleanRoomId;
+        user.roomPin = roomPin;
+        await user.save();
+        
+        res.json({ message: "Room claimed successfully!", customRoomId: user.customRoomId });
     } catch (err) {
+        console.error("Room claim error:", err);
         res.status(500).json({ error: "Server error" });
     }
 });
 
-// Endpoint for File Uploads
-app.post('/api/upload', authenticateToken, upload.single('file'), (req, res) => {
-    if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
-    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-    
-    // Return the URL to access the file
-    const fileUrl = `/uploads/${req.file.filename}`;
-    res.json({ url: fileUrl, filename: req.file.originalname, mimetype: req.file.mimetype });
+// Endpoint to fetch current room status
+app.get('/api/room', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+        let user = await User.findById(req.user.id);
+        res.json({ customRoomId: user.customRoomId || null, hasPin: !!user.roomPin });
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
 });
 // -----------------------
 

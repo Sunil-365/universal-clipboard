@@ -25,10 +25,13 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    persistentRoomId: {
+    customRoomId: {
         type: String,
         unique: true,
         sparse: true
+    },
+    roomPin: {
+        type: String
     },
     createdAt: {
         type: Date,

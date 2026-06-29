@@ -286,6 +286,10 @@
                 No items received yet.<br/>Scan the QR code to start!
             </div>
         </div>
+        
+        <div class="ad-banner" id="receiver-ad-banner" style="margin-top: 20px; width: 100%; height: 50px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-secondary); font-size: 0.8rem; border: 1px dashed #cbd5e1; flex-shrink: 0;">
+            Ad Placement Placeholder
+        </div>
     </div>
 
     <script>
@@ -299,6 +303,18 @@
         const urlParams = new URLSearchParams(window.location.search);
         const persistentRoomId = urlParams.get('room');
 
+        if (persistentRoomId) {
+            // It's a Premium Custom Room. Ask for PIN to decrypt incoming data.
+            const userPin = prompt("Secure Premium Room: Please enter your room PIN to decrypt incoming messages.");
+            if (userPin) {
+                encryptionKey = userPin;
+            }
+            
+            // Hide Ads for Custom Rooms (Premium only)
+            const adBanner = document.getElementById('receiver-ad-banner');
+            if (adBanner) adBanner.style.display = 'none';
+        }
+
         socket.on('session-expired', () => {
             alert("Free session expired (10 minutes max). Please refresh for a new session or upgrade to Premium.");
             window.location.reload();
@@ -307,9 +323,8 @@
         function refreshQRCode() {
             if (persistentRoomId) {
                 // Persistent Premium Room
-                encryptionKey = persistentRoomId + "_static_key"; // Basic static key
                 const currentUrl = window.location.origin;
-                const senderUrl = `${currentUrl}/sender.html?room=${persistentRoomId}#key=${encryptionKey}`;
+                const senderUrl = `${currentUrl}/sender.html?room=${persistentRoomId}`;
                 
                 document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
                 socket.emit('join-room', persistentRoomId);
@@ -365,19 +380,17 @@
 
         // 5. Listen for incoming data from Device 2
         socket.on('receive-data', async (data) => {
-            // DECRYPT THE DATA FIRST! (Unless it's a file URL which is unencrypted)
-            if (data.type !== 'file') {
-                try {
-                    const bytes = CryptoJS.AES.decrypt(data.content, encryptionKey);
-                    const originalText = bytes.toString(CryptoJS.enc.Utf8);
-                    
-                    if (!originalText) throw new Error('Decryption resulted in empty string');
-                    data.content = originalText;
-                } catch (err) {
-                    console.error("Decryption failed:", err);
-                    showSuccess("Decryption Failed! Bad Key.");
-                    return;
-                }
+            // DECRYPT THE DATA FIRST!
+            try {
+                const bytes = CryptoJS.AES.decrypt(data.content, encryptionKey);
+                const originalText = bytes.toString(CryptoJS.enc.Utf8);
+                
+                if (!originalText) throw new Error('Decryption resulted in empty string');
+                data.content = originalText;
+            } catch (err) {
+                console.error("Decryption failed:", err);
+                showSuccess("Decryption Failed! Bad PIN/Key.");
+                return;
             }
 
             const emptyState = document.getElementById('emptyState');
@@ -393,19 +406,7 @@
             const btn = document.createElement('button');
             btn.className = 'action-btn';
             
-            if (data.type === 'file') {
-                showSuccess("File Received!");
-                btn.textContent = 'Download File';
-                btn.onclick = () => {
-                    const a = document.createElement('a');
-                    a.href = data.content;
-                    a.download = data.filename || 'download';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                };
-                contentDiv.textContent = '📁 ' + (data.filename || 'File');
-            } else if (data.type === 'url') {
+            if (data.type === 'url') {
                 showSuccess("URL Received!");
                 btn.textContent = 'Open Link';
                 btn.onclick = () => window.open(data.content, '_blank');

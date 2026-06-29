@@ -286,18 +286,12 @@
         
         <div id="reader"></div>
         
-        <div id="premium-upload-section" style="display: none; width: 100%; margin-top: 15px;">
-            <div class="divider" style="margin: 10px 0;">Premium</div>
-            <input type="file" id="fileInput" style="display: none;" />
-            <button id="uploadBtn" class="outline" style="border-color: #f59e0b; color: #f59e0b;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                Send File
-            </button>
+        <div id="premium-banner-section" style="display: none; width: 100%; margin-top: 15px;">
         </div>
+    </div>
+    
+    <div class="ad-banner" style="margin-top: 20px; width: 100%; max-width: 400px; height: 50px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-secondary); font-size: 0.8rem; border: 1px dashed #cbd5e1;">
+        Ad Placement Placeholder
     </div>
     
     <div id="toast" class="status-toast">Sent successfully!</div>
@@ -318,25 +312,31 @@
         let encryptionKey = '';
         if (window.location.hash.startsWith('#key=')) {
             encryptionKey = window.location.hash.substring(5);
+        } else if (roomId) {
+            // If no key in hash but there is a room, it might be a Custom Room. Prompt for PIN.
+            const userPin = prompt("This is a Secure Room. Please enter the room PIN to connect:");
+            if (userPin) {
+                encryptionKey = userPin;
+            }
         }
         
         let html5QrCode;
 
         // Premium Section Check
-        const premiumSection = document.getElementById('premium-upload-section');
+        const premiumSection = document.getElementById('premium-banner-section');
         const token = localStorage.getItem('token');
         const headerLoginBtn = document.getElementById('headerLoginBtn');
         const headerDashBtn = document.getElementById('headerDashBtn');
 
         if (token) {
-            premiumSection.style.display = 'block';
             headerLoginBtn.style.display = 'none';
             headerDashBtn.style.display = 'inline-block';
+            document.querySelectorAll('.ad-banner').forEach(el => el.style.display = 'none');
         } else {
             premiumSection.style.display = 'block';
             premiumSection.innerHTML = `
                 <div class="divider" style="margin: 10px 0;">Premium</div>
-                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">Log in to unlock File Sharing and Auto-History!</div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">Log in to unlock Auto-History & Ad-Free Experience!</div>
                 <button class="btn outline" style="border-color: #f59e0b; color: #f59e0b;" onclick="document.getElementById('headerLoginBtn').click()">Log In to Unlock</button>
             `;
         }
@@ -474,59 +474,6 @@
 
         stopScanBtn.addEventListener('click', stopScanner);
 
-        // File Upload Logic
-        const fileInput = document.getElementById('fileInput');
-        const uploadBtn = document.getElementById('uploadBtn');
-
-        if (uploadBtn) {
-            uploadBtn.addEventListener('click', () => fileInput.click());
-        }
-
-        if (fileInput) {
-            fileInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                if (!roomId) {
-                    alert("Not connected to a receiver.");
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append('file', file);
-                
-                const originalHtml = uploadBtn.innerHTML;
-                uploadBtn.innerHTML = '<div class="loader-small" style="border-left-color: #f59e0b;"></div> Uploading...';
-                uploadBtn.disabled = true;
-
-                try {
-                    const res = await fetch('/api/upload', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}` },
-                        body: formData
-                    });
-                    if (!res.ok) throw new Error("Upload failed");
-                    const data = await res.json(); // { url, filename, mimetype }
-                    
-                    // Emit unencrypted for now (or encrypt the URL, but receiver needs to know how to handle files)
-                    socket.emit('send-data', {
-                        roomId: roomId,
-                        type: 'file',
-                        content: window.location.origin + data.url,
-                        filename: data.filename,
-                        token: token
-                    });
-                    
-                    showToast("File sent successfully!");
-                } catch (err) {
-                    alert("File upload failed. Ensure you have Premium.");
-                } finally {
-                    uploadBtn.innerHTML = originalHtml;
-                    uploadBtn.disabled = false;
-                    fileInput.value = '';
-                }
-            });
-        }
     </script>
 </body>
 </html>

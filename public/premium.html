@@ -73,17 +73,30 @@
                 <button class="btn" id="save-btn">Save to Cloud</button>
             </div>
             
-            <div class="input-card" style="margin-bottom: 0; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <h3 style="margin-top: 0;">Permanent Desk Receiver</h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Leave this Receiver open on your desk monitor. The QR code never expires.</p>
-                <img id="persistent-qr" src="" alt="QR Code" style="width: 120px; height: 120px; display: none; margin-bottom: 15px; border-radius: 8px;">
-                <a href="#" id="open-receiver-btn" target="_blank" class="btn" style="background: #059669; display: none;">Open Receiver Mode</a>
+            <div class="input-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h3 style="margin-top: 0; text-align: center;">Desk Receiver</h3>
+                    <div id="room-claim-section" style="display: none;">
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 15px;">Claim a custom room URL to display on your monitor.</p>
+                        <input type="text" id="custom-room-input" placeholder="Room Name (e.g. OfficeMac)" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--bg-color); font-family: inherit; box-sizing: border-box;">
+                        <input type="password" id="room-pin-input" placeholder="PIN Code" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--bg-color); font-family: inherit; box-sizing: border-box;">
+                        <button class="btn" id="claim-room-btn" style="width: 100%; padding: 10px;">Claim Room</button>
+                    </div>
+                    <div id="room-active-section" style="display: none; text-align: center;">
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 10px;">Leave this open on your desk monitor. The QR code never expires.</p>
+                        <img id="persistent-qr" src="" alt="QR Code" style="width: 120px; height: 120px; margin-bottom: 15px; border-radius: 8px;">
+                        <a href="#" id="open-receiver-btn" target="_blank" class="btn" style="background: #059669; width: 100%; padding: 10px; box-sizing: border-box;">Open Receiver</a>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="clips-header">
             <h2>Permanent History</h2>
-            <span id="clip-count" style="color: var(--text-secondary); font-size: 0.9rem;"></span>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="search-input" placeholder="Search history..." style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--card-border); font-size: 0.9rem; width: 150px;">
+                <span id="clip-count" style="color: var(--text-secondary); font-size: 0.9rem;"></span>
+            </div>
         </div>
         
         <div class="clips-list" id="clips-list">
@@ -139,30 +152,66 @@
                 try {
                     const roomRes = await fetch('/api/room', { headers: { 'Authorization': `Bearer ${token}` }});
                     if (roomRes.ok) {
-                        const { roomId } = await roomRes.json();
+                        const { customRoomId, hasPin } = await roomRes.json();
+                        const claimSection = document.getElementById('room-claim-section');
+                        const activeSection = document.getElementById('room-active-section');
                         const qrImg = document.getElementById('persistent-qr');
                         const receiverBtn = document.getElementById('open-receiver-btn');
                         
-                        // Use the same static key format defined in receiver.html
-                        const staticKey = roomId + "_static_key";
-                        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + roomId + '#key=' + staticKey)}`;
-                        qrImg.style.display = 'block';
-                        
-                        receiverBtn.href = `receiver.html?room=${roomId}`;
-                        receiverBtn.style.display = 'inline-block';
+                        if (customRoomId) {
+                            claimSection.style.display = 'none';
+                            activeSection.style.display = 'block';
+                            
+                            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + customRoomId)}`;
+                            receiverBtn.href = `receiver.html?room=${customRoomId}`;
+                        } else {
+                            claimSection.style.display = 'block';
+                            activeSection.style.display = 'none';
+                        }
                     }
                 } catch (e) {
                     console.error("Failed to load persistent room");
                 }
             }
 
+            const claimBtn = document.getElementById('claim-room-btn');
+            if(claimBtn) claimBtn.addEventListener('click', async () => {
+                const roomName = document.getElementById('custom-room-input').value;
+                const pin = document.getElementById('room-pin-input').value;
+                if (!roomName || !pin) return alert('Room Name and PIN required.');
+                
+                claimBtn.disabled = true;
+                try {
+                    const res = await fetch('/api/room/claim', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ customRoomId: roomName, roomPin: pin })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Failed to claim');
+                    fetchPersistentRoom();
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    claimBtn.disabled = false;
+                }
+            });
+
+            let allClips = [];
+            const searchInput = document.getElementById('search-input');
+            if(searchInput) searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = allClips.filter(c => c.content.toLowerCase().includes(term));
+                renderClips(filtered);
+            });
+
             async function fetchClips() {
                 try {
                     const res = await fetch('/api/clips', {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
-                    const clips = await res.json();
-                    renderClips(clips);
+                    allClips = await res.json();
+                    renderClips(allClips);
                 } catch (err) {
                     clipsList.innerHTML = '<div class="empty-state">Error loading clips.</div>';
                 }
