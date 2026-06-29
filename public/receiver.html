@@ -132,7 +132,8 @@
             border-radius: 8px;
             width: 180px;
             height: 180px;
-            background: #f1f5f9;
+            background: #ffffff;
+            padding: 10px;
         }
 
         .status-box {
@@ -323,7 +324,16 @@
             <p id="status"><span class="loader" id="loader"></span> Waiting for connection...</p>
         </div>
 
-        <div class="received-items" id="receivedItems"></div>
+        <div class="received-items" id="receivedItems">
+            <div id="emptyState" style="color: var(--text-secondary); text-align: center; margin-top: 30px; font-style: italic; animation: slideIn 0.5s ease;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.3;">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg><br/>
+                No items received yet.<br/>Scan the QR code to start!
+            </div>
+        </div>
     </div>
 
     <script>
@@ -393,6 +403,9 @@
                 showSuccess("Decryption Failed! Bad Key.");
                 return;
             }
+
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.remove();
 
             const card = document.createElement('div');
             card.className = 'received-card';

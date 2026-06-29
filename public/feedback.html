@@ -224,6 +224,31 @@
             font-style: italic;
         }
 
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .skeleton-line { height: 16px; width: 100%; }
+        .skeleton-line.short { width: 40%; }
+
     </style>
 </head>
 <body>
@@ -242,7 +267,8 @@
         </div>
 
         <div class="feedback-form">
-            <textarea id="feedbackText" placeholder="Share your anonymous thoughts, feature requests, or bugs..."></textarea>
+            <textarea id="feedbackText" placeholder="Share your anonymous thoughts, feature requests, or bugs..." maxlength="500"></textarea>
+            <div id="charCount" style="text-align: right; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 15px; margin-top: -10px;">0 / 500</div>
             <button id="submitBtn" class="submit-btn" onclick="submitFeedback()">Submit Anonymously</button>
         </div>
 
@@ -254,7 +280,15 @@
         </div>
         
         <div class="reviews-list" id="reviewsList">
-            <div class="empty-state">Loading feedback...</div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-line short"></div>
+                <div class="skeleton skeleton-line"></div>
+                <div class="skeleton skeleton-line"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-line short"></div>
+                <div class="skeleton skeleton-line"></div>
+            </div>
         </div>
     </div>
 
@@ -263,6 +297,11 @@
         const reviewsList = document.getElementById('reviewsList');
         const submitBtn = document.getElementById('submitBtn');
         const feedbackText = document.getElementById('feedbackText');
+        const charCount = document.getElementById('charCount');
+
+        feedbackText.addEventListener('input', () => {
+            charCount.textContent = `${feedbackText.value.length} / 500`;
+        });
 
         // Fetch and display reviews on load
         async function loadReviews() {
