@@ -255,7 +255,6 @@
             });
 
             window.deleteClip = async (id) => {
-                if (!confirm("Delete this clip permanently?")) return;
                 try {
                     await fetch(`/api/clips/${id}`, {
                         method: 'DELETE',
