@@ -1,40 +1,37 @@
 /* Dark Mode Overrides */
 body.dark-theme {
     --bg-color: #0f172a;
-    --card-bg: rgba(30, 41, 59, 0.7);
-    --card-border: rgba(255, 255, 255, 0.1);
+    --card-bg: #1e293b;
+    --card-border: #334155;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    --accent-primary: #818cf8;
-    --accent-secondary: #c084fc;
+    --accent-primary: #6366f1;
 }
-body.dark-theme .orb-1 { background: #4f46e5; }
-body.dark-theme .orb-2 { background: #9333ea; }
 
 body.dark-theme input, 
 body.dark-theme textarea, 
 body.dark-theme .status-box, 
 body.dark-theme .received-card,
 body.dark-theme .skeleton-card {
-    background: rgba(0, 0, 0, 0.3) !important;
+    background: #0f172a !important;
     border-color: var(--card-border);
 }
 
 body.dark-theme .qr-wrapper {
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 0 30px rgba(129, 140, 248, 0.2);
+    background: #ffffff;
+    box-shadow: none;
 }
 
 body.dark-theme .back-btn, body.dark-theme .feedback-link {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: #334155;
+    border-color: #475569;
 }
 body.dark-theme .back-btn:hover, body.dark-theme .feedback-link:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #475569;
 }
 
-body.dark-theme .card::before, body.dark-theme .container::before {
-    opacity: 0.7;
+body.dark-theme .skeleton {
+    background: #334155;
 }
 
 /* Theme Toggle Button Styles */
@@ -46,21 +43,19 @@ body.dark-theme .card::before, body.dark-theme .container::before {
     height: 55px;
     border-radius: 50%;
     background: var(--card-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--card-border);
     color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s, color 0.3s;
+    transition: transform 0.2s, background 0.2s, color 0.2s;
 }
 .theme-toggle-btn:hover {
-    transform: scale(1.1) rotate(15deg);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    transform: scale(1.05);
+    background: var(--card-border);
 }
 .theme-toggle-btn:active {
     transform: scale(0.95);

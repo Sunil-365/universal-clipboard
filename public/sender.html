@@ -22,12 +22,11 @@
     <style>
         :root {
             --bg-color: #f1f5f9;
-            --card-bg: rgba(255, 255, 255, 0.65);
-            --card-border: rgba(255, 255, 255, 0.5);
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
             --text-primary: #1e293b;
             --text-secondary: #64748b;
-            --accent-primary: #6366f1;
-            --accent-secondary: #ec4899;
+            --accent-primary: #4f46e5;
             --danger: #ef4444;
             --success: #10b981;
         }
@@ -44,36 +43,15 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            overflow-x: hidden;
-        }
-
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            z-index: -1;
-            opacity: 0.6;
-            animation: float 20s infinite alternate ease-in-out;
-        }
-        .orb-1 { width: 450px; height: 450px; background: #c4b5fd; top: 0%; left: 0%; }
-        .orb-2 { width: 550px; height: 550px; background: #fbcfe8; bottom: 0%; right: 0%; animation-delay: -10s; }
-        
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(100px, 50px) scale(1.1); }
         }
 
         .container {
             background: var(--card-bg);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
             border: 1px solid var(--card-border);
-            border-top: 1px solid rgba(255, 255, 255, 1);
-            border-left: 1px solid rgba(255, 255, 255, 1);
-            border-radius: 24px;
+            border-radius: 16px;
             padding: 30px 40px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,0.4);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             max-width: 400px;
             width: 100%;
             position: relative;
@@ -86,7 +64,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; height: 4px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            background: var(--accent-primary);
         }
 
         h2 {
@@ -94,11 +72,7 @@
             margin-top: 0;
             margin-bottom: 8px;
             font-size: 1.8rem;
-            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
+            color: var(--accent-primary);
         }
 
         p.subtitle {
@@ -111,20 +85,19 @@
             width: 100%;
             padding: 14px 16px; 
             font-size: 16px; 
-            background: rgba(255, 255, 255, 0.7);
+            background: #f8fafc;
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-            border-radius: 12px;
+            border-radius: 8px;
             margin-bottom: 15px;
             outline: none;
             box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: border-color 0.2s;
             font-family: inherit;
         }
 
         input:focus {
             border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
         
         input::placeholder {
@@ -136,12 +109,12 @@
             padding: 14px; 
             font-size: 16px; 
             font-weight: 600;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            background: var(--accent-primary);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+            transition: background 0.2s, transform 0.2s;
             margin-bottom: 10px;
             font-family: inherit;
             display: flex;
@@ -155,27 +128,25 @@
         }
 
         button:hover {
-            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
-            filter: brightness(1.1);
+            background: #4338ca;
         }
 
         button.outline {
-            background: rgba(255, 255, 255, 0.5);
+            background: transparent;
             border: 1px solid var(--accent-primary);
             color: var(--accent-primary);
         }
 
         button.outline:hover {
-            background: rgba(99, 102, 241, 0.1);
-            box-shadow: none;
+            background: #e0e7ff;
         }
         
         button.danger {
-            background: linear-gradient(90deg, var(--danger), #be123c);
+            background: var(--danger);
         }
         
         button.danger:hover {
-            box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.4);
+            background: #dc2626;
         }
 
         .divider {
@@ -200,11 +171,10 @@
         #reader {
             width: 100%;
             margin-top: 20px;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             display: none;
-            background-color: rgba(255,255,255,0.8);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            background-color: var(--card-bg);
             border: 1px solid var(--card-border);
         }
         
@@ -214,11 +184,11 @@
             background: var(--success);
             color: #fff;
             padding: 12px 24px;
-            border-radius: 30px;
+            border-radius: 8px;
             font-weight: 600;
             transform: translateY(150%);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 100;
         }
         
@@ -235,23 +205,22 @@
         }
 
         .back-btn {
-            background: rgba(255, 255, 255, 0.5);
+            background: var(--card-bg);
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 8px 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: background 0.2s;
             flex-shrink: 0;
         }
 
         .back-btn:hover {
-            background: white;
-            transform: scale(1.05);
+            background: #f1f5f9;
         }
         
         .loader-small {
@@ -269,8 +238,6 @@
     <script src="theme.js"></script>
 </head>
 <body>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
 
     <div class="container" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
         <div class="header">
