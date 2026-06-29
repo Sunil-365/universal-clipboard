@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
                 if (decodedUser && decodedUser.isPremium) {
                     const newClip = new Clip({
                         userId: decodedUser.id,
-                        content: data.content
+                        content: data.rawContent || data.content
                     });
                     await newClip.save();
                 }
