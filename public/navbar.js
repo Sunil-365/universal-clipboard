@@ -28,5 +28,20 @@ document.addEventListener('DOMContentLoaded', () => {
         </nav>
     `;
 
+    const footerHtml = `
+        <footer style="margin-top: auto; padding: 40px 20px; border-top: 1px solid var(--card-border); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+            <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                <div>© ${new Date().getFullYear()} DropConnect. All rights reserved.</div>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <a href="contact.html" style="color: var(--text-secondary); text-decoration: none;">Contact Us</a>
+                    <a href="terms.html" style="color: var(--text-secondary); text-decoration: none;">Terms & Conditions</a>
+                    <a href="refund.html" style="color: var(--text-secondary); text-decoration: none;">Refund & Cancellation</a>
+                    <a href="privacy.html" style="color: var(--text-secondary); text-decoration: none;">Privacy Policy</a>
+                </div>
+            </div>
+        </footer>
+    `;
+
     document.body.insertAdjacentHTML('afterbegin', navbarHtml);
+    document.body.insertAdjacentHTML('beforeend', footerHtml);
 });
