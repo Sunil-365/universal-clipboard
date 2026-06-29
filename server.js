@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const User = require('./models/User');
 
 const app = express();
@@ -105,6 +106,8 @@ app.post('/api/reviews', async (req, res) => {
 
 // --- Authentication Middleware & Routes ---
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_dev_mode';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID_HERE';
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -118,6 +121,44 @@ const authenticateToken = (req, res, next) => {
         next();
     });
 };
+
+app.post('/api/auth/google', async (req, res) => {
+    try {
+        const { credential } = req.body;
+        if (!credential) return res.status(400).json({ error: "No credential provided" });
+
+        if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+            return res.status(500).json({ error: "Google Sign-In is not configured on the server." });
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const { email, sub: googleId } = payload;
+
+        if (!MONGODB_URI) return res.status(500).json({ error: "Database not configured" });
+
+        let user = await User.findOne({ email });
+        
+        if (user) {
+            if (!user.googleId) {
+                user.googleId = googleId;
+                await user.save();
+            }
+        } else {
+            user = new User({ email, googleId, authProvider: 'google', isPremium: true });
+            await user.save();
+        }
+
+        const token = jwt.sign({ id: user._id, email: user.email, isPremium: user.isPremium }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { email: user.email, isPremium: user.isPremium } });
+    } catch (err) {
+        console.error("Google Auth Error:", err);
+        res.status(400).json({ error: "Invalid Google token" });
+    }
+});
 
 app.post('/api/register', async (req, res) => {
     try {

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Register</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js"></script>
@@ -36,6 +37,27 @@
     <div class="auth-container">
         <h1 id="form-title">Welcome Back</h1>
         <div class="error-msg" id="error-msg"></div>
+        
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleGoogleResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="continue_with"
+             data-size="large"
+             data-logo_alignment="left"
+             style="display: flex; justify-content: center; margin-bottom: 20px;">
+        </div>
+        <div style="text-align: center; color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
+            or
+        </div>
+
         <form id="auth-form">
             <div class="input-group">
                 <label>Email Address</label>
@@ -52,6 +74,27 @@
     <a href="index.html" class="back">← Back to Home</a>
 
     <script>
+        async function handleGoogleResponse(response) {
+            const errorMsg = document.getElementById('error-msg');
+            try {
+                const res = await fetch('/api/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    errorMsg.innerText = data.error || "Google Auth failed.";
+                } else {
+                    localStorage.setItem('token', data.token);
+                    window.location.href = 'premium.html';
+                }
+            } catch (err) {
+                errorMsg.innerText = "Network error during Google Sign-In.";
+            }
+        }
+
         let isLogin = true;
         const formTitle = document.getElementById('form-title');
         const submitBtn = document.getElementById('submit-btn');
