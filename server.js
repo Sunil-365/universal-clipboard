@@ -139,7 +139,7 @@ app.post('/api/reviews', async (req, res) => {
 
 // --- Authentication Middleware & Routes ---
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_dev_mode';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID_HERE';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '18426025024-722mlcucv7tl8s28sue7dmc9djibkqht.apps.googleusercontent.com';
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const authenticateToken = (req, res, next) => {
@@ -160,9 +160,7 @@ app.post('/api/auth/google', async (req, res) => {
         const { credential } = req.body;
         if (!credential) return res.status(400).json({ error: "No credential provided" });
 
-        if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
-            return res.status(500).json({ error: "Google Sign-In is not configured on the server." });
-        }
+
 
         const ticket = await googleClient.verifyIdToken({
             idToken: credential,
