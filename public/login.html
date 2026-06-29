@@ -88,7 +88,14 @@
                     errorMsg.innerText = data.error || "Google Auth failed.";
                 } else {
                     localStorage.setItem('token', data.token);
-                    window.location.href = 'premium.html';
+                    
+                    const redirect = sessionStorage.getItem('redirectAfterLogin');
+                    if (redirect) {
+                        sessionStorage.removeItem('redirectAfterLogin');
+                        window.location.href = redirect;
+                    } else {
+                        window.location.href = 'premium.html';
+                    }
                 }
             } catch (err) {
                 errorMsg.innerText = "Network error during Google Sign-In.";
@@ -146,7 +153,14 @@
                         const subData = await subRes.json();
                         if (subData.token) localStorage.setItem('token', subData.token);
                     }
-                    window.location.href = 'premium.html';
+                    
+                    const redirect = sessionStorage.getItem('redirectAfterLogin');
+                    if (redirect) {
+                        sessionStorage.removeItem('redirectAfterLogin');
+                        window.location.href = redirect;
+                    } else {
+                        window.location.href = 'premium.html';
+                    }
                 }
             } catch (err) {
                 errorMsg.innerText = "Network error. Please try again.";

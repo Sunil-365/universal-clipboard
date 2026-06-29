@@ -254,7 +254,10 @@
                     E2EE
                 </div>
             </div>
-            <div style="width: 44px; height: 40px;"></div>
+            <div id="auth-status-container" style="display: flex; align-items: center; width: 44px; justify-content: flex-end;">
+                <a href="#" id="headerLoginBtn" style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600; text-decoration: none;">Log In</a>
+                <a href="premium.html" id="headerDashBtn" style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 600; text-decoration: none; display: none;">Dash</a>
+            </div>
         </div>
         <p class="subtitle">Secure session established. Enter text or scan a URL to transmit.</p>
         
@@ -322,9 +325,27 @@
         // Premium Section Check
         const premiumSection = document.getElementById('premium-upload-section');
         const token = localStorage.getItem('token');
+        const headerLoginBtn = document.getElementById('headerLoginBtn');
+        const headerDashBtn = document.getElementById('headerDashBtn');
+
         if (token) {
             premiumSection.style.display = 'block';
+            headerLoginBtn.style.display = 'none';
+            headerDashBtn.style.display = 'inline-block';
+        } else {
+            premiumSection.style.display = 'block';
+            premiumSection.innerHTML = `
+                <div class="divider" style="margin: 10px 0;">Premium</div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px;">Log in to unlock File Sharing and Auto-History!</div>
+                <button class="btn outline" style="border-color: #f59e0b; color: #f59e0b;" onclick="document.getElementById('headerLoginBtn').click()">Log In to Unlock</button>
+            `;
         }
+
+        headerLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            sessionStorage.setItem('redirectAfterLogin', window.location.href);
+            window.location.href = 'login.html';
+        });
 
         function showToast(message) {
             toast.textContent = message;

@@ -396,7 +396,14 @@
             if (data.type === 'file') {
                 showSuccess("File Received!");
                 btn.textContent = 'Download File';
-                btn.onclick = () => window.open(data.content, '_blank');
+                btn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = data.content;
+                    a.download = data.filename || 'download';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
                 contentDiv.textContent = '📁 ' + (data.filename || 'File');
             } else if (data.type === 'url') {
                 showSuccess("URL Received!");
