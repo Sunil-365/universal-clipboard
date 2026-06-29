@@ -44,6 +44,12 @@
         .received-items { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-right: 5px; max-height: 250px; text-align: left; margin-top: 15px; width: 100%; box-sizing: border-box; }
         .received-card { background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; text-align: left; width: 100%; box-sizing: border-box; }
         .received-content { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 15px; color: var(--text-primary); font-weight: 500; font-size: 0.95rem; }
+        
+        .space-item { padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); cursor: pointer; transition: all 0.2s; background: var(--bg-color); display: flex; justify-content: space-between; align-items: center; color: var(--text-primary); font-weight: 500;}
+        .space-item:hover { border-color: var(--accent-primary); }
+        .space-item.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+        .space-delete { background: none; border: none; color: inherit; cursor: pointer; opacity: 0.7; padding: 5px; }
+        .space-delete:hover { opacity: 1; color: var(--danger); }
     </style>
 </head>
 <body>
@@ -59,19 +65,24 @@
             <button class="btn btn-outline" id="logout-btn" style="width: auto; padding: 8px 16px; font-size: 0.9rem;">Log Out</button>
         </div>
 
-        <div class="dashboard-grid" style="display: flex; justify-content: center;">
-            <div class="dashboard-card">
-                <h3 style="text-align: center;">Persistent Desk Display</h3>
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: minmax(200px, 250px) 1fr; gap: 20px;">
+            <div class="dashboard-card" style="padding: 20px;">
+                <h3 style="margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; text-align: center;">My Spaces</h3>
+                <div id="spaces-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                    <!-- Spaces injected here -->
+                </div>
+                <button class="btn btn-outline" id="new-space-btn" style="width: 100%; font-size: 0.9rem; padding: 8px;">+ Create New Space</button>
+            </div>
+            <div class="dashboard-card" id="space-view-card">
+                <h3 id="active-space-title" style="text-align: center;">Select a Space</h3>
                 <div id="room-claim-section" style="display: none; flex: 1; flex-direction: column; justify-content: center; width: 100%; max-width: 400px; margin: 0 auto;">
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; text-align: center;">Claim a custom room URL to display on your monitor.</p>
                     <input type="text" id="custom-room-input" placeholder="Room ID (e.g. OfficeMac)" style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--bg-color); font-family: inherit; box-sizing: border-box; color: var(--text-primary); outline: none;">
                     <button class="btn" id="claim-room-btn" style="width: 100%;">Save Room ID</button>
-                    <button class="btn btn-outline" id="cancel-claim-btn" style="width: 100%; margin-top: 10px; display: none;">Cancel</button>
                 </div>
                 <div id="room-active-section" style="display: none; text-align: center; flex: 1; flex-direction: column; justify-content: center; align-items: center;">
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Leave this open. The QR code never expires.</p>
                     <img id="persistent-qr" src="" alt="QR Code" style="width: 140px; height: 140px; margin-bottom: 15px; border-radius: 8px; padding: 10px; background: white; border: 1px solid var(--card-border);">
-                    <button class="btn btn-outline" id="change-room-btn" style="padding: 6px 12px; font-size: 0.85rem; width: auto; margin-bottom: 20px;">Change Room ID</button>
                     <div style="width: 100%; border-top: 1px solid var(--card-border); margin-top: 10px; padding-top: 15px;">
                         <div class="received-items" id="dashboard-receiver">
                             <div id="dashboard-empty" style="color: var(--text-secondary); text-align: center; font-style: italic; font-size: 0.9rem;">
@@ -138,94 +149,150 @@
                 window.location.href = 'index.html';
             });
 
+            let customRooms = [];
+            let currentActiveRoom = null;
+
             async function fetchPersistentRoom() {
                 try {
                     const roomRes = await fetch('/api/room', { headers: { 'Authorization': `Bearer ${token}` }});
                     if (roomRes.ok) {
-                        const { customRoomId } = await roomRes.json();
-                        const claimSection = document.getElementById('room-claim-section');
-                        const activeSection = document.getElementById('room-active-section');
-                        const qrImg = document.getElementById('persistent-qr');
-                        const changeBtn = document.getElementById('change-room-btn');
-                        const cancelBtn = document.getElementById('cancel-claim-btn');
-                        const inputField = document.getElementById('custom-room-input');
+                        const { customRoomIds } = await roomRes.json();
+                        customRooms = customRoomIds || [];
                         
-                        if (customRoomId) {
-                            claimSection.style.display = 'none';
-                            activeSection.style.display = 'flex';
-                            cancelBtn.style.display = 'block';
-                            inputField.value = customRoomId;
-                            
-                            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + customRoomId)}`;
-                            
-                            changeBtn.onclick = () => {
-                                activeSection.style.display = 'none';
-                                claimSection.style.display = 'flex';
-                            };
-                            cancelBtn.onclick = () => {
-                                claimSection.style.display = 'none';
-                                activeSection.style.display = 'flex';
-                            };
-                            
-                            // Initialize integrated receiver
-                            if (!window.roomSocket) {
-                                window.roomSocket = io();
-                                window.roomSocket.emit('join-room', customRoomId);
-                                
-                                window.roomSocket.on('receive-data', async (data) => {
-                                    const bytes = CryptoJS.AES.decrypt(data.content, customRoomId);
-                                    const originalText = bytes.toString(CryptoJS.enc.Utf8);
-                                    
-                                    if (originalText) {
-                                        // Auto-copy to clipboard
-                                        try {
-                                            await navigator.clipboard.writeText(originalText);
-                                        } catch (e) {
-                                            console.error("Auto-copy failed:", e);
-                                        }
-
-                                        const receiverBox = document.getElementById('dashboard-receiver');
-                                        const empty = document.getElementById('dashboard-empty');
-                                        if(empty) empty.style.display = 'none';
-                                        
-                                        const card = document.createElement('div');
-                                        card.className = 'received-card';
-                                        
-                                        const contentDiv = document.createElement('div');
-                                        contentDiv.className = 'received-content';
-                                        
-                                        if (data.type === 'url') {
-                                            contentDiv.innerHTML = `<a href="${originalText}" target="_blank" style="color: var(--accent-primary);">${originalText}</a>`;
-                                        } else {
-                                            contentDiv.textContent = originalText;
-                                        }
-                                        
-                                        const copyBtn = document.createElement('button');
-                                        copyBtn.className = 'btn';
-                                        copyBtn.style.padding = '6px 12px';
-                                        copyBtn.style.width = 'auto';
-                                        copyBtn.style.fontSize = '0.85rem';
-                                        copyBtn.innerHTML = 'Copy';
-                                        copyBtn.onclick = () => {
-                                            navigator.clipboard.writeText(originalText);
-                                            copyBtn.innerHTML = 'Copied!';
-                                            setTimeout(() => copyBtn.innerHTML = 'Copy', 2000);
-                                        };
-                                        
-                                        card.appendChild(contentDiv);
-                                        card.appendChild(copyBtn);
-                                        
-                                        receiverBox.insertBefore(card, receiverBox.firstChild);
-                                    }
-                                });
-                            }
-                        } else {
-                            claimSection.style.display = 'flex';
-                            activeSection.style.display = 'none';
+                        // If active room was deleted, reset
+                        if (currentActiveRoom && !customRooms.includes(currentActiveRoom)) {
+                            currentActiveRoom = null;
                         }
+                        
+                        // Default to first room if none selected
+                        if (!currentActiveRoom && customRooms.length > 0) {
+                            currentActiveRoom = customRooms[0];
+                        }
+                        
+                        renderSpaces();
+                        activateRoomView();
                     }
                 } catch (e) {
-                    console.error("Failed to load persistent room");
+                    console.error("Failed to load spaces");
+                }
+            }
+            
+            function renderSpaces() {
+                const spacesList = document.getElementById('spaces-list');
+                if (customRooms.length === 0) {
+                    spacesList.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.85rem; text-align: center;">No spaces yet.</div>';
+                    return;
+                }
+                
+                spacesList.innerHTML = customRooms.map(roomId => `
+                    <div class="space-item ${roomId === currentActiveRoom ? 'active' : ''}" onclick="selectSpace('${roomId}')">
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${roomId}</span>
+                        <button class="space-delete" onclick="event.stopPropagation(); deleteSpace('${roomId}')">×</button>
+                    </div>
+                `).join('');
+            }
+            
+            window.selectSpace = (roomId) => {
+                currentActiveRoom = roomId;
+                renderSpaces();
+                activateRoomView();
+            };
+            
+            window.deleteSpace = async (roomId) => {
+                if(!confirm(`Delete space "${roomId}"?`)) return;
+                try {
+                    await fetch(`/api/room/${roomId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
+                    if (window.roomSocket && currentActiveRoom === roomId) {
+                        window.roomSocket.disconnect();
+                        window.roomSocket = null;
+                    }
+                    fetchPersistentRoom();
+                } catch (e) {
+                    alert("Error deleting space");
+                }
+            };
+            
+            document.getElementById('new-space-btn').addEventListener('click', () => {
+                if (customRooms.length >= 5) return alert("Maximum of 5 spaces allowed.");
+                currentActiveRoom = null;
+                renderSpaces();
+                activateRoomView();
+            });
+
+            function activateRoomView() {
+                const claimSection = document.getElementById('room-claim-section');
+                const activeSection = document.getElementById('room-active-section');
+                const qrImg = document.getElementById('persistent-qr');
+                const title = document.getElementById('active-space-title');
+                const inputField = document.getElementById('custom-room-input');
+                
+                if (currentActiveRoom) {
+                    title.innerText = "Space: " + currentActiveRoom;
+                    claimSection.style.display = 'none';
+                    activeSection.style.display = 'flex';
+                    
+                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + currentActiveRoom)}`;
+                    
+                    // Reset receiver UI
+                    document.getElementById('dashboard-receiver').innerHTML = '<div id="dashboard-empty" style="color: var(--text-secondary); text-align: center; font-style: italic; font-size: 0.9rem;">Waiting for incoming items...</div>';
+
+                    // Reconnect socket for new room
+                    if (window.roomSocket) {
+                        window.roomSocket.disconnect();
+                        window.roomSocket = null;
+                    }
+                    
+                    window.roomSocket = io();
+                    window.roomSocket.emit('join-room', currentActiveRoom);
+                    
+                    window.roomSocket.on('receive-data', async (data) => {
+                        const bytes = CryptoJS.AES.decrypt(data.content, currentActiveRoom);
+                        const originalText = bytes.toString(CryptoJS.enc.Utf8);
+                        
+                        if (originalText) {
+                            try {
+                                await navigator.clipboard.writeText(originalText);
+                            } catch (e) { console.error("Auto-copy failed:", e); }
+
+                            const receiverBox = document.getElementById('dashboard-receiver');
+                            const empty = document.getElementById('dashboard-empty');
+                            if(empty) empty.style.display = 'none';
+                            
+                            const card = document.createElement('div');
+                            card.className = 'received-card';
+                            
+                            const contentDiv = document.createElement('div');
+                            contentDiv.className = 'received-content';
+                            
+                            if (data.type === 'url') {
+                                contentDiv.innerHTML = `<a href="${originalText}" target="_blank" style="color: var(--accent-primary);">${originalText}</a>`;
+                            } else {
+                                contentDiv.textContent = originalText;
+                            }
+                            
+                            const copyBtn = document.createElement('button');
+                            copyBtn.className = 'btn';
+                            copyBtn.style.padding = '6px 12px';
+                            copyBtn.style.width = 'auto';
+                            copyBtn.style.fontSize = '0.85rem';
+                            copyBtn.innerHTML = 'Copy';
+                            copyBtn.onclick = () => {
+                                navigator.clipboard.writeText(originalText);
+                                copyBtn.innerHTML = 'Copied!';
+                                setTimeout(() => copyBtn.innerHTML = 'Copy', 2000);
+                            };
+                            
+                            card.appendChild(contentDiv);
+                            card.appendChild(copyBtn);
+                            receiverBox.insertBefore(card, receiverBox.firstChild);
+                        }
+                    });
+                    
+                } else {
+                    title.innerText = "Create New Space";
+                    claimSection.style.display = 'flex';
+                    activeSection.style.display = 'none';
+                    inputField.value = '';
                 }
             }
 
@@ -245,12 +312,7 @@
                     const data = await res.json();
                     if (!res.ok) throw new Error(data.error || 'Failed to claim');
                     
-                    if (window.roomSocket) {
-                        window.roomSocket.disconnect();
-                        window.roomSocket = null;
-                        document.getElementById('dashboard-receiver').innerHTML = '<div id="dashboard-empty" style="color: var(--text-secondary); text-align: center; font-style: italic; font-size: 0.9rem;">Waiting for incoming items...</div>';
-                    }
-
+                    currentActiveRoom = roomName;
                     fetchPersistentRoom();
                 } catch (err) {
                     alert(err.message);
@@ -300,35 +362,6 @@
                     </div>
                 `).join('');
             }
-
-            saveBtn.addEventListener('click', async () => {
-                const content = clipInput.value.trim();
-                if (!content) return;
-
-                saveBtn.disabled = true;
-                saveBtn.innerText = "Saving...";
-
-                try {
-                    const res = await fetch('/api/clips', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ content })
-                    });
-                    
-                    if (res.ok) {
-                        clipInput.value = '';
-                        fetchClips();
-                    }
-                } catch (err) {
-                    alert("Failed to save clip.");
-                } finally {
-                    saveBtn.disabled = false;
-                    saveBtn.innerText = "Save to Cloud";
-                }
-            });
 
             window.deleteClip = async (id) => {
                 try {

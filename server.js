@@ -317,16 +317,25 @@ app.post('/api/room/claim', authenticateToken, async (req, res) => {
         if (cleanRoomId.length < 3) return res.status(400).json({ error: "Room name must be at least 3 alphanumeric characters." });
 
         // Check if room is already taken by someone else
-        const existing = await User.findOne({ customRoomId: cleanRoomId });
+        const existing = await User.findOne({ customRoomIds: cleanRoomId });
         if (existing && existing._id.toString() !== req.user.id) {
             return res.status(400).json({ error: "Room name already taken." });
         }
 
         let user = await User.findById(req.user.id);
-        user.customRoomId = cleanRoomId;
-        await user.save();
         
-        res.json({ message: "Room claimed successfully!", customRoomId: user.customRoomId });
+        // Prevent exceeding limit
+        if (user.customRoomIds.length >= 5) {
+            return res.status(400).json({ error: "Maximum of 5 spaces allowed." });
+        }
+        
+        // Add if not already present
+        if (!user.customRoomIds.includes(cleanRoomId)) {
+            user.customRoomIds.push(cleanRoomId);
+            await user.save();
+        }
+        
+        res.json({ message: "Room claimed successfully!", customRoomIds: user.customRoomIds });
     } catch (err) {
         console.error("Room claim error:", err);
         res.status(500).json({ error: "Server error" });
@@ -338,7 +347,20 @@ app.get('/api/room', authenticateToken, async (req, res) => {
     try {
         if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
         let user = await User.findById(req.user.id);
-        res.json({ customRoomId: user.customRoomId || null });
+        res.json({ customRoomIds: user.customRoomIds || [] });
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+// Endpoint to delete a room
+app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+        let user = await User.findById(req.user.id);
+        user.customRoomIds = user.customRoomIds.filter(id => id !== req.params.roomId);
+        await user.save();
+        res.json({ success: true, customRoomIds: user.customRoomIds });
     } catch (err) {
         res.status(500).json({ error: "Server error" });
     }

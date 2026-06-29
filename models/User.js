@@ -25,10 +25,9 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    customRoomId: {
-        type: String,
-        unique: true,
-        sparse: true
+    customRoomIds: {
+        type: [String],
+        default: []
     },
     createdAt: {
         type: Date,
