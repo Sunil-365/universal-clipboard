@@ -143,7 +143,9 @@
                         const qrImg = document.getElementById('persistent-qr');
                         const receiverBtn = document.getElementById('open-receiver-btn');
                         
-                        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + roomId)}`;
+                        // Use the same static key format defined in receiver.html
+                        const staticKey = roomId + "_static_key";
+                        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + roomId + '#key=' + staticKey)}`;
                         qrImg.style.display = 'block';
                         
                         receiverBtn.href = `receiver.html?room=${roomId}`;
