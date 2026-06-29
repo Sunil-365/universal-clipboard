@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
+    <script src="theme.js"></script>
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent-primary: #4f46e5;
+            --success: #10b981;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var(--text-primary); margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .dashboard { width: 100%; max-width: 800px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; background: var(--card-bg); padding: 20px 30px; border-radius: 16px; border: 1px solid var(--card-border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+        .badge { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .logout-btn { background: transparent; border: 1px solid var(--card-border); color: var(--text-secondary); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+        .logout-btn:hover { background: #f8fafc; color: var(--text-primary); }
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .card h3 { margin-top: 0; font-size: 1.2rem; color: var(--text-primary); margin-bottom: 15px; }
+        .card p { color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 20px; }
+        .btn { display: inline-block; padding: 10px 20px; background: var(--accent-primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.2s; text-align: center; }
+        .btn:hover { background: #4338ca; }
+        #auth-guard { display: none; text-align: center; margin-top: 100px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid var(--card-border); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    
+    <div id="auth-guard">
+        <div class="spinner"></div>
+        <h2>Authenticating...</h2>
+    </div>
+
+    <div class="dashboard" id="dashboard" style="display: none;">
+        <div class="header">
+            <h1>My Dashboard <span class="badge">Premium</span></h1>
+            <button class="logout-btn" id="logout-btn">Log Out</button>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3>Welcome to Premium!</h3>
+                <p>Thank you for subscribing. You now have access to permanent clipboard history, end-to-end encryption, and unlimited character limits across all your connected devices.</p>
+                <a href="index.html" class="btn">Go to App</a>
+            </div>
+            
+            <div class="card">
+                <h3>Clipboard History (Coming Soon)</h3>
+                <p>We are currently rolling out the permanent history feature to your region. Soon, all your clips will be safely stored here for you to access anytime.</p>
+                <button class="btn" style="background: var(--card-border); color: var(--text-secondary); cursor: not-allowed;">View History</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const authGuard = document.getElementById('auth-guard');
+            const dashboard = document.getElementById('dashboard');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            authGuard.style.display = 'block';
+
+            try {
+                const res = await fetch('/api/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!res.ok) {
+                    throw new Error("Invalid token");
+                }
+                
+                const user = await res.json();
+                
+                if (!user.isPremium) {
+                    window.location.href = 'pricing.html';
+                    return;
+                }
+
+                authGuard.style.display = 'none';
+                dashboard.style.display = 'block';
+
+            } catch (err) {
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('token');
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>

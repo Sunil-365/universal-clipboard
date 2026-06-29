@@ -5,6 +5,10 @@ const http = require('http');
 const { Server } = require("socket.io");
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('./models/User');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const server = http.createServer(app);
@@ -96,6 +100,89 @@ app.post('/api/reviews', async (req, res) => {
     } catch (err) {
         console.error("Error saving review:", err);
         res.status(500).json({ error: "Failed to save review" });
+    }
+});
+// -----------------------
+
+// --- Authentication Middleware & Routes ---
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_dev_mode';
+
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    
+    if (!token) return res.status(401).json({ error: "Access denied. No token provided." });
+    
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ error: "Invalid or expired token." });
+        req.user = user; 
+        next();
+    });
+};
+
+app.post('/api/register', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) return res.status(400).json({ error: "Email and password required" });
+        if (!MONGODB_URI) return res.status(500).json({ error: "Database not configured" });
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) return res.status(400).json({ error: "User already exists" });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({ email, password: hashedPassword });
+        await user.save();
+        
+        const token = jwt.sign({ id: user._id, email: user.email, isPremium: user.isPremium }, JWT_SECRET, { expiresIn: '7d' });
+        res.status(201).json({ token, user: { email: user.email, isPremium: user.isPremium } });
+    } catch (err) {
+        console.error("Register error:", err);
+        res.status(500).json({ error: "Server error during registration" });
+    }
+});
+
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) return res.status(400).json({ error: "Email and password required" });
+        if (!MONGODB_URI) return res.status(500).json({ error: "Database not configured" });
+
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ error: "Invalid credentials" });
+
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) return res.status(400).json({ error: "Invalid credentials" });
+
+        const token = jwt.sign({ id: user._id, email: user.email, isPremium: user.isPremium }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { email: user.email, isPremium: user.isPremium } });
+    } catch (err) {
+        console.error("Login error:", err);
+        res.status(500).json({ error: "Server error during login" });
+    }
+});
+
+app.get('/api/me', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) return res.status(404).json({ error: "User not found" });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+app.post('/api/subscribe', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ error: "User not found" });
+        
+        user.isPremium = true;
+        await user.save();
+        
+        const token = jwt.sign({ id: user._id, email: user.email, isPremium: user.isPremium }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ message: "Successfully subscribed to Premium!", token, user: { email: user.email, isPremium: true } });
+    } catch (err) {
+        res.status(500).json({ error: "Server error during subscription" });
     }
 });
 // -----------------------
