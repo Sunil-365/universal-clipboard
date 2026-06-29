@@ -59,23 +59,19 @@
             <button class="btn btn-outline" id="logout-btn" style="width: auto; padding: 8px 16px; font-size: 0.9rem;">Log Out</button>
         </div>
 
-        <div class="dashboard-grid">
-            <div class="dashboard-card">
-                <h3>Cloud Clipboard</h3>
-                <textarea id="clip-input" placeholder="Paste or type something to permanently save to your account..."></textarea>
-                <button class="btn" id="save-btn">Save to Cloud</button>
-            </div>
-            
+        <div class="dashboard-grid" style="display: flex; justify-content: center;">
             <div class="dashboard-card">
                 <h3 style="text-align: center;">Persistent Desk Display</h3>
-                <div id="room-claim-section" style="display: none; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <div id="room-claim-section" style="display: none; flex: 1; flex-direction: column; justify-content: center; width: 100%; max-width: 400px; margin: 0 auto;">
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; text-align: center;">Claim a custom room URL to display on your monitor.</p>
                     <input type="text" id="custom-room-input" placeholder="Room ID (e.g. OfficeMac)" style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--bg-color); font-family: inherit; box-sizing: border-box; color: var(--text-primary); outline: none;">
-                    <button class="btn" id="claim-room-btn" style="width: 100%;">Claim Room</button>
+                    <button class="btn" id="claim-room-btn" style="width: 100%;">Save Room ID</button>
+                    <button class="btn btn-outline" id="cancel-claim-btn" style="width: 100%; margin-top: 10px; display: none;">Cancel</button>
                 </div>
-                <div id="room-active-section" style="display: none; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div id="room-active-section" style="display: none; text-align: center; flex: 1; flex-direction: column; justify-content: center; align-items: center;">
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">Leave this open. The QR code never expires.</p>
-                    <img id="persistent-qr" src="" alt="QR Code" style="width: 140px; height: 140px; margin-bottom: 20px; border-radius: 8px; padding: 10px; background: white; border: 1px solid var(--card-border);">
+                    <img id="persistent-qr" src="" alt="QR Code" style="width: 140px; height: 140px; margin-bottom: 15px; border-radius: 8px; padding: 10px; background: white; border: 1px solid var(--card-border);">
+                    <button class="btn btn-outline" id="change-room-btn" style="padding: 6px 12px; font-size: 0.85rem; width: auto; margin-bottom: 20px;">Change Room ID</button>
                     <div style="width: 100%; border-top: 1px solid var(--card-border); margin-top: 10px; padding-top: 15px;">
                         <div class="received-items" id="dashboard-receiver">
                             <div id="dashboard-empty" style="color: var(--text-secondary); text-align: center; font-style: italic; font-size: 0.9rem;">
@@ -105,8 +101,6 @@
             const authGuard = document.getElementById('auth-guard');
             const dashboard = document.getElementById('dashboard');
             const logoutBtn = document.getElementById('logout-btn');
-            const saveBtn = document.getElementById('save-btn');
-            const clipInput = document.getElementById('clip-input');
             const clipsList = document.getElementById('clips-list');
             const clipCount = document.getElementById('clip-count');
             
@@ -152,12 +146,26 @@
                         const claimSection = document.getElementById('room-claim-section');
                         const activeSection = document.getElementById('room-active-section');
                         const qrImg = document.getElementById('persistent-qr');
+                        const changeBtn = document.getElementById('change-room-btn');
+                        const cancelBtn = document.getElementById('cancel-claim-btn');
+                        const inputField = document.getElementById('custom-room-input');
                         
                         if (customRoomId) {
                             claimSection.style.display = 'none';
                             activeSection.style.display = 'flex';
+                            cancelBtn.style.display = 'block';
+                            inputField.value = customRoomId;
                             
                             qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + customRoomId)}`;
+                            
+                            changeBtn.onclick = () => {
+                                activeSection.style.display = 'none';
+                                claimSection.style.display = 'flex';
+                            };
+                            cancelBtn.onclick = () => {
+                                claimSection.style.display = 'none';
+                                activeSection.style.display = 'flex';
+                            };
                             
                             // Initialize integrated receiver
                             if (!window.roomSocket) {
@@ -227,7 +235,7 @@
                 if (!roomName) return alert('Room Name required.');
                 
                 claimBtn.disabled = true;
-                claimBtn.innerText = "Claiming...";
+                claimBtn.innerText = "Saving...";
                 try {
                     const res = await fetch('/api/room/claim', {
                         method: 'POST',
@@ -236,12 +244,19 @@
                     });
                     const data = await res.json();
                     if (!res.ok) throw new Error(data.error || 'Failed to claim');
+                    
+                    if (window.roomSocket) {
+                        window.roomSocket.disconnect();
+                        window.roomSocket = null;
+                        document.getElementById('dashboard-receiver').innerHTML = '<div id="dashboard-empty" style="color: var(--text-secondary); text-align: center; font-style: italic; font-size: 0.9rem;">Waiting for incoming items...</div>';
+                    }
+
                     fetchPersistentRoom();
                 } catch (err) {
                     alert(err.message);
                 } finally {
                     claimBtn.disabled = false;
-                    claimBtn.innerText = "Claim Room";
+                    claimBtn.innerText = "Save Room ID";
                 }
             });
 
