@@ -15,21 +15,36 @@
             --text-primary: #1e293b;
             --text-secondary: #64748b;
             --accent-primary: #4f46e5;
-            --success: #10b981;
+            --danger: #ef4444;
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var(--text-primary); margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }
         .dashboard { width: 100%; max-width: 800px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; background: var(--card-bg); padding: 20px 30px; border-radius: 16px; border: 1px solid var(--card-border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: var(--card-bg); padding: 20px 30px; border-radius: 16px; border: 1px solid var(--card-border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
         .badge { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
         .logout-btn { background: transparent; border: 1px solid var(--card-border); color: var(--text-secondary); padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
         .logout-btn:hover { background: #f8fafc; color: var(--text-primary); }
-        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .card h3 { margin-top: 0; font-size: 1.2rem; color: var(--text-primary); margin-bottom: 15px; }
-        .card p { color: var(--text-secondary); line-height: 1.5; font-size: 0.95rem; margin-bottom: 20px; }
-        .btn { display: inline-block; padding: 10px 20px; background: var(--accent-primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.2s; text-align: center; }
+        
+        .input-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        textarea { width: 100%; height: 100px; padding: 15px; font-size: 1rem; border: 1px solid var(--card-border); border-radius: 8px; resize: vertical; box-sizing: border-box; font-family: inherit; margin-bottom: 15px; background: var(--bg-color); color: var(--text-primary); }
+        textarea:focus { outline: none; border-color: var(--accent-primary); }
+        .btn { display: inline-block; padding: 12px 24px; background: var(--accent-primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .btn:hover { background: #4338ca; }
+        
+        .clips-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .clips-header h2 { margin: 0; font-size: 1.4rem; color: var(--text-primary); }
+        
+        .clips-list { display: flex; flex-direction: column; gap: 15px; }
+        .clip-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; position: relative; transition: transform 0.2s; }
+        .clip-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .clip-content { font-size: 1rem; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; margin: 0 0 15px 0; font-family: inherit; }
+        .clip-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-secondary); }
+        .clip-actions button { background: transparent; border: 1px solid var(--card-border); padding: 5px 10px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 0.85rem; margin-left: 5px; transition: all 0.2s; }
+        .clip-actions button:hover { background: #f8fafc; color: var(--text-primary); }
+        .clip-actions button.delete:hover { color: var(--danger); border-color: var(--danger); background: #fef2f2; }
+        
+        .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
+        
         #auth-guard { display: none; text-align: center; margin-top: 100px; }
         .spinner { width: 40px; height: 40px; border: 4px solid var(--card-border); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -45,21 +60,24 @@
     <div class="dashboard" id="dashboard" style="display: none;">
         <div class="header">
             <h1>My Dashboard <span class="badge">Premium</span></h1>
-            <button class="logout-btn" id="logout-btn">Log Out</button>
+            <div>
+                <a href="index.html" class="logout-btn" style="text-decoration:none; margin-right: 10px;">Home</a>
+                <button class="logout-btn" id="logout-btn">Log Out</button>
+            </div>
         </div>
 
-        <div class="content-grid">
-            <div class="card">
-                <h3>Welcome to Premium!</h3>
-                <p>Thank you for subscribing. You now have access to permanent clipboard history, end-to-end encryption, and unlimited character limits across all your connected devices.</p>
-                <a href="index.html" class="btn">Go to App</a>
-            </div>
-            
-            <div class="card">
-                <h3>Clipboard History (Coming Soon)</h3>
-                <p>We are currently rolling out the permanent history feature to your region. Soon, all your clips will be safely stored here for you to access anytime.</p>
-                <button class="btn" style="background: var(--card-border); color: var(--text-secondary); cursor: not-allowed;">View History</button>
-            </div>
+        <div class="input-card">
+            <textarea id="clip-input" placeholder="Paste or type something to permanently save to your account..."></textarea>
+            <button class="btn" id="save-btn">Save to Cloud</button>
+        </div>
+
+        <div class="clips-header">
+            <h2>Permanent History</h2>
+            <span id="clip-count" style="color: var(--text-secondary); font-size: 0.9rem;"></span>
+        </div>
+        
+        <div class="clips-list" id="clips-list">
+            <div class="spinner"></div>
         </div>
     </div>
 
@@ -68,6 +86,10 @@
             const authGuard = document.getElementById('auth-guard');
             const dashboard = document.getElementById('dashboard');
             const logoutBtn = document.getElementById('logout-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const clipInput = document.getElementById('clip-input');
+            const clipsList = document.getElementById('clips-list');
+            const clipCount = document.getElementById('clip-count');
             
             const token = localStorage.getItem('token');
             if (!token) {
@@ -81,11 +103,7 @@
                 const res = await fetch('/api/me', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
-                if (!res.ok) {
-                    throw new Error("Invalid token");
-                }
-                
+                if (!res.ok) throw new Error("Invalid token");
                 const user = await res.json();
                 
                 if (!user.isPremium) {
@@ -95,7 +113,7 @@
 
                 authGuard.style.display = 'none';
                 dashboard.style.display = 'block';
-
+                fetchClips();
             } catch (err) {
                 localStorage.removeItem('token');
                 window.location.href = 'login.html';
@@ -105,6 +123,104 @@
                 localStorage.removeItem('token');
                 window.location.href = 'index.html';
             });
+
+            async function fetchClips() {
+                try {
+                    const res = await fetch('/api/clips', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const clips = await res.json();
+                    renderClips(clips);
+                } catch (err) {
+                    clipsList.innerHTML = '<div class="empty-state">Error loading clips.</div>';
+                }
+            }
+
+            function renderClips(clips) {
+                clipCount.innerText = `${clips.length} saved`;
+                if (clips.length === 0) {
+                    clipsList.innerHTML = '<div class="empty-state">No saved clips yet. Start typing above!</div>';
+                    return;
+                }
+
+                clipsList.innerHTML = clips.map(clip => `
+                    <div class="clip-card" id="clip-${clip._id}">
+                        <pre class="clip-content">${escapeHTML(clip.content)}</pre>
+                        <div class="clip-meta">
+                            <span>${new Date(clip.createdAt).toLocaleString()}</span>
+                            <div class="clip-actions">
+                                <button onclick="copyClip('${escapeHTML(clip.content.replace(/'/g, "\\'").replace(/\n/g, '\\n'))}')">Copy</button>
+                                <button class="delete" onclick="deleteClip('${clip._id}')">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            saveBtn.addEventListener('click', async () => {
+                const content = clipInput.value.trim();
+                if (!content) return;
+
+                saveBtn.disabled = true;
+                saveBtn.innerText = "Saving...";
+
+                try {
+                    const res = await fetch('/api/clips', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ content })
+                    });
+                    
+                    if (res.ok) {
+                        clipInput.value = '';
+                        fetchClips();
+                    }
+                } catch (err) {
+                    alert("Failed to save clip.");
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = "Save to Cloud";
+                }
+            });
+
+            window.deleteClip = async (id) => {
+                if (!confirm("Delete this clip permanently?")) return;
+                try {
+                    await fetch(`/api/clips/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    fetchClips();
+                } catch (err) {
+                    alert("Failed to delete clip.");
+                }
+            };
+
+            window.copyClip = (text) => {
+                // Decode HTML entities before copying
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = text;
+                navigator.clipboard.writeText(textarea.value).then(() => {
+                    alert("Copied to clipboard!");
+                }).catch(() => {
+                    alert("Failed to copy.");
+                });
+            };
+
+            function escapeHTML(str) {
+                return str.replace(/[&<>'"]/g, 
+                    tag => ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        "'": '&#39;',
+                        '"': '&quot;'
+                    }[tag])
+                );
+            }
         });
     </script>
 </body>

@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('./models/User');
+const Clip = require('./models/Clip');
 
 const app = express();
 const server = http.createServer(app);
@@ -223,6 +224,50 @@ app.post('/api/subscribe', authenticateToken, async (req, res) => {
         res.json({ message: "Successfully subscribed to Premium!", token, user: { email: user.email, isPremium: true } });
     } catch (err) {
         res.status(500).json({ error: "Server error during subscription" });
+    }
+});
+// --- Premium Clip History Routes ---
+app.get('/api/clips', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+        const clips = await Clip.find({ userId: req.user.id }).sort({ createdAt: -1 }).limit(100);
+        res.json(clips);
+    } catch (err) {
+        console.error("Error fetching clips:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+app.post('/api/clips', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+        const { content } = req.body;
+        if (!content || content.trim().length === 0) return res.status(400).json({ error: "Content cannot be empty" });
+        
+        const newClip = new Clip({
+            userId: req.user.id,
+            content: content.trim()
+        });
+        await newClip.save();
+        res.status(201).json(newClip);
+    } catch (err) {
+        console.error("Error saving clip:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+app.delete('/api/clips/:id', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+        const clipId = req.params.id;
+        
+        const deletedClip = await Clip.findOneAndDelete({ _id: clipId, userId: req.user.id });
+        if (!deletedClip) return res.status(404).json({ error: "Clip not found or unauthorized" });
+        
+        res.json({ message: "Clip deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting clip:", err);
+        res.status(500).json({ error: "Server error" });
     }
 });
 // -----------------------
