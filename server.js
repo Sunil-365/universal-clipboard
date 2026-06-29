@@ -82,6 +82,7 @@ io.on('connection', (socket) => {
 
 // --- Feedback System ---
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -184,9 +185,30 @@ app.post('/api/auth/google', async (req, res) => {
         }
 
         const token = jwt.sign({ id: user._id, email: user.email, isPremium: user.isPremium }, JWT_SECRET, { expiresIn: '7d' });
+        
+        // If request came from a full-page form redirect, return HTML to set localStorage and redirect to premium.html
+        if (req.headers['content-type'] && req.headers['content-type'].includes('application/x-www-form-urlencoded')) {
+            return res.send(`
+                <!DOCTYPE html>
+                <html>
+                <head><title>Logging in...</title></head>
+                <body>
+                    <p style="text-align:center; font-family:sans-serif; margin-top:50px;">Completing login...</p>
+                    <script>
+                        localStorage.setItem('token', '${token}');
+                        window.location.href = '/premium.html';
+                    </script>
+                </body>
+                </html>
+            `);
+        }
+
         res.json({ token, user: { email: user.email, isPremium: user.isPremium } });
     } catch (err) {
         console.error("Google Auth Error:", err);
+        if (req.headers['content-type'] && req.headers['content-type'].includes('application/x-www-form-urlencoded')) {
+            return res.status(400).send("Authentication failed. Please try logging in again.");
+        }
         res.status(400).json({ error: "Invalid Google token" });
     }
 });
