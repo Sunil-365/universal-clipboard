@@ -387,12 +387,12 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
 });
 // -----------------------
 // --- Cashfree Payment Gateway & Settings ---
-const { Cashfree } = require('cashfree-pg');
+const { Cashfree, CFEnvironment } = require('cashfree-pg');
 Cashfree.XClientId = process.env.CASHFREE_APP_ID || 'TEST_APP_ID';
 Cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY || 'TEST_SECRET_KEY';
 Cashfree.XEnvironment = (process.env.CASHFREE_ENV || '').toUpperCase() === 'PRODUCTION' 
-    ? Cashfree.Environment.PRODUCTION 
-    : Cashfree.Environment.SANDBOX;
+    ? CFEnvironment.PRODUCTION 
+    : CFEnvironment.SANDBOX;
 
 // 1. Create Payment Session (Cashfree Order)
 app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
