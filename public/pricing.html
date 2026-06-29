@@ -6,31 +6,33 @@
     <title>Upgrade to Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
-        .pricing-section { width: 100%; max-width: 900px; margin: 60px auto 40px auto; padding: 0 20px; text-align: center; box-sizing: border-box; }
+        .pricing-section { width: 100%; max-width: 1000px; margin: 60px auto 40px auto; padding: 0 20px; text-align: center; box-sizing: border-box; }
         h1 { font-weight: 800; font-size: 3rem; color: var(--text-primary); margin-bottom: 10px; }
         .subtitle { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 50px; }
         
-        .pricing-container { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; }
+        .pricing-container { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; align-items: stretch; }
         
-        .plan-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 40px; width: 100%; max-width: 380px; text-align: left; box-shadow: var(--shadow-sm); position: relative; box-sizing: border-box; transition: transform 0.2s, box-shadow 0.2s; }
+        .plan-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 40px; width: 100%; max-width: 300px; text-align: left; box-shadow: var(--shadow-sm); position: relative; box-sizing: border-box; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
         .plan-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-        .plan-card.premium { border: 2px solid var(--accent-primary); transform: scale(1.05); }
-        .plan-card.premium:hover { transform: scale(1.05) translateY(-5px); }
+        .plan-card.premium { border: 2px solid var(--accent-primary); transform: scale(1.03); }
+        .plan-card.premium:hover { transform: scale(1.03) translateY(-5px); }
         
-        .plan-badge { position: absolute; top: -14px; right: 24px; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
+        .plan-badge { position: absolute; top: -14px; right: 24px; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
         
         .plan-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 15px; color: var(--text-primary); }
-        .plan-price { font-size: 3rem; font-weight: 800; margin-bottom: 30px; color: var(--text-primary); display: flex; align-items: baseline; gap: 5px; }
-        .plan-price span { font-size: 1.1rem; color: var(--text-secondary); font-weight: 500; }
+        .plan-price { font-size: 2.8rem; font-weight: 800; margin-bottom: 10px; color: var(--text-primary); display: flex; align-items: baseline; gap: 5px; }
+        .plan-price span { font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
+        .trial-tag { font-size: 0.85rem; color: var(--accent-primary); font-weight: 700; margin-bottom: 25px; display: block; }
         
-        ul { list-style: none; padding: 0; margin-bottom: 40px; }
-        ul li { margin-bottom: 18px; display: flex; align-items: flex-start; gap: 12px; color: var(--text-secondary); line-height: 1.4; font-size: 0.95rem; }
-        ul li svg { width: 22px; height: 22px; color: var(--success); flex-shrink: 0; margin-top: -2px; }
+        ul { list-style: none; padding: 0; margin-bottom: 30px; flex: 1; }
+        ul li { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; color: var(--text-secondary); line-height: 1.4; font-size: 0.9rem; }
+        ul li svg { width: 20px; height: 20px; color: var(--success); flex-shrink: 0; margin-top: -2px; }
         
-        .plan-btn { display: block; width: 100%; padding: 16px; text-align: center; background: var(--accent-primary); color: white; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 1.05rem; transition: background 0.2s; box-sizing: border-box; }
+        .plan-btn { display: block; width: 100%; padding: 14px; text-align: center; background: var(--accent-primary); color: white; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 1rem; transition: background 0.2s; box-sizing: border-box; border: none; cursor: pointer; }
         .plan-btn:hover { background: #4338ca; }
         .plan-btn-outline { background: transparent; border: 2px solid var(--card-border); color: var(--text-primary); }
         .plan-btn-outline:hover { background: var(--bg-color); border-color: var(--text-secondary); }
@@ -38,38 +40,94 @@
 </head>
 <body>
     <div class="pricing-section">
-        <h1>Unlock More Power</h1>
-        <p class="subtitle">Choose the plan that works best for your workflow.</p>
+        <h1>Unlock Premium Power</h1>
+        <p class="subtitle">Try risk-free with a 7-day free trial. Cancel anytime.</p>
     
         <div class="pricing-container">
             <!-- Free Plan -->
             <div class="plan-card">
-                <div class="plan-title">Free</div>
-                <div class="plan-price">$0 <span>/ forever</span></div>
-                <ul>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Send and receive text & links</li>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Basic E2E Encryption</li>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> 10-minute session limits</li>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Ad-supported experience</li>
-                </ul>
+                <div>
+                    <div class="plan-title">Free</div>
+                    <div class="plan-price">$0 <span>/ forever</span></div>
+                    <span class="trial-tag" style="color: transparent;">Basic Features</span>
+                    <ul>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Send and receive text & links</li>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> End-to-End Encryption</li>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Random Room URLs</li>
+                    </ul>
+                </div>
                 <a href="/" class="plan-btn plan-btn-outline">Current Plan</a>
             </div>
     
-            <!-- Premium Plan -->
+            <!-- Monthly Plan -->
             <div class="plan-card premium">
-                <div class="plan-badge">MOST POPULAR</div>
-                <div class="plan-title">Premium</div>
-                <div class="plan-price">$3.99 <span>/ month</span></div>
-                <ul>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> <b>Permanent Desk Display QR Code</b> (never refresh again)</li>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> <b>Frictionless Personal Room Link</b></li>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> <b>Cloud Clipboard History</b> (saved forever)</li>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Unlimited session lengths</li>
-                    <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> 100% Ad-Free experience</li>
-                </ul>
-                <a href="login.html" class="plan-btn">Subscribe Now</a>
+                <div class="plan-badge">7-DAY FREE TRIAL</div>
+                <div>
+                    <div class="plan-title">Monthly</div>
+                    <div class="plan-price">$0.99 <span>/ month</span></div>
+                    <span class="trial-tag">✨ 7 Days Free Trial included</span>
+                    <ul>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Up to 5 Custom Spaces (Office, Home, etc.)</li>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Integrated Receiver Dashboard</li>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Permanent Desk QR Display</li>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Cloud Clipboard History</li>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> 100% Ad-Free experience</li>
+                    </ul>
+                </div>
+                <button class="plan-btn" onclick="startSubscription('monthly')">Start 7-Day Free Trial</button>
+            </div>
+
+            <!-- Yearly Plan -->
+            <div class="plan-card premium">
+                <div class="plan-badge" style="background: linear-gradient(135deg, #10b981, #059669);">SAVE 16%</div>
+                <div>
+                    <div class="plan-title">Yearly</div>
+                    <div class="plan-price">$9.99 <span>/ year</span></div>
+                    <span class="trial-tag">✨ 7 Days Free Trial included</span>
+                    <ul>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Everything in Monthly</li>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Best overall value ($0.83/mo)</li>
+                        <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Priority Support</li>
+                    </ul>
+                </div>
+                <button class="plan-btn" onclick="startSubscription('yearly')" style="background: #10b981;">Start 7-Day Free Trial</button>
             </div>
         </div>
     </div>
+
+    <script>
+        const cashfree = Cashfree({ mode: "sandbox" }); // or "production"
+
+        async function startSubscription(plan) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                sessionStorage.setItem('redirectAfterLogin', 'pricing.html');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/payment/create-session', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ plan })
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to initialize payment');
+
+                const checkoutOptions = {
+                    paymentSessionId: data.payment_session_id,
+                    redirectTarget: "_self"
+                };
+                cashfree.checkout(checkoutOptions);
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    </script>
 </body>
 </html>

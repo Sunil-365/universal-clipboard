@@ -386,6 +386,114 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
     }
 });
 // -----------------------
+// --- Cashfree Payment Gateway & Settings ---
+const { Cashfree } = require('cashfree-pg');
+Cashfree.XClientId = process.env.CASHFREE_APP_ID || 'TEST_APP_ID';
+Cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY || 'TEST_SECRET_KEY';
+Cashfree.XEnvironment = (process.env.CASHFREE_ENV || '').toUpperCase() === 'PRODUCTION' 
+    ? Cashfree.Environment.PRODUCTION 
+    : Cashfree.Environment.SANDBOX;
+
+// 1. Create Payment Session (Cashfree Order)
+app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
+    try {
+        const { plan } = req.body; // 'monthly' ($0.99) or 'yearly' ($9.99)
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        const orderAmount = plan === 'yearly' ? 9.99 : 0.99;
+        const orderId = "order_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+
+        const request = {
+            "order_amount": orderAmount,
+            "order_currency": "USD",
+            "order_id": orderId,
+            "customer_details": {
+                "customer_id": user._id.toString(),
+                "customer_email": user.email,
+                "customer_phone": "9999999999"
+            },
+            "order_meta": {
+                "return_url": `${req.protocol}://${req.get('host')}/settings.html?order_id={order_id}&plan=${plan}`
+            }
+        };
+
+        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+        res.json({
+            payment_session_id: response.data.payment_session_id,
+            order_id: orderId
+        });
+    } catch (err) {
+        console.error("Cashfree order error:", err.response ? err.response.data : err.message);
+        res.status(500).json({ error: "Failed to initialize Cashfree payment" });
+    }
+});
+
+// 2. Verify Payment & Activate 7-Day Trial / Subscription
+app.post('/api/payment/verify', authenticateToken, async (req, res) => {
+    try {
+        const { order_id, plan } = req.body;
+        if (!order_id) return res.status(400).json({ error: "Order ID required" });
+
+        const response = await Cashfree.PGFetchOrder("2023-08-01", order_id);
+        if (response.data.order_status === "PAID") {
+            const user = await User.findById(req.user.id);
+            const now = new Date();
+            const trialEnds = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 Days Trial
+            const subEnds = plan === 'yearly'
+                ? new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000)
+                : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+            user.isPremium = true;
+            user.subscriptionStatus = 'trial';
+            user.subscriptionPlan = plan || 'monthly';
+            user.trialEndsAt = trialEnds;
+            user.subscriptionEndsAt = subEnds;
+            await user.save();
+
+            return res.json({ success: true, message: "Subscription activated!", user: { isPremium: user.isPremium, subscriptionStatus: user.subscriptionStatus, trialEndsAt: user.trialEndsAt } });
+        } else {
+            return res.status(400).json({ error: "Payment not completed or pending" });
+        }
+    } catch (err) {
+        console.error("Payment verify error:", err);
+        res.status(500).json({ error: "Failed to verify payment" });
+    }
+});
+
+// 3. Get User Profile & Subscription Status
+app.get('/api/user/profile', authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) return res.status(404).json({ error: "User not found" });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+// 4. Change Password (for Local users)
+app.post('/api/user/change-password', authenticateToken, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        if (!currentPassword || !newPassword) return res.status(400).json({ error: "All fields required" });
+
+        const user = await User.findById(req.user.id);
+        if (user.authProvider === 'google') {
+            return res.status(400).json({ error: "Google authenticated accounts cannot change password here." });
+        }
+
+        const valid = await bcrypt.compare(currentPassword, user.password);
+        if (!valid) return res.status(400).json({ error: "Incorrect current password" });
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+        res.json({ message: "Password updated successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+// -----------------------
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

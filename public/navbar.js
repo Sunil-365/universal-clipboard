@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     const authLink = token 
-        ? `<a href="premium.html" class="nav-btn" style="background: var(--card-border); color: var(--text-primary) !important;">Dashboard</a>`
+        ? `<a href="settings.html">Settings</a><a href="premium.html" class="nav-btn" style="background: var(--card-border); color: var(--text-primary) !important;">Dashboard</a>`
         : `<a href="login.html" class="nav-btn">Log In</a>`;
 
     const navbarHtml = `
