@@ -389,16 +389,21 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
 // --- Cashfree Payment Gateway & Settings ---
 const { Cashfree, CFEnvironment } = require('cashfree-pg');
 
+const axios = require('axios');
 const cashfreeEnv = (process.env.CASHFREE_ENV || '').toUpperCase() === 'PRODUCTION' 
-    ? CFEnvironment.PRODUCTION 
-    : CFEnvironment.SANDBOX;
+    ? 'PRODUCTION' 
+    : 'SANDBOX';
 
-const cashfree = new Cashfree(
-    cashfreeEnv,
-    '2023-08-01',
-    process.env.CASHFREE_APP_ID || 'TEST_APP_ID',
-    process.env.CASHFREE_SECRET_KEY || 'TEST_SECRET_KEY'
-);
+const cashfreeBaseUrl = cashfreeEnv === 'PRODUCTION' 
+    ? 'https://api.cashfree.com/pg' 
+    : 'https://sandbox.cashfree.com/pg';
+
+const cashfreeHeaders = {
+    'x-client-id': process.env.CASHFREE_APP_ID,
+    'x-client-secret': process.env.CASHFREE_SECRET_KEY,
+    'x-api-version': '2023-08-01',
+    'Content-Type': 'application/json'
+};
 
 // 1. Create Subscription Plans (Run once to setup plans on Cashfree)
 app.post('/api/payment/setup-plans', authenticateToken, async (req, res) => {
@@ -424,8 +429,8 @@ app.post('/api/payment/setup-plans', authenticateToken, async (req, res) => {
             max_cycles: 5
         };
 
-        await cashfree.SubsCreatePlan(monthlyPlan);
-        await cashfree.SubsCreatePlan(yearlyPlan);
+        await axios.post(`${cashfreeBaseUrl}/plans`, monthlyPlan, { headers: cashfreeHeaders });
+        await axios.post(`${cashfreeBaseUrl}/plans`, yearlyPlan, { headers: cashfreeHeaders });
         res.json({ success: true, message: "Plans created successfully" });
     } catch (err) {
         console.error("Plan creation error:", err.response ? err.response.data : err.message);
@@ -457,7 +462,7 @@ app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
             }
         };
 
-        const response = await cashfree.SubsCreateSubscription(request);
+        const response = await axios.post(`${cashfreeBaseUrl}/subscriptions`, request, { headers: cashfreeHeaders });
         
         // Return the Cashfree hosted checkout URL for authorization
         res.json({
