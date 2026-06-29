@@ -1,4 +1,6 @@
+require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
 const http = require('http');
 const { Server } = require("socket.io");
 
@@ -26,53 +28,57 @@ io.on('connection', (socket) => {
 });
 
 // --- Feedback System ---
-const fs = require('fs');
-const path = require('path');
-const REVIEWS_FILE = path.join(__dirname, 'reviews.json');
-
 app.use(express.json());
 
-// Helper to read reviews
-function getReviews() {
-    try {
-        if (!fs.existsSync(REVIEWS_FILE)) return [];
-        const data = fs.readFileSync(REVIEWS_FILE, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        console.error("Error reading reviews:", err);
-        return [];
-    }
+// Connect to MongoDB
+const MONGODB_URI = process.env.MONGODB_URI;
+if (MONGODB_URI) {
+    mongoose.connect(MONGODB_URI)
+        .then(() => console.log('Connected to MongoDB'))
+        .catch(err => console.error('MongoDB connection error:', err));
+} else {
+    console.warn('⚠️ MONGODB_URI is not defined in .env file. Feedback will not be saved.');
 }
 
+// Define Review Schema and Model
+const reviewSchema = new mongoose.Schema({
+    content: { type: String, required: true },
+    date: { type: Date, default: Date.now }
+});
+const Review = mongoose.model('Review', reviewSchema);
+
 // GET all reviews
-app.get('/api/reviews', (req, res) => {
-    res.json(getReviews());
+app.get('/api/reviews', async (req, res) => {
+    try {
+        if (!MONGODB_URI) return res.json([]);
+        const reviews = await Review.find().sort({ date: -1 }).limit(100);
+        res.json(reviews);
+    } catch (err) {
+        console.error("Error fetching reviews:", err);
+        res.status(500).json({ error: "Failed to fetch reviews" });
+    }
 });
 
 // POST a new anonymous review
-app.post('/api/reviews', (req, res) => {
+app.post('/api/reviews', async (req, res) => {
     const { content } = req.body;
     if (!content || content.trim().length === 0) {
         return res.status(400).json({ error: "Review cannot be empty" });
     }
 
-    const newReview = {
-        id: Date.now().toString(),
-        content: content.trim(),
-        date: new Date().toISOString()
-    };
-
-    const reviews = getReviews();
-    reviews.unshift(newReview); // Add to beginning
-
-    // Keep only the last 100 reviews to avoid giant files on the free server
-    if (reviews.length > 100) reviews.length = 100;
+    if (!MONGODB_URI) {
+        return res.status(500).json({ error: "Database not configured. Please add MONGODB_URI to .env" });
+    }
 
     try {
-        fs.writeFileSync(REVIEWS_FILE, JSON.stringify(reviews, null, 2));
+        const newReview = new Review({
+            content: content.trim(),
+            date: new Date()
+        });
+        await newReview.save();
         res.status(201).json(newReview);
     } catch (err) {
-        console.error("Error writing review:", err);
+        console.error("Error saving review:", err);
         res.status(500).json({ error: "Failed to save review" });
     }
 });
