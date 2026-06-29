@@ -450,7 +450,9 @@ app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
 
         const request = {
             subscription_id: subscriptionId,
-            plan_id: planId,
+            plan_details: {
+                plan_id: planId
+            },
             customer_details: {
                 customer_name: user.email.split('@')[0],
                 customer_email: user.email,
