@@ -17,19 +17,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent-primary: #38bdf8;
-            --accent-secondary: #818cf8;
-            --success: #34d399;
+            --bg-color: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.65);
+            --card-border: rgba(255, 255, 255, 0.5);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent-primary: #6366f1;
+            --accent-secondary: #ec4899;
+            --success: #10b981;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #050505;
+            background: var(--bg-color);
             color: var(--text-primary);
             display: flex;
             flex-direction: column;
@@ -44,17 +44,17 @@
         .orb {
             position: fixed;
             border-radius: 50%;
-            filter: blur(80px);
+            filter: blur(120px);
             z-index: -1;
             opacity: 0.6;
             animation: float 20s infinite alternate ease-in-out;
         }
-        .orb-1 { width: 300px; height: 300px; background: var(--accent-primary); top: 10%; left: 10%; }
-        .orb-2 { width: 400px; height: 400px; background: var(--accent-secondary); bottom: 10%; right: 10%; animation-delay: -10s; }
+        .orb-1 { width: 450px; height: 450px; background: #c4b5fd; top: 0%; left: 0%; }
+        .orb-2 { width: 550px; height: 550px; background: #fbcfe8; bottom: 0%; right: 0%; animation-delay: -10s; }
         
         @keyframes float {
             0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(100px, 50px) scale(1.2); }
+            100% { transform: translate(100px, 50px) scale(1.1); }
         }
 
         .container {
@@ -69,9 +69,9 @@
         }
 
         .back-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.5);
             border: 1px solid var(--card-border);
-            color: white;
+            color: var(--text-primary);
             border-radius: 12px;
             padding: 10px;
             cursor: pointer;
@@ -84,7 +84,7 @@
         }
 
         .back-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: white;
             transform: scale(1.05);
         }
 
@@ -92,7 +92,7 @@
             font-weight: 800;
             font-size: 2.2rem;
             margin: 0;
-            background: linear-gradient(to right, var(--accent-primary), #e879f9);
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -100,25 +100,25 @@
         }
 
         .feedback-form {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--card-bg);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--card-border);
+            border-top: 1px solid rgba(255, 255, 255, 1);
+            border-left: 1px solid rgba(255, 255, 255, 1);
             border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,0.4);
             margin-bottom: 40px;
         }
 
         textarea {
             width: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.7);
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 15px;
-            color: white;
+            color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
             min-height: 120px;
@@ -131,10 +131,11 @@
         textarea:focus {
             outline: none;
             border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
 
         textarea::placeholder {
-            color: rgba(255, 255, 255, 0.3);
+            color: #94a3b8;
         }
 
         .submit-btn {
@@ -152,7 +153,7 @@
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px -10px var(--accent-primary);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
         }
 
         .submit-btn:disabled {
@@ -177,15 +178,16 @@
         }
 
         .review-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--card-bg);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--card-border);
+            border-top: 1px solid rgba(255, 255, 255, 1);
+            border-left: 1px solid rgba(255, 255, 255, 1);
             border-radius: 16px;
             padding: 20px;
             animation: slideIn 0.4s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
         }
 
         @keyframes slideIn {
@@ -202,7 +204,7 @@
         }
 
         .review-badge {
-            background: rgba(255,255,255,0.1);
+            background: rgba(99, 102, 241, 0.1);
             padding: 3px 8px;
             border-radius: 20px;
             font-size: 0.75rem;
@@ -225,7 +227,7 @@
         }
 
         .skeleton {
-            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background: linear-gradient(90deg, rgba(0,0,0,0.03) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.03) 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
             border-radius: 8px;
@@ -237,8 +239,8 @@
         }
 
         .skeleton-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 16px;
             padding: 20px;
             display: flex;
