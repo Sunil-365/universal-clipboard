@@ -411,21 +411,33 @@ app.post('/api/payment/setup-plans', authenticateToken, async (req, res) => {
         const monthlyPlan = {
             plan_id: "premium_monthly_01",
             plan_name: "Premium Monthly",
-            type: "PERIODIC",
+            plan_type: "PERIODIC",
+            plan_amount: 79.00,
             amount: 79.00,
+            plan_max_amount: 500.00,
+            plan_currency: "INR",
             currency: "INR",
+            plan_interval_type: "MONTH",
             interval_type: "MONTH",
+            plan_intervals: 1,
             intervals: 1,
+            plan_max_cycles: 12,
             max_cycles: 12
         };
         const yearlyPlan = {
             plan_id: "premium_yearly_01",
             plan_name: "Premium Yearly",
-            type: "PERIODIC",
+            plan_type: "PERIODIC",
+            plan_amount: 799.00,
             amount: 799.00,
+            plan_max_amount: 2000.00,
+            plan_currency: "INR",
             currency: "INR",
+            plan_interval_type: "YEAR",
             interval_type: "YEAR",
+            plan_intervals: 1,
             intervals: 1,
+            plan_max_cycles: 5,
             max_cycles: 5
         };
 
