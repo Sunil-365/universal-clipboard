@@ -12,6 +12,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false // Optional for Google Sign-Up users
     },
+    phone: {
+        type: String
+    },
     authProvider: {
         type: String,
         enum: ['local', 'google'],

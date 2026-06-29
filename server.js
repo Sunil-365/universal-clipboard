@@ -411,7 +411,7 @@ app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
             "customer_details": {
                 "customer_id": user._id.toString(),
                 "customer_email": user.email,
-                "customer_phone": "9999999999"
+                "customer_phone": user.phone || "9999999999"
             },
             "order_meta": {
                 "return_url": `${req.protocol}://${req.get('host')}/settings.html?order_id={order_id}&plan=${plan}`
@@ -467,6 +467,20 @@ app.get('/api/user/profile', authenticateToken, async (req, res) => {
         const user = await User.findById(req.user.id).select('-password');
         if (!user) return res.status(404).json({ error: "User not found" });
         res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+// Update Profile Details (Phone)
+app.put('/api/user/profile', authenticateToken, async (req, res) => {
+    try {
+        const { phone } = req.body;
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ error: "User not found" });
+        if (phone !== undefined) user.phone = phone;
+        await user.save();
+        res.json({ message: "Profile updated successfully!", user: { email: user.email, phone: user.phone } });
     } catch (err) {
         res.status(500).json({ error: "Server error" });
     }

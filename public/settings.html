@@ -98,6 +98,14 @@
                     <div class="info-label">Member Since</div>
                     <div class="info-value" id="user-joined">-</div>
                 </div>
+                <form id="profile-form" style="margin-top: 20px;">
+                    <div class="input-group">
+                        <label>Phone Number (Optional for Billing)</label>
+                        <input type="tel" id="user-phone-input" placeholder="e.g. 9876543210">
+                    </div>
+                    <button type="submit" class="btn" id="profile-btn">Save Profile</button>
+                    <div id="profile-msg" class="msg"></div>
+                </form>
             </div>
 
             <!-- Security Tab -->
@@ -160,6 +168,7 @@
                 const user = await res.json();
 
                 document.getElementById('user-email').innerText = user.email;
+                if (user.phone) document.getElementById('user-phone-input').value = user.phone;
                 document.getElementById('user-auth').innerText = user.authProvider === 'google' ? 'Google Sign-In' : 'Email & Password';
                 document.getElementById('user-joined').innerText = new Date(user.createdAt).toLocaleDateString();
 
@@ -189,6 +198,34 @@
                 console.error("Failed to load profile", e);
             }
         }
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('profile-btn');
+            const msg = document.getElementById('profile-msg');
+            const phone = document.getElementById('user-phone-input').value.trim();
+
+            btn.disabled = true;
+            msg.innerText = '';
+            
+            try {
+                const res = await fetch('/api/user/profile', {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to update profile');
+
+                msg.className = 'msg success';
+                msg.innerText = data.message;
+            } catch (err) {
+                msg.className = 'msg error';
+                msg.innerText = err.message;
+            } finally {
+                btn.disabled = false;
+            }
+        });
 
         document.getElementById('password-form').addEventListener('submit', async (e) => {
             e.preventDefault();
