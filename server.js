@@ -400,108 +400,112 @@ const cashfree = new Cashfree(
     process.env.CASHFREE_SECRET_KEY || 'TEST_SECRET_KEY'
 );
 
-// 1. Create Payment Session (Cashfree Order)
+// 1. Create Subscription Plans (Run once to setup plans on Cashfree)
+app.post('/api/payment/setup-plans', authenticateToken, async (req, res) => {
+    try {
+        const monthlyPlan = {
+            plan_id: "premium_monthly_01",
+            plan_name: "Premium Monthly",
+            type: "PERIODIC",
+            amount: 79.00,
+            currency: "INR",
+            interval_type: "MONTH",
+            intervals: 1,
+            max_cycles: 12
+        };
+        const yearlyPlan = {
+            plan_id: "premium_yearly_01",
+            plan_name: "Premium Yearly",
+            type: "PERIODIC",
+            amount: 799.00,
+            currency: "INR",
+            interval_type: "YEAR",
+            intervals: 1,
+            max_cycles: 5
+        };
+
+        await cashfree.SubsCreatePlan(monthlyPlan);
+        await cashfree.SubsCreatePlan(yearlyPlan);
+        res.json({ success: true, message: "Plans created successfully" });
+    } catch (err) {
+        console.error("Plan creation error:", err.response ? err.response.data : err.message);
+        res.status(500).json({ error: "Failed to setup plans" });
+    }
+});
+
+// 2. Create Subscription Session (replaces PGCreateOrder)
 app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
     try {
-        const { plan } = req.body; // 'monthly' ($0.99) or 'yearly' ($9.99)
+        const { plan } = req.body; // 'monthly' or 'yearly'
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        const orderAmount = plan === 'yearly' ? 799.00 : 79.00;
-        const orderId = "order_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        const subscriptionId = "sub_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        const planId = plan === 'yearly' ? 'premium_yearly_01' : 'premium_monthly_01';
 
         const request = {
-            "order_amount": orderAmount,
-            "order_currency": "INR",
-            "order_id": orderId,
-            "customer_details": {
-                "customer_id": user._id.toString(),
-                "customer_email": user.email,
-                "customer_phone": user.phone || "9999999999"
+            subscription_id: subscriptionId,
+            plan_id: planId,
+            customer_details: {
+                customer_name: user.email.split('@')[0],
+                customer_email: user.email,
+                customer_phone: user.phone || "9999999999"
             },
-            "order_meta": {
-                "return_url": `${req.protocol}://${req.get('host')}/settings?order_id={order_id}&plan=${plan}`
+            subscription_meta: {
+                return_url: `${req.protocol}://${req.get('host')}/settings?sub_id=${subscriptionId}&status=success`,
+                notification_channel: ["EMAIL", "SMS"]
             }
         };
 
-        const response = await cashfree.PGCreateOrder(request);
+        const response = await cashfree.SubsCreateSubscription(request);
+        
+        // Return the Cashfree hosted checkout URL for authorization
         res.json({
-            payment_session_id: response.data.payment_session_id,
-            order_id: orderId
+            subscription_id: subscriptionId,
+            checkout_url: response.data.subscription_session_id 
+                ? `https://payments.cashfree.com/subscription/${response.data.subscription_session_id}` // Production
+                : response.data.auth_url || `https://sandbox.cashfree.com/pg/view/subscription/${response.data.subscription_session_id}`
         });
     } catch (err) {
         const errorDetails = err.response ? err.response.data : err.message;
-        console.error("Cashfree order error:", errorDetails);
-        const userMsg = err.response?.data?.message || err.message || "Failed to initialize Cashfree payment";
+        console.error("Cashfree subscription error:", errorDetails);
+        const userMsg = err.response?.data?.message || err.message || "Failed to initialize subscription";
         res.status(500).json({ error: userMsg });
     }
 });
 
-// 2. Verify Payment & Activate 7-Day Trial / Subscription
-app.post('/api/payment/verify', authenticateToken, async (req, res) => {
-    try {
-        const { order_id, plan } = req.body;
-        if (!order_id) return res.status(400).json({ error: "Order ID required" });
-
-        const response = await cashfree.PGFetchOrder(order_id);
-        if (response.data.order_status === "PAID") {
-            const user = await User.findById(req.user.id);
-            const now = new Date();
-            const trialEnds = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 Days Trial
-            const subEnds = plan === 'yearly'
-                ? new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000)
-                : new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-
-            user.isPremium = true;
-            user.subscriptionStatus = 'trial';
-            user.subscriptionPlan = plan || 'monthly';
-            user.trialEndsAt = trialEnds;
-            user.subscriptionEndsAt = subEnds;
-            await user.save();
-
-            return res.json({ success: true, message: "Subscription activated!", user: { isPremium: user.isPremium, subscriptionStatus: user.subscriptionStatus, trialEndsAt: user.trialEndsAt } });
-        } else {
-            return res.status(400).json({ error: "Payment not completed or pending" });
-        }
-    } catch (err) {
-        console.error("Payment verify error:", err);
-        res.status(500).json({ error: "Failed to verify payment" });
-    }
-});
-
-// 3. Cashfree Webhook Listener
+// 3. Webhook Listener for Subscription events
 app.post('/api/webhooks/cashfree', express.json(), async (req, res) => {
     try {
         const event = req.body;
         console.log('Cashfree Webhook Event received:', event.type);
 
-        // Handle payment success (one-time or initial order)
-        if (event.type === 'PAYMENT_SUCCESS_WEBHOOK') {
-            const customerId = event.data?.customer_details?.customer_id;
-            if (customerId) {
-                const user = await User.findById(customerId);
+        // Handle successful new subscription mandate authorization
+        if (event.type === 'SUBSCRIPTION_NEW' || event.type === 'SUBSCRIPTION_STATUS_CHANGE') {
+            const customerEmail = event.data?.subscription?.customer_details?.customer_email || event.data?.customer_details?.customer_email;
+            if (customerEmail && event.data?.subscription?.subscription_status === 'ACTIVE') {
+                const user = await User.findOne({ email: customerEmail });
                 if (user) {
-                    const now = new Date();
                     user.isPremium = true;
                     user.subscriptionStatus = 'active';
-                    user.subscriptionEndsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+                    user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Add 30 days
                     await user.save();
-                    console.log(`Updated user ${user.email} subscription status via webhook`);
+                    console.log(`Updated user ${user.email} subscription status to active via webhook`);
                 }
             }
         }
 
-        // Handle subscription recurring charges
-        if (event.type === 'SUBSCRIPTION_CHARGED') {
-            const customerId = event.data?.customer_details?.customer_id;
-            if (customerId) {
-                const user = await User.findById(customerId);
+        // Handle recurring subscription charge success
+        if (event.type === 'SUBSCRIPTION_CHARGE_SUCCESS' || event.type === 'SUBSCRIPTION_CHARGED') {
+            const customerEmail = event.data?.subscription?.customer_details?.customer_email || event.data?.customer_details?.customer_email;
+            if (customerEmail) {
+                const user = await User.findOne({ email: customerEmail });
                 if (user) {
-                    const now = new Date();
                     user.isPremium = true;
                     user.subscriptionStatus = 'active';
-                    user.subscriptionEndsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+                    user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
                     await user.save();
+                    console.log(`Renewed user ${user.email} via recurring webhook`);
                 }
             }
         }
