@@ -401,12 +401,12 @@ app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        const orderAmount = plan === 'yearly' ? 9.99 : 0.99;
+        const orderAmount = plan === 'yearly' ? 799.00 : 79.00;
         const orderId = "order_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
 
         const request = {
             "order_amount": orderAmount,
-            "order_currency": "USD",
+            "order_currency": "INR",
             "order_id": orderId,
             "customer_details": {
                 "customer_id": user._id.toString(),
@@ -424,8 +424,10 @@ app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
             order_id: orderId
         });
     } catch (err) {
-        console.error("Cashfree order error:", err.response ? err.response.data : err.message);
-        res.status(500).json({ error: "Failed to initialize Cashfree payment" });
+        const errorDetails = err.response ? err.response.data : err.message;
+        console.error("Cashfree order error:", errorDetails);
+        const userMsg = err.response?.data?.message || err.message || "Failed to initialize Cashfree payment";
+        res.status(500).json({ error: userMsg });
     }
 });
 
