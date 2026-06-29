@@ -8,7 +8,6 @@ const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
-const rateLimit = require('express-rate-limit');
 
 const app = express();
 const server = http.createServer(app);
