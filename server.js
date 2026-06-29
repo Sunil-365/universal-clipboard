@@ -31,7 +31,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Serve static files from the 'public' directory
-app.use(express.static('public'));
+app.use(express.static('public', { extensions: ['html'] }));
 
 const roomTimeouts = {};
 
@@ -196,7 +196,7 @@ app.post('/api/auth/google', async (req, res) => {
                     <p style="text-align:center; font-family:sans-serif; margin-top:50px;">Completing login...</p>
                     <script>
                         localStorage.setItem('token', '${token}');
-                        window.location.href = '/premium.html';
+                        window.location.href = '/premium';
                     </script>
                 </body>
                 </html>
@@ -414,7 +414,7 @@ app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
                 "customer_phone": user.phone || "9999999999"
             },
             "order_meta": {
-                "return_url": `${req.protocol}://${req.get('host')}/settings.html?order_id={order_id}&plan=${plan}`
+                "return_url": `${req.protocol}://${req.get('host')}/settings?order_id={order_id}&plan=${plan}`
             }
         };
 

@@ -104,7 +104,7 @@
             if (persistentRoomId) {
                 // Persistent Premium Room
                 const currentUrl = window.location.origin;
-                const senderUrl = `${currentUrl}/sender.html?room=${persistentRoomId}`;
+                const senderUrl = `${currentUrl}/sender?room=${persistentRoomId}`;
                 
                 document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
                 socket.emit('join-room', persistentRoomId);
@@ -116,7 +116,7 @@
             const newSessionId = Math.random().toString(36).substring(2, 10);
             encryptionKey = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             const currentUrl = window.location.origin;
-            const senderUrl = `${currentUrl}/sender.html?room=${newSessionId}#key=${encryptionKey}`;
+            const senderUrl = `${currentUrl}/sender?room=${newSessionId}#key=${encryptionKey}`;
 
             document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
             socket.emit('join-room', newSessionId);

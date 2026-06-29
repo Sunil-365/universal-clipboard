@@ -117,7 +117,7 @@
             
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = 'login.html';
+                window.location.href = 'login';
                 return;
             }
 
@@ -131,7 +131,7 @@
                 const user = await res.json();
                 
                 if (!user.isPremium) {
-                    window.location.href = 'pricing.html';
+                    window.location.href = 'pricing';
                     return;
                 }
 
@@ -141,12 +141,12 @@
                 fetchPersistentRoom();
             } catch (err) {
                 localStorage.removeItem('token');
-                window.location.href = 'login.html';
+                window.location.href = 'login';
             }
 
             logoutBtn.addEventListener('click', () => {
                 localStorage.removeItem('token');
-                window.location.href = 'index.html';
+                window.location.href = '/';
             });
 
             let customRooms = [];
@@ -231,7 +231,7 @@
                     claimSection.style.display = 'none';
                     activeSection.style.display = 'flex';
                     
-                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender.html?room=' + currentActiveRoom)}`;
+                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + '/sender?room=' + currentActiveRoom)}`;
                     
                     // Reset receiver UI
                     document.getElementById('dashboard-receiver').innerHTML = '<div id="dashboard-empty" style="color: var(--text-secondary); text-align: center; font-style: italic; font-size: 0.9rem;">Waiting for incoming items...</div>';

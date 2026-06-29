@@ -109,7 +109,7 @@
             premiumSection.innerHTML = `
                 <div class="divider" style="margin: 10px 0;">Premium</div>
                 <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; text-align: center;">Log in to unlock Auto-History & Ad-Free Experience!</div>
-                <button class="btn btn-outline" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.location.href='login.html'">Log In to Unlock</button>
+                <button class="btn btn-outline" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.location.href='login'">Log In to Unlock</button>
             `;
         }
 
@@ -186,7 +186,7 @@
                 (decodedText, decodedResult) => {
                     stopScanner();
                     
-                    if (decodedText.includes('/sender.html?room=')) {
+                    if (decodedText.includes('/sender?room=')) {
                         try {
                             const url = new URL(decodedText);
                             const newRoomId = url.searchParams.get('room');

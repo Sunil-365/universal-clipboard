@@ -101,8 +101,8 @@
         async function startSubscription(plan) {
             const token = localStorage.getItem('token');
             if (!token) {
-                sessionStorage.setItem('redirectAfterLogin', 'pricing.html');
-                window.location.href = 'login.html';
+                sessionStorage.setItem('redirectAfterLogin', 'pricing');
+                window.location.href = 'login';
                 return;
             }
 
