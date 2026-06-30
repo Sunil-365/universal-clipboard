@@ -184,7 +184,7 @@ app.post('/api/auth/google', async (req, res) => {
                 await user.save();
             }
         } else {
-            user = new User({ email, googleId, authProvider: 'google', isPremium: true });
+            user = new User({ email, googleId, authProvider: 'google' });
             await user.save();
         }
 
@@ -268,20 +268,6 @@ app.get('/api/me', authenticateToken, async (req, res) => {
     }
 });
 
-app.post('/api/subscribe', authenticateToken, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
-        if (!user) return res.status(404).json({ error: "User not found" });
-        
-        user.isPremium = true;
-        await user.save();
-        
-        const token = jwt.sign({ id: user._id, email: user.email, isPremium: user.isPremium }, JWT_SECRET, { expiresIn: '7d' });
-        res.json({ message: "Successfully subscribed to Premium!", token, user: { email: user.email, isPremium: true } });
-    } catch (err) {
-        res.status(500).json({ error: "Server error during subscription" });
-    }
-});
 // --- Premium Clip History Routes ---
 app.get('/api/clips', authenticateToken, async (req, res) => {
     try {

@@ -10,6 +10,7 @@
     <script src="navbar.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
     <style>
         .dashboard-container { width: 100%; max-width: 900px; margin: 80px auto 40px auto; padding: 0 20px; box-sizing: border-box; }
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; background: var(--card-bg); padding: 20px 30px; border-radius: 16px; border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); }
@@ -50,6 +51,18 @@
         .space-item.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
         .space-delete { background: none; border: none; color: inherit; cursor: pointer; opacity: 0.7; padding: 5px; }
         .space-delete:hover { opacity: 1; color: var(--danger); }
+
+        /* Premium Lock Overlay */
+        .premium-lock-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+        .premium-lock-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 40px; border-radius: 20px; max-width: 400px; width: 90%; box-shadow: var(--shadow-md); color: var(--text-primary); }
+        .premium-lock-card h2 { margin-top: 0; margin-bottom: 10px; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .premium-lock-card p { margin-bottom: 25px; color: var(--text-secondary); line-height: 1.5; }
+        .premium-lock-actions { display: flex; flex-direction: column; gap: 10px; }
+        .btn-upgrade { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: transform 0.2s, opacity 0.2s; font-size: 1rem; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-upgrade:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-upgrade.yearly { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-upgrade.monthly { background: var(--card-bg); color: var(--text-primary); border: 1px solid var(--card-border); }
+        .btn-upgrade.monthly:hover { background: var(--bg-color); }
     </style>
 </head>
 <body>
@@ -57,6 +70,18 @@
     <div id="auth-guard">
         <div class="spinner"></div>
         <h2>Authenticating...</h2>
+    </div>
+
+    <div class="premium-lock-overlay" id="premium-lock-overlay">
+        <div class="premium-lock-card">
+            <h2><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Premium Required</h2>
+            <p>Unlock the permanent clipboard history, multiple spaces, and priority support by upgrading to Premium.</p>
+            <div class="premium-lock-actions">
+                <button class="btn-upgrade yearly" onclick="startSubscription('yearly')">Upgrade Yearly ($9.99/yr)</button>
+                <button class="btn-upgrade monthly" onclick="startSubscription('monthly')">Upgrade Monthly ($0.99/mo)</button>
+            </div>
+            <a href="/" style="display: block; margin-top: 20px; color: var(--text-secondary); font-size: 0.9rem; text-decoration: none;">Go back home</a>
+        </div>
     </div>
 
     <div class="dashboard-container" id="dashboard" style="display: none;">
@@ -130,19 +155,51 @@
                 if (!res.ok) throw new Error("Invalid token");
                 const user = await res.json();
                 
-                if (!user.isPremium) {
-                    window.location.href = 'pricing';
-                    return;
-                }
+                // Initialize Paddle for Checkout
+                Paddle.Environment.set('sandbox');
+                Paddle.Initialize({ 
+                    token: 'test_75c55ff5451dd18cb2bfe553a45',
+                    eventCallback: function(data) {
+                        if (data.name === "checkout.completed") {
+                            // User paid successfully! Hide overlay and reload data.
+                            document.getElementById('premium-lock-overlay').style.display = 'none';
+                            // Wait a short moment for backend webhook to process, then refetch
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        }
+                    }
+                });
+
+                window.currentUser = user; // Store globally for checkout
 
                 authGuard.style.display = 'none';
                 dashboard.style.display = 'block';
-                fetchClips();
-                fetchPersistentRoom();
+
+                if (!user.isPremium) {
+                    // Show locked overlay instead of redirecting
+                    document.getElementById('premium-lock-overlay').style.display = 'flex';
+                } else {
+                    // Only fetch premium data if they are premium
+                    fetchClips();
+                    fetchPersistentRoom();
+                }
             } catch (err) {
                 localStorage.removeItem('token');
                 window.location.href = 'login';
             }
+
+            window.startSubscription = function(plan) {
+                if (!window.currentUser) {
+                    alert("Please log in first.");
+                    return;
+                }
+                const priceId = plan === 'yearly' ? 'pri_01kwber8q7vkm3qdq2zw0wcr0t' : 'pri_01kwber8bgb20ha08dshjza212';
+                Paddle.Checkout.open({
+                    items: [{ priceId: priceId, quantity: 1 }],
+                    customer: { email: window.currentUser.email }
+                });
+            };
 
             logoutBtn.addEventListener('click', () => {
                 localStorage.removeItem('token');
