@@ -133,9 +133,9 @@
                             }
                         } catch(e) { console.error(e); }
                         
-                        if (attempts >= 5) {
+                        if (attempts >= 10) {
                             if (window.pollInterval) clearInterval(window.pollInterval);
-                            overlay.innerHTML = '<h2>Update Delayed</h2><p>Your payment was successful but syncing is delayed.</p><button onclick="window.location.href=\'/premium\'" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 8px; margin-top: 15px; cursor: pointer;">Go to Dashboard</button>';
+                            window.location.href = '/premium';
                             return false;
                         }
                         return false;

@@ -187,9 +187,9 @@
                                     }
                                 } catch(e) { console.error(e); }
                                 
-                                if (attempts >= 5) {
+                                if (attempts >= 10) {
                                     if (window.pollInterval) clearInterval(window.pollInterval);
-                                    document.getElementById('premium-lock-overlay').innerHTML = '<div class="premium-lock-card"><h2>Update Delayed</h2><p>Your payment was successful but syncing is delayed. Please refresh the page in a moment.</p><button onclick="window.location.reload()" class="btn-upgrade monthly">Refresh Page</button></div>';
+                                    window.location.reload();
                                     return false;
                                 }
                                 return false;

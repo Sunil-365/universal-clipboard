@@ -288,7 +288,8 @@ app.post('/api/verify-payment', authenticateToken, async (req, res) => {
         const transaction = await paddle.transactions.get(transaction_id);
         console.log("Fetched transaction status:", transaction?.status);
         
-        if (transaction && transaction.status === 'completed') {
+        const validStatuses = ['completed', 'paid', 'billed', 'ready'];
+        if (transaction && validStatuses.includes(transaction.status)) {
             const user = await User.findById(req.user.id);
             if (user) {
                 user.isPremium = true;
