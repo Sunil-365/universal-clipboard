@@ -100,6 +100,53 @@
         Paddle.Environment.set('sandbox');
         Paddle.Initialize({ 
             token: 'test_75c55ff5451dd18cb2bfe553a45',
+            eventCallback: function(data) {
+                if (data.name === "checkout.completed") {
+                    Paddle.Checkout.close();
+                    
+                    // Show a simple loading overlay on pricing page
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; color: white; font-family: Inter, sans-serif; flex-direction: column;';
+                    overlay.innerHTML = '<div style="width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.2); border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div><style>@keyframes spin { to { transform: rotate(360deg); } }</style><h2>Upgrading Account...</h2><p>Please wait while we unlock your premium features.</p>';
+                    document.body.appendChild(overlay);
+
+                    const transaction_id = data.data.transaction_id;
+                    const token = localStorage.getItem('token');
+                    let attempts = 0;
+                    
+                    const verifyPayment = async () => {
+                        attempts++;
+                        try {
+                            const res = await fetch('/api/verify-payment', { 
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}` 
+                                },
+                                body: JSON.stringify({ transaction_id })
+                            });
+                            const result = await res.json();
+                            if (result.isPremium) {
+                                if (window.pollInterval) clearInterval(window.pollInterval);
+                                // Redirect straight to premium dashboard!
+                                window.location.href = '/premium';
+                                return true;
+                            }
+                        } catch(e) { console.error(e); }
+                        
+                        if (attempts >= 5) {
+                            if (window.pollInterval) clearInterval(window.pollInterval);
+                            overlay.innerHTML = '<h2>Update Delayed</h2><p>Your payment was successful but syncing is delayed.</p><button onclick="window.location.href=\'/premium\'" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 8px; margin-top: 15px; cursor: pointer;">Go to Dashboard</button>';
+                            return false;
+                        }
+                        return false;
+                    };
+
+                    verifyPayment().then(success => {
+                        if (!success) window.pollInterval = setInterval(verifyPayment, 1500);
+                    });
+                }
+            }
         });
 
         // Fetch Local Prices
@@ -146,9 +193,6 @@
                     },
                     customData: {
                         customer_email: user.email
-                    },
-                    settings: {
-                        successUrl: window.location.origin + '/settings?status=success'
                     }
                 });
             } catch (err) {

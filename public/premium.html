@@ -167,7 +167,8 @@
                             
                             const transaction_id = data.data.transaction_id;
                             let attempts = 0;
-                            const poll = setInterval(async () => {
+                            
+                            const verifyPayment = async () => {
                                 attempts++;
                                 try {
                                     const res = await fetch('/api/verify-payment', { 
@@ -180,18 +181,30 @@
                                     });
                                     const result = await res.json();
                                     if (result.isPremium) {
-                                        clearInterval(poll);
+                                        if (window.pollInterval) clearInterval(window.pollInterval);
                                         window.currentUser.isPremium = true;
                                         document.getElementById('premium-lock-overlay').style.display = 'none';
                                         fetchClips();
                                         fetchPersistentRoom();
-                                    } else if (attempts >= 5) {
-                                        // Give up polling
-                                        clearInterval(poll);
-                                        document.getElementById('premium-lock-overlay').innerHTML = '<div class="premium-lock-card"><h2>Update Delayed</h2><p>Your payment was successful but syncing is delayed. Please refresh the page in a moment.</p><button onclick="window.location.reload()" class="btn-upgrade monthly">Refresh Page</button></div>';
+                                        return true;
                                     }
-                                } catch(e) { }
-                            }, 1500);
+                                } catch(e) { console.error(e); }
+                                
+                                if (attempts >= 5) {
+                                    if (window.pollInterval) clearInterval(window.pollInterval);
+                                    document.getElementById('premium-lock-overlay').innerHTML = '<div class="premium-lock-card"><h2>Update Delayed</h2><p>Your payment was successful but syncing is delayed. Please refresh the page in a moment.</p><button onclick="window.location.reload()" class="btn-upgrade monthly">Refresh Page</button></div>';
+                                    return false;
+                                }
+                                return false;
+                            };
+
+                            // Run immediately for instant unlock
+                            verifyPayment().then(success => {
+                                if (!success) {
+                                    // Fallback to polling if the first attempt wasn't successful (maybe Paddle API delayed)
+                                    window.pollInterval = setInterval(verifyPayment, 1500);
+                                }
+                            });
                         }
                     }
                 });
