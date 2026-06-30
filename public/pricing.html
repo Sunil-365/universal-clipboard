@@ -97,9 +97,9 @@
 
     <script>
         // Initialize Paddle
-        Paddle.Environment.set('sandbox');
+        Paddle.Environment.set('production');
         Paddle.Initialize({ 
-            token: 'test_75c55ff5451dd18cb2bfe553a45',
+            token: 'live_fccc2318739943e8e9fd2f99a96',
             eventCallback: function(data) {
                 if (data.name === "checkout.completed") {
                     Paddle.Checkout.close();
@@ -152,15 +152,15 @@
         // Fetch Local Prices
         Paddle.PricePreview({
             items: [
-                { priceId: 'pri_01kwber8bgb20ha08dshjza212', quantity: 1 },
-                { priceId: 'pri_01kwber8q7vkm3qdq2zw0wcr0t', quantity: 1 }
+                { priceId: 'pri_01kwbkgk2903tr6pttqhkbxych', quantity: 1 },
+                { priceId: 'pri_01kwbkgkda68awbqctb46yypgk', quantity: 1 }
             ]
         }).then(result => {
             const items = result.data.details.lineItems;
             items.forEach(item => {
-                if (item.price.id === 'pri_01kwber8bgb20ha08dshjza212') {
+                if (item.price.id === 'pri_01kwbkgk2903tr6pttqhkbxych') {
                     document.getElementById('monthly-price-display').innerHTML = `${item.formattedTotals.total} <span>/ month</span>`;
-                } else if (item.price.id === 'pri_01kwber8q7vkm3qdq2zw0wcr0t') {
+                } else if (item.price.id === 'pri_01kwbkgkda68awbqctb46yypgk') {
                     document.getElementById('yearly-price-display').innerHTML = `${item.formattedTotals.total} <span>/ year</span>`;
                 }
             });
@@ -182,7 +182,7 @@
                 const user = await res.json();
                 if (!res.ok) throw new Error('Could not fetch user profile');
 
-                const priceId = plan === 'yearly' ? 'pri_01kwber8q7vkm3qdq2zw0wcr0t' : 'pri_01kwber8bgb20ha08dshjza212';
+                const priceId = plan === 'yearly' ? 'pri_01kwbkgkda68awbqctb46yypgk' : 'pri_01kwbkgk2903tr6pttqhkbxych';
 
                 Paddle.Checkout.open({
                     items: [
