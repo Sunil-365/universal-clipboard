@@ -418,7 +418,7 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
 // --- Paddle Billing Integration ---
 const { Paddle, Environment } = require('@paddle/paddle-node-sdk');
 
-const paddle = new Paddle(process.env.PADDLE_API_KEY || 'fallback_key', {
+const paddle = new Paddle(process.env.PADDLE_API_KEY || 'pdl_sdbx_apikey_01kwbejpt7272rfv9p4pd7kvs7_t0HEPa3ZqpGhERq9FZ7QFx_AUk', {
     environment: Environment.sandbox, // Change to production for live
 });
 
