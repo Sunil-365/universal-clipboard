@@ -426,7 +426,7 @@ const paddle = new Paddle(process.env.PADDLE_API_KEY || 'pdl_live_apikey_01kwbkf
 app.post('/api/webhooks/paddle', async (req, res) => {
     try {
         const signature = req.headers['paddle-signature'];
-        const secret = process.env.PADDLE_WEBHOOK_SECRET || 'fallback_secret';
+        const secret = process.env.PADDLE_WEBHOOK_SECRET || 'pdl_live_wbs_ntfset_01kwbm397maz1fz78xk3fae1hg';
         
         // Use req.rawBody populated by express.json middleware
         if (!req.rawBody) {
