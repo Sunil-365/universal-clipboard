@@ -155,7 +155,6 @@
                 const user = await res.json();
                 
                 // Initialize Paddle for Checkout
-                Paddle.Environment.set('production');
                 Paddle.Initialize({ 
                     token: 'live_fccc2318739943e8e9fd2f99a96',
                     eventCallback: function(data) {
