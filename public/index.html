@@ -98,7 +98,7 @@
             if (localStorage.getItem('token')) {
                 const logoutBtn = document.createElement('button');
                 logoutBtn.innerText = 'Log Out';
-                logoutBtn.style.cssText = 'position: fixed; bottom: 30px; right: 30px; background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: 700; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15); z-index: 1000; transition: transform 0.2s; backdrop-filter: blur(4px);';
+                logoutBtn.style.cssText = 'position: fixed; bottom: 30px; left: 30px; background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: 700; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15); z-index: 1000; transition: transform 0.2s; backdrop-filter: blur(4px);';
                 logoutBtn.onmouseover = () => logoutBtn.style.transform = 'translateY(-3px)';
                 logoutBtn.onmouseout = () => logoutBtn.style.transform = 'translateY(0)';
                 logoutBtn.onclick = () => {

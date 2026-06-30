@@ -274,6 +274,32 @@ app.get('/api/me', authenticateToken, async (req, res) => {
     }
 });
 
+app.post('/api/verify-payment', authenticateToken, async (req, res) => {
+    try {
+        const { transaction_id } = req.body;
+        if (!transaction_id) return res.status(400).json({ error: "No transaction ID provided" });
+
+        // Fetch transaction directly from Paddle API
+        const transaction = await paddle.transactions.get(transaction_id);
+        
+        if (transaction && transaction.status === 'completed') {
+            const user = await User.findById(req.user.id);
+            if (user) {
+                user.isPremium = true;
+                user.subscriptionStatus = 'active';
+                user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                await user.save();
+                console.log(`Granted premium to ${user.email} via frontend transaction verification`);
+                return res.json({ success: true, isPremium: true });
+            }
+        }
+        res.status(400).json({ error: "Transaction not completed or invalid" });
+    } catch (e) {
+        console.error("Verify payment error:", e);
+        res.status(500).json({ error: "Failed to verify payment" });
+    }
+});
+
 // --- Premium Clip History Routes ---
 app.get('/api/clips', authenticateToken, async (req, res) => {
     try {

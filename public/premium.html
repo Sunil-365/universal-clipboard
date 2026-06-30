@@ -165,31 +165,55 @@
                             Paddle.Checkout.close();
                             document.getElementById('premium-lock-overlay').innerHTML = '<div class="premium-lock-card"><h2>Processing Payment...</h2><div class="spinner"></div><p>Activating your premium features...</p></div>';
                             
+                            const transaction_id = data.data.transaction_id;
                             let attempts = 0;
                             const poll = setInterval(async () => {
                                 attempts++;
                                 try {
-                                    const res = await fetch('/api/me', { headers: { 'Authorization': `Bearer ${token}` }});
-                                    const user = await res.json();
-                                    if (user.isPremium) {
-                                        clearInterval(poll);
-                                        window.currentUser = user;
-                                        document.getElementById('premium-lock-overlay').style.display = 'none';
-                                        fetchClips();
-                                        fetchPersistentRoom();
-                                    } else if (attempts > 10) {
-                                        // Fallback optimistic unlock if webhook is delayed (common during local dev)
+                                    const res = await fetch('/api/verify-payment', { 
+                                        method: 'POST',
+                                        headers: { 
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${token}` 
+                                        },
+                                        body: JSON.stringify({ transaction_id })
+                                    });
+                                    const result = await res.json();
+                                    if (result.isPremium) {
                                         clearInterval(poll);
                                         window.currentUser.isPremium = true;
                                         document.getElementById('premium-lock-overlay').style.display = 'none';
                                         fetchClips();
                                         fetchPersistentRoom();
+                                    } else if (attempts >= 5) {
+                                        // Give up polling
+                                        clearInterval(poll);
+                                        document.getElementById('premium-lock-overlay').innerHTML = '<div class="premium-lock-card"><h2>Update Delayed</h2><p>Your payment was successful but syncing is delayed. Please refresh the page in a moment.</p><button onclick="window.location.reload()" class="btn-upgrade monthly">Refresh Page</button></div>';
                                     }
                                 } catch(e) { }
-                            }, 2000);
+                            }, 1500);
                         }
                     }
                 });
+
+                // Fetch local pricing for buttons
+                Paddle.PricePreview({
+                    items: [
+                        { priceId: 'pri_01kwber8bgb20ha08dshjza212', quantity: 1 },
+                        { priceId: 'pri_01kwber8q7vkm3qdq2zw0wcr0t', quantity: 1 }
+                    ]
+                }).then(result => {
+                    const items = result.data.details.lineItems;
+                    items.forEach(item => {
+                        if (item.price.id === 'pri_01kwber8bgb20ha08dshjza212') {
+                            const btn = document.querySelector('.btn-upgrade.monthly');
+                            if(btn) btn.innerText = `Upgrade Monthly (${item.formattedTotals.total}/mo)`;
+                        } else if (item.price.id === 'pri_01kwber8q7vkm3qdq2zw0wcr0t') {
+                            const btn = document.querySelector('.btn-upgrade.yearly');
+                            if(btn) btn.innerText = `Upgrade Yearly (${item.formattedTotals.total}/yr)`;
+                        }
+                    });
+                }).catch(err => console.error("Error fetching local prices:", err));
 
                 window.currentUser = user; // Store globally for checkout
 

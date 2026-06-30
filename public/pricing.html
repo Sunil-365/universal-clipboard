@@ -64,7 +64,7 @@
                 <div class="plan-badge">7-DAY FREE TRIAL</div>
                 <div>
                     <div class="plan-title">Monthly</div>
-                    <div class="plan-price">$0.99 <span>/ month</span></div>
+                    <div class="plan-price" id="monthly-price-display">$0.99 <span>/ month</span></div>
                     <span class="trial-tag">✨ 7 Days Free Trial included</span>
                     <ul>
                         <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Up to 5 Custom Spaces (Office, Home, etc.)</li>
@@ -82,7 +82,7 @@
                 <div class="plan-badge" style="background: linear-gradient(135deg, #10b981, #059669);">SAVE 16%</div>
                 <div>
                     <div class="plan-title">Yearly</div>
-                    <div class="plan-price">$9.99 <span>/ year</span></div>
+                    <div class="plan-price" id="yearly-price-display">$9.99 <span>/ year</span></div>
                     <span class="trial-tag">✨ 7 Days Free Trial included</span>
                     <ul>
                         <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Everything in Monthly</li>
@@ -100,8 +100,24 @@
         Paddle.Environment.set('sandbox');
         Paddle.Initialize({ 
             token: 'test_75c55ff5451dd18cb2bfe553a45',
-            // You can optionally add an eventCallback here to listen for checkout events
         });
+
+        // Fetch Local Prices
+        Paddle.PricePreview({
+            items: [
+                { priceId: 'pri_01kwber8bgb20ha08dshjza212', quantity: 1 },
+                { priceId: 'pri_01kwber8q7vkm3qdq2zw0wcr0t', quantity: 1 }
+            ]
+        }).then(result => {
+            const items = result.data.details.lineItems;
+            items.forEach(item => {
+                if (item.price.id === 'pri_01kwber8bgb20ha08dshjza212') {
+                    document.getElementById('monthly-price-display').innerHTML = `${item.formattedTotals.total} <span>/ month</span>`;
+                } else if (item.price.id === 'pri_01kwber8q7vkm3qdq2zw0wcr0t') {
+                    document.getElementById('yearly-price-display').innerHTML = `${item.formattedTotals.total} <span>/ year</span>`;
+                }
+            });
+        }).catch(err => console.error("Error fetching local prices:", err));
 
         async function startSubscription(plan) {
             const token = localStorage.getItem('token');
