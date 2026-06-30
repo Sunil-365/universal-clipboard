@@ -418,7 +418,8 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
 // --- Paddle Billing Integration ---
 const { Paddle, Environment } = require('@paddle/paddle-node-sdk');
 
-const paddle = new Paddle(process.env.PADDLE_API_KEY || 'pdl_live_apikey_01kwbkfj5cezsk8znmqrrxm6jx_74kwwDhrjaxW24Y2aVn1JR_A33', {
+// Hardcoded Live key to override any old Sandbox keys in Railway environment variables
+const paddle = new Paddle('pdl_live_apikey_01kwbkfj5cezsk8znmqrrxm6jx_74kwwDhrjaxW24Y2aVn1JR_A33', {
     environment: Environment.production, // Use production for LIVE
 });
 

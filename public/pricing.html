@@ -198,6 +198,27 @@
                 alert(err.message);
             }
         }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const res = await fetch('/api/me', { headers: { 'Authorization': `Bearer ${token}` } });
+                    if (res.ok) {
+                        const user = await res.json();
+                        if (user.isPremium) {
+                            const btns = document.querySelectorAll('.plan-btn');
+                            btns.forEach(btn => {
+                                btn.innerText = "Already Upgraded";
+                                btn.style.background = "#4b5563"; // Grayed out
+                                btn.style.cursor = "not-allowed";
+                                btn.onclick = (e) => { e.preventDefault(); };
+                            });
+                        }
+                    }
+                } catch(e) {}
+            }
+        });
     </script>
 </body>
 </html>
