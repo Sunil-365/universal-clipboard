@@ -24,10 +24,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         sparse: true
     },
-    isPremium: {
-        type: Boolean,
-        default: false
-    },
+    isPremium: { type: Boolean, default: true }, // Automatically grant premium features to all users
     subscriptionStatus: {
         type: String,
         enum: ['none', 'trial', 'active', 'cancelled'],

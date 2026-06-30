@@ -56,36 +56,12 @@
 
         <div class="settings-card">
             <div class="settings-tabs">
-                <button class="tab-btn active" onclick="switchTab('sub')">Subscription</button>
-                <button class="tab-btn" onclick="switchTab('profile')">Profile</button>
+                <button class="tab-btn active" onclick="switchTab('profile')">Profile</button>
                 <button class="tab-btn" onclick="switchTab('security')">Security</button>
             </div>
 
-            <!-- Subscription Tab -->
-            <div id="tab-sub" class="tab-content active">
-                <div class="info-group">
-                    <div class="info-label">Current Status</div>
-                    <div class="info-value" id="sub-status"><span class="badge badge-none">Free Tier</span></div>
-                </div>
-                <div class="info-group" id="plan-group" style="display: none;">
-                    <div class="info-label">Plan</div>
-                    <div class="info-value" id="sub-plan">-</div>
-                </div>
-                <div class="info-group" id="trial-group" style="display: none;">
-                    <div class="info-label">7-Day Free Trial Ends</div>
-                    <div class="info-value" id="trial-date">-</div>
-                </div>
-                <div class="info-group" id="ends-group" style="display: none;">
-                    <div class="info-label">Next Billing Date</div>
-                    <div class="info-value" id="sub-date">-</div>
-                </div>
-                <div style="margin-top: 25px;">
-                    <a href="pricing" class="btn" style="text-decoration: none; display: inline-block;">Upgrade Plan</a>
-                </div>
-            </div>
-
             <!-- Profile Tab -->
-            <div id="tab-profile" class="tab-content">
+            <div id="tab-profile" class="tab-content active">
                 <div class="info-group">
                     <div class="info-label">Email Address</div>
                     <div class="info-value" id="user-email">Loading...</div>
@@ -142,26 +118,6 @@
 
         async function loadProfile() {
             try {
-                // Check if returning from Cashfree payment
-                const urlParams = new URLSearchParams(window.location.search);
-                const orderId = urlParams.get('order_id');
-                const plan = urlParams.get('plan');
-
-                if (orderId) {
-                    const verifyRes = await fetch('/api/payment/verify', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ order_id: orderId, plan: plan })
-                    });
-                    const verifyData = await verifyRes.json();
-                    if (verifyRes.ok) {
-                        const alertBox = document.getElementById('status-alert');
-                        alertBox.innerText = "🎉 Payment verified! Your 7-Day Free Trial is now active.";
-                        alertBox.style.display = 'block';
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                    }
-                }
-
                 const res = await fetch('/api/user/profile', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -174,25 +130,6 @@
 
                 if (user.authProvider === 'google') {
                     document.getElementById('password-form').innerHTML = '<p style="color: var(--text-secondary);">Your account is managed via Google Sign-In. Password reset is not applicable.</p>';
-                }
-
-                const statusEl = document.getElementById('sub-status');
-                if (user.isPremium) {
-                    if (user.subscriptionStatus === 'trial') {
-                        statusEl.innerHTML = '<span class="badge badge-trial">7-Day Free Trial Active</span>';
-                        if (user.trialEndsAt) {
-                            document.getElementById('trial-group').style.display = 'block';
-                            document.getElementById('trial-date').innerText = new Date(user.trialEndsAt).toLocaleDateString();
-                        }
-                    } else {
-                        statusEl.innerHTML = '<span class="badge badge-active">Active Subscriber</span>';
-                    }
-                    if (user.subscriptionPlan) {
-                        document.getElementById('plan-group').style.display = 'block';
-                        document.getElementById('sub-plan').innerText = user.subscriptionPlan.toUpperCase();
-                    }
-                } else {
-                    statusEl.innerHTML = '<span class="badge badge-none">Free Tier</span>';
                 }
             } catch (e) {
                 console.error("Failed to load profile", e);

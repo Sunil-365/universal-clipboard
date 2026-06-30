@@ -277,41 +277,10 @@ app.get('/api/me', authenticateToken, async (req, res) => {
 app.post('/api/verify-payment', authenticateToken, async (req, res) => {
     try {
         const { transaction_id, fullEventData } = req.body;
-        console.log("Verify payment called with transaction_id:", transaction_id);
-        console.log("Full Event Data:", JSON.stringify(fullEventData, null, 2));
-        if (!transaction_id) {
-            console.log("No transaction ID provided");
-            return res.status(400).json({ error: "No transaction ID provided" });
-        }
-
-        // Fetch transaction directly from Paddle API
-        const transaction = await paddle.transactions.get(transaction_id);
-        console.log("Fetched transaction status:", transaction?.status);
-        
-        const validStatuses = ['completed', 'paid', 'billed', 'ready'];
-        if (transaction && validStatuses.includes(transaction.status)) {
-            const user = await User.findById(req.user.id);
-            if (user) {
-                user.isPremium = true;
-                user.subscriptionStatus = 'active';
-                user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-                await user.save();
-                console.log(`Granted premium to ${user.email} via frontend transaction verification`);
-                return res.json({ success: true, isPremium: true });
-            }
-        }
-        console.log("Transaction not completed or user not found");
-        res.status(400).json({ error: "Transaction not completed or invalid" });
-    } catch (e) {
-        console.error("Verify payment error:", e);
-        res.status(500).json({ error: "Failed to verify payment" });
-    }
-});
-
 // --- Premium Clip History Routes ---
 app.get('/api/clips', authenticateToken, async (req, res) => {
     try {
-        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+
         const clips = await Clip.find({ userId: req.user.id }).sort({ createdAt: -1 }).limit(100);
         res.json(clips);
     } catch (err) {
@@ -322,7 +291,7 @@ app.get('/api/clips', authenticateToken, async (req, res) => {
 
 app.post('/api/clips', authenticateToken, async (req, res) => {
     try {
-        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+
         const { content } = req.body;
         if (!content || content.trim().length === 0) return res.status(400).json({ error: "Content cannot be empty" });
         
@@ -340,7 +309,7 @@ app.post('/api/clips', authenticateToken, async (req, res) => {
 
 app.delete('/api/clips/:id', authenticateToken, async (req, res) => {
     try {
-        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+
         const clipId = req.params.id;
         
         const deletedClip = await Clip.findOneAndDelete({ _id: clipId, userId: req.user.id });
@@ -357,7 +326,7 @@ app.delete('/api/clips/:id', authenticateToken, async (req, res) => {
 // Endpoint for Custom Persistent Room Claim
 app.post('/api/room/claim', authenticateToken, async (req, res) => {
     try {
-        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+
         
         const { customRoomId } = req.body;
         if (!customRoomId) return res.status(400).json({ error: "Room name required." });
@@ -395,7 +364,7 @@ app.post('/api/room/claim', authenticateToken, async (req, res) => {
 // Endpoint to fetch current room status
 app.get('/api/room', authenticateToken, async (req, res) => {
     try {
-        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+
         let user = await User.findById(req.user.id);
         res.json({ customRoomIds: user.customRoomIds || [] });
     } catch (err) {
@@ -406,7 +375,7 @@ app.get('/api/room', authenticateToken, async (req, res) => {
 // Endpoint to delete a room
 app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
     try {
-        if (!req.user.isPremium) return res.status(403).json({ error: "Premium subscription required." });
+
         let user = await User.findById(req.user.id);
         user.customRoomIds = user.customRoomIds.filter(id => id !== req.params.roomId);
         await user.save();
@@ -416,76 +385,6 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
     }
 });
 // -----------------------
-// --- Paddle Billing Integration ---
-const { Paddle, Environment } = require('@paddle/paddle-node-sdk');
-
-// Hardcoded Live key to override any old Sandbox keys in Railway environment variables
-const paddle = new Paddle('pdl_live_apikey_01kwbkfj5cezsk8znmqrrxm6jx_74kwwDhrjaxW24Y2aVn1JR_A33', {
-    environment: Environment.production, // Use production for LIVE
-});
-
-// Webhook Listener for Paddle Billing events
-app.post('/api/webhooks/paddle', async (req, res) => {
-    try {
-        const signature = req.headers['paddle-signature'];
-        const secret = process.env.PADDLE_WEBHOOK_SECRET || 'pdl_live_wbs_ntfset_01kwbm397maz1fz78xk3fae1hg';
-        
-        // Use req.rawBody populated by express.json middleware
-        if (!req.rawBody) {
-            console.error('No raw body found for webhook verification');
-            return res.status(400).send('No raw body');
-        }
-
-        let eventData;
-        try {
-            eventData = paddle.webhooks.unmarshal(req.rawBody, secret, signature);
-        } catch (e) {
-            console.error('Signature verification failed:', e);
-            return res.status(400).send('Invalid signature');
-        }
-
-        console.log('Paddle Webhook Event received:', eventData.eventType);
-
-        // Paddle uses 'transaction.completed' or 'subscription.activated'
-        if (eventData.eventType === 'transaction.completed' || eventData.eventType === 'subscription.activated') {
-            let customerEmail = null;
-            if (eventData.data && eventData.data.customData && eventData.data.customData.customer_email) {
-                customerEmail = eventData.data.customData.customer_email;
-            }
-
-            if (customerEmail) {
-                const user = await User.findOne({ email: customerEmail });
-                if (user) {
-                    user.isPremium = true;
-                    user.subscriptionStatus = 'active';
-                    user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // We could read real end date from eventData
-                    await user.save();
-                    console.log(`Updated user ${user.email} subscription status to active via Paddle webhook`);
-                }
-            }
-        } 
-        else if (eventData.eventType === 'subscription.canceled' || eventData.eventType === 'subscription.past_due') {
-            let customerEmail = null;
-            if (eventData.data && eventData.data.customData && eventData.data.customData.customer_email) {
-                customerEmail = eventData.data.customData.customer_email;
-            }
-            if (customerEmail) {
-                const user = await User.findOne({ email: customerEmail });
-                if (user) {
-                    user.isPremium = false;
-                    user.subscriptionStatus = eventData.eventType === 'subscription.canceled' ? 'canceled' : 'past_due';
-                    await user.save();
-                    console.log(`Revoked premium for ${user.email} due to cancellation or failed payment.`);
-                }
-            }
-        }
-
-        res.status(200).send('Webhook Received');
-    } catch (err) {
-        console.error('Webhook processing error:', err);
-        res.status(500).send('Server Error');
-    }
-});
 
 // 4. Get User Profile & Subscription Status
 app.get('/api/user/profile', authenticateToken, async (req, res) => {

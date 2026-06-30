@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 DropConnect
             </a>
             <div class="nav-links">
-                <a href="pricing">Pricing</a>
                 ${authLink}
             </div>
         </nav>
