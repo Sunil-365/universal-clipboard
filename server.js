@@ -274,9 +274,6 @@ app.get('/api/me', authenticateToken, async (req, res) => {
     }
 });
 
-app.post('/api/verify-payment', authenticateToken, async (req, res) => {
-    try {
-        const { transaction_id, fullEventData } = req.body;
 // --- Premium Clip History Routes ---
 app.get('/api/clips', authenticateToken, async (req, res) => {
     try {
