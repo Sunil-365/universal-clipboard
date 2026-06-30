@@ -446,7 +446,6 @@ app.post('/api/webhooks/paddle', async (req, res) => {
 
         // Paddle uses 'transaction.completed' or 'subscription.activated'
         if (eventData.eventType === 'transaction.completed' || eventData.eventType === 'subscription.activated') {
-            // Retrieve customer email from customData passed during checkout
             let customerEmail = null;
             if (eventData.data && eventData.data.customData && eventData.data.customData.customer_email) {
                 customerEmail = eventData.data.customData.customer_email;
@@ -457,12 +456,25 @@ app.post('/api/webhooks/paddle', async (req, res) => {
                 if (user) {
                     user.isPremium = true;
                     user.subscriptionStatus = 'active';
-                    user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                    user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // We could read real end date from eventData
                     await user.save();
                     console.log(`Updated user ${user.email} subscription status to active via Paddle webhook`);
                 }
-            } else {
-                console.warn('Webhook received but no customer email found in customData.');
+            }
+        } 
+        else if (eventData.eventType === 'subscription.canceled' || eventData.eventType === 'subscription.past_due') {
+            let customerEmail = null;
+            if (eventData.data && eventData.data.customData && eventData.data.customData.customer_email) {
+                customerEmail = eventData.data.customData.customer_email;
+            }
+            if (customerEmail) {
+                const user = await User.findOne({ email: customerEmail });
+                if (user) {
+                    user.isPremium = false;
+                    user.subscriptionStatus = eventData.eventType === 'subscription.canceled' ? 'canceled' : 'past_due';
+                    await user.save();
+                    console.log(`Revoked premium for ${user.email} due to cancellation or failed payment.`);
+                }
             }
         }
 
