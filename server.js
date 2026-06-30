@@ -387,113 +387,68 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
 });
 // -----------------------
 // --- Cashfree Payment Gateway & Settings ---
-const { Cashfree, CFEnvironment } = require('cashfree-pg');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
-const axios = require('axios');
-const cashfreeEnv = (process.env.CASHFREE_ENV || '').toUpperCase() === 'PRODUCTION' 
-    ? 'PRODUCTION' 
-    : 'SANDBOX';
-
-const cashfreeBaseUrl = cashfreeEnv === 'PRODUCTION' 
-    ? 'https://api.cashfree.com/pg' 
-    : 'https://sandbox.cashfree.com/pg';
-
-const cashfreeHeaders = {
-    'x-client-id': process.env.CASHFREE_APP_ID,
-    'x-client-secret': process.env.CASHFREE_SECRET_KEY,
-    'x-api-version': '2023-08-01',
-    'Content-Type': 'application/json'
-};
-
-// 1. Create Subscription Plans (Run once to setup plans on Cashfree)
-app.post('/api/payment/setup-plans', authenticateToken, async (req, res) => {
-    try {
-        const monthlyPlan = {
-            plan_id: "premium_monthly_01",
-            plan_name: "Premium Monthly",
-            plan_type: "PERIODIC",
-            plan_recurring_amount: 79.00,
-            plan_max_amount: 500.00,
-            plan_currency: "INR",
-            plan_interval_type: "MONTH",
-            plan_intervals: 1,
-            plan_max_cycles: 12
-        };
-        const yearlyPlan = {
-            plan_id: "premium_yearly_01",
-            plan_name: "Premium Yearly",
-            plan_type: "PERIODIC",
-            plan_recurring_amount: 799.00,
-            plan_max_amount: 2000.00,
-            plan_currency: "INR",
-            plan_interval_type: "YEAR",
-            plan_intervals: 1,
-            plan_max_cycles: 5
-        };
-
-        await axios.post(`${cashfreeBaseUrl}/plans`, monthlyPlan, { headers: cashfreeHeaders });
-        await axios.post(`${cashfreeBaseUrl}/plans`, yearlyPlan, { headers: cashfreeHeaders });
-        res.json({ success: true, message: "Plans created successfully" });
-    } catch (err) {
-        console.error("Plan creation error:", err.response ? err.response.data : err.message);
-        res.status(500).json({ error: "Failed to setup plans" });
-    }
+const razorpayInstance = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// 2. Create Subscription Session (replaces PGCreateOrder)
+// 1. Create Subscription Session
 app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
     try {
         const { plan } = req.body; // 'monthly' or 'yearly'
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        const subscriptionId = "sub_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-        const planId = plan === 'yearly' ? 'premium_yearly_01' : 'premium_monthly_01';
+        // Ideally, these Plan IDs should come from your database or environment variables 
+        // after generating them via setup-plans.js
+        const planId = plan === 'yearly' ? 'plan_yearly_id_here' : 'plan_monthly_id_here'; 
 
-        const request = {
-            subscription_id: subscriptionId,
-            plan_details: {
-                plan_id: planId
-            },
-            customer_details: {
-                customer_name: user.email.split('@')[0],
-                customer_email: user.email,
-                customer_phone: user.phone || "9999999999"
-            },
-            subscription_meta: {
-                return_url: `${req.protocol}://${req.get('host')}/settings?sub_id=${subscriptionId}&status=success`,
-                notification_channel: ["EMAIL", "SMS"]
+        const options = {
+            plan_id: planId,
+            total_count: plan === 'yearly' ? 5 : 12,
+            customer_notify: 1,
+            notes: {
+                customer_email: user.email // Store email in notes so we can retrieve it in webhook
             }
         };
 
-        const response = await axios.post(`${cashfreeBaseUrl}/subscriptions`, request, { headers: cashfreeHeaders });
+        const subscription = await razorpayInstance.subscriptions.create(options);
         
-        // Return the Cashfree hosted checkout URL for authorization
         res.json({
-            subscription_id: subscriptionId,
-            checkout_url: response.data.subscription_session_id 
-                ? `https://payments.cashfree.com/subscription/${response.data.subscription_session_id}` // Production
-                : response.data.auth_url || `https://sandbox.cashfree.com/pg/view/subscription/${response.data.subscription_session_id}`,
-            payment_session_id: response.data.subscription_session_id || response.data.payment_session_id
+            subscription_id: subscription.id,
+            payment_session_id: subscription.id, // Return the Razorpay Subscription ID
+            key_id: process.env.RAZORPAY_KEY_ID
         });
     } catch (err) {
-        const errorDetails = err.response ? err.response.data : err.message;
-        console.error("Cashfree subscription error:", errorDetails);
-        const userMsg = err.response?.data?.message || err.message || "Failed to initialize subscription";
-        res.status(500).json({ error: userMsg });
+        console.error("Razorpay subscription error:", err);
+        res.status(500).json({ error: "Failed to initialize subscription" });
     }
 });
 
-// 3. Webhook Listener for Subscription events
-app.post('/api/webhooks/cashfree', express.json(), async (req, res) => {
+// 2. Webhook Listener for Subscription events
+app.post('/api/webhooks/razorpay', express.json(), async (req, res) => {
     try {
-        const event = req.body;
-        console.log('Cashfree Webhook Event received:', event.type);
+        const secret = process.env.RAZORPAY_WEBHOOK_SECRET || 'fallback_secret';
+        const signature = req.headers['x-razorpay-signature'];
+        
+        const expectedSignature = crypto.createHmac('sha256', secret)
+            .update(JSON.stringify(req.body))
+            .digest('hex');
 
-        // Handle successful new subscription mandate authorization
-        if (event.type === 'SUBSCRIPTION_NEW' || event.type === 'SUBSCRIPTION_STATUS_CHANGE') {
-            const customerEmail = event.data?.subscription?.customer_details?.customer_email || event.data?.customer_details?.customer_email;
-            if (customerEmail && event.data?.subscription?.subscription_status === 'ACTIVE') {
+        if (expectedSignature !== signature) {
+            return res.status(400).send('Invalid signature');
+        }
+
+        const event = req.body;
+        console.log('Razorpay Webhook Event received:', event.event);
+
+        if (event.event === 'subscription.charged' || event.event === 'subscription.activated') {
+            const customerEmail = event.payload.subscription.entity.notes?.customer_email;
+            
+            if (customerEmail) {
                 const user = await User.findOne({ email: customerEmail });
                 if (user) {
                     user.isPremium = true;
@@ -501,21 +456,6 @@ app.post('/api/webhooks/cashfree', express.json(), async (req, res) => {
                     user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Add 30 days
                     await user.save();
                     console.log(`Updated user ${user.email} subscription status to active via webhook`);
-                }
-            }
-        }
-
-        // Handle recurring subscription charge success
-        if (event.type === 'SUBSCRIPTION_CHARGE_SUCCESS' || event.type === 'SUBSCRIPTION_CHARGED') {
-            const customerEmail = event.data?.subscription?.customer_details?.customer_email || event.data?.customer_details?.customer_email;
-            if (customerEmail) {
-                const user = await User.findOne({ email: customerEmail });
-                if (user) {
-                    user.isPremium = true;
-                    user.subscriptionStatus = 'active';
-                    user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-                    await user.save();
-                    console.log(`Renewed user ${user.email} via recurring webhook`);
                 }
             }
         }

@@ -1,59 +1,48 @@
 require('dotenv').config();
-const axios = require('axios');
+const Razorpay = require('razorpay');
 
-const cashfreeEnv = (process.env.CASHFREE_ENV || '').toUpperCase() === 'PRODUCTION' 
-    ? 'PRODUCTION' 
-    : 'SANDBOX';
-
-const cashfreeBaseUrl = cashfreeEnv === 'PRODUCTION' 
-    ? 'https://api.cashfree.com/pg' 
-    : 'https://sandbox.cashfree.com/pg';
-
-const cashfreeHeaders = {
-    'x-client-id': process.env.CASHFREE_APP_ID,
-    'x-client-secret': process.env.CASHFREE_SECRET_KEY,
-    'x-api-version': '2023-08-01',
-    'Content-Type': 'application/json'
-};
+const instance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 const monthlyPlan = {
-    plan_id: "premium_monthly_01",
-    plan_name: "Premium Monthly",
-    plan_type: "PERIODIC",
-    plan_recurring_amount: 79.00,
-    plan_max_amount: 500.00,
-    plan_currency: "INR",
-    plan_interval_type: "MONTH",
-    plan_intervals: 1,
-    plan_max_cycles: 12
+  period: "monthly",
+  interval: 1,
+  item: {
+    name: "Premium Monthly",
+    amount: 7900, // Amount in paise (79 INR)
+    currency: "INR",
+    description: "Premium Monthly Subscription"
+  }
 };
+
 const yearlyPlan = {
-    plan_id: "premium_yearly_01",
-    plan_name: "Premium Yearly",
-    plan_type: "PERIODIC",
-    plan_recurring_amount: 799.00,
-    plan_max_amount: 2000.00,
-    plan_currency: "INR",
-    plan_interval_type: "YEAR",
-    plan_intervals: 1,
-    plan_max_cycles: 5
+  period: "yearly",
+  interval: 1,
+  item: {
+    name: "Premium Yearly",
+    amount: 79900, // Amount in paise (799 INR)
+    currency: "INR",
+    description: "Premium Yearly Subscription"
+  }
 };
 
 async function createPlans() {
     try {
-        console.log('Creating monthly plan...');
-        await axios.post(`${cashfreeBaseUrl}/plans`, monthlyPlan, { headers: cashfreeHeaders });
-        console.log('Monthly plan created.');
+        console.log('Creating Razorpay monthly plan...');
+        const res = await instance.plans.create(monthlyPlan);
+        console.log('Monthly plan created! Plan ID:', res.id);
     } catch (e) {
-        console.error('Monthly plan error:', e.response ? e.response.data : e.message);
+        console.error('Monthly plan error:', e);
     }
     
     try {
-        console.log('Creating yearly plan...');
-        await axios.post(`${cashfreeBaseUrl}/plans`, yearlyPlan, { headers: cashfreeHeaders });
-        console.log('Yearly plan created.');
+        console.log('Creating Razorpay yearly plan...');
+        const res = await instance.plans.create(yearlyPlan);
+        console.log('Yearly plan created! Plan ID:', res.id);
     } catch (e) {
-        console.error('Yearly plan error:', e.response ? e.response.data : e.message);
+        console.error('Yearly plan error:', e);
     }
 }
 
