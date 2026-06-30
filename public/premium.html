@@ -175,7 +175,7 @@
                                             'Content-Type': 'application/json',
                                             'Authorization': `Bearer ${token}` 
                                         },
-                                        body: JSON.stringify({ transaction_id })
+                                        body: JSON.stringify({ transaction_id, fullEventData: data })
                                     });
                                     const result = await res.json();
                                     if (result.isPremium) {

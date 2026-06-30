@@ -276,11 +276,17 @@ app.get('/api/me', authenticateToken, async (req, res) => {
 
 app.post('/api/verify-payment', authenticateToken, async (req, res) => {
     try {
-        const { transaction_id } = req.body;
-        if (!transaction_id) return res.status(400).json({ error: "No transaction ID provided" });
+        const { transaction_id, fullEventData } = req.body;
+        console.log("Verify payment called with transaction_id:", transaction_id);
+        console.log("Full Event Data:", JSON.stringify(fullEventData, null, 2));
+        if (!transaction_id) {
+            console.log("No transaction ID provided");
+            return res.status(400).json({ error: "No transaction ID provided" });
+        }
 
         // Fetch transaction directly from Paddle API
         const transaction = await paddle.transactions.get(transaction_id);
+        console.log("Fetched transaction status:", transaction?.status);
         
         if (transaction && transaction.status === 'completed') {
             const user = await User.findById(req.user.id);
@@ -293,6 +299,7 @@ app.post('/api/verify-payment', authenticateToken, async (req, res) => {
                 return res.json({ success: true, isPremium: true });
             }
         }
+        console.log("Transaction not completed or user not found");
         res.status(400).json({ error: "Transaction not completed or invalid" });
     } catch (e) {
         console.error("Verify payment error:", e);
