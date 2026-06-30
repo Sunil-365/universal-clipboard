@@ -412,33 +412,23 @@ app.post('/api/payment/setup-plans', authenticateToken, async (req, res) => {
             plan_id: "premium_monthly_01",
             plan_name: "Premium Monthly",
             plan_type: "PERIODIC",
-            plan_amount: 79.00,
-            amount: 79.00,
+            plan_recurring_amount: 79.00,
             plan_max_amount: 500.00,
             plan_currency: "INR",
-            currency: "INR",
             plan_interval_type: "MONTH",
-            interval_type: "MONTH",
             plan_intervals: 1,
-            intervals: 1,
-            plan_max_cycles: 12,
-            max_cycles: 12
+            plan_max_cycles: 12
         };
         const yearlyPlan = {
             plan_id: "premium_yearly_01",
             plan_name: "Premium Yearly",
             plan_type: "PERIODIC",
-            plan_amount: 799.00,
-            amount: 799.00,
+            plan_recurring_amount: 799.00,
             plan_max_amount: 2000.00,
             plan_currency: "INR",
-            currency: "INR",
             plan_interval_type: "YEAR",
-            interval_type: "YEAR",
             plan_intervals: 1,
-            intervals: 1,
-            plan_max_cycles: 5,
-            max_cycles: 5
+            plan_max_cycles: 5
         };
 
         await axios.post(`${cashfreeBaseUrl}/plans`, monthlyPlan, { headers: cashfreeHeaders });
@@ -483,7 +473,8 @@ app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
             subscription_id: subscriptionId,
             checkout_url: response.data.subscription_session_id 
                 ? `https://payments.cashfree.com/subscription/${response.data.subscription_session_id}` // Production
-                : response.data.auth_url || `https://sandbox.cashfree.com/pg/view/subscription/${response.data.subscription_session_id}`
+                : response.data.auth_url || `https://sandbox.cashfree.com/pg/view/subscription/${response.data.subscription_session_id}`,
+            payment_session_id: response.data.subscription_session_id || response.data.payment_session_id
         });
     } catch (err) {
         const errorDetails = err.response ? err.response.data : err.message;

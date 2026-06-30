@@ -119,8 +119,14 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Failed to initialize payment');
 
-                if (data.checkout_url) {
-                    window.location.href = data.checkout_url;
+                if (data.payment_session_id) {
+                    let checkoutOptions = {
+                        paymentSessionId: data.payment_session_id,
+                        redirectTarget: "_self"
+                    };
+                    cashfree.checkout(checkoutOptions);
+                } else if (data.checkout_url) {
+                    window.location.href = data.checkout_url; // fallback
                 } else {
                     throw new Error('No checkout URL received');
                 }
