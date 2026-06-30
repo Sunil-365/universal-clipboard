@@ -209,13 +209,13 @@
                 // Fetch local pricing for buttons
                 Paddle.PricePreview({
                     items: [
-                        { priceId: 'pri_01kwbkgk2903tr6pttqhkbxych', quantity: 1 },
+                        { priceId: 'pri_01kwc4fw8s4bza2cayr5d46v8q', quantity: 1 },
                         { priceId: 'pri_01kwbkgkda68awbqctb46yypgk', quantity: 1 }
                     ]
                 }).then(result => {
                     const items = result.data.details.lineItems;
                     items.forEach(item => {
-                        if (item.price.id === 'pri_01kwbkgk2903tr6pttqhkbxych') {
+                        if (item.price.id === 'pri_01kwc4fw8s4bza2cayr5d46v8q') {
                             const btn = document.querySelector('.btn-upgrade.monthly');
                             if(btn) btn.innerText = `Upgrade Monthly (${item.formattedTotals.total}/mo)`;
                         } else if (item.price.id === 'pri_01kwbkgkda68awbqctb46yypgk') {
@@ -248,7 +248,7 @@
                     alert("Please log in first.");
                     return;
                 }
-                const priceId = plan === 'yearly' ? 'pri_01kwbkgkda68awbqctb46yypgk' : 'pri_01kwbkgk2903tr6pttqhkbxych';
+                const priceId = plan === 'yearly' ? 'pri_01kwbkgkda68awbqctb46yypgk' : 'pri_01kwc4fw8s4bza2cayr5d46v8q';
                 Paddle.Checkout.open({
                     items: [{ priceId: priceId, quantity: 1 }],
                     customer: { email: window.currentUser.email },
