@@ -6,7 +6,7 @@
     <title>Upgrade to Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
@@ -96,6 +96,13 @@
     </div>
 
     <script>
+        // Initialize Paddle
+        Paddle.Environment.set('sandbox');
+        Paddle.Initialize({ 
+            token: 'test_75c55ff5451dd18cb2bfe553a45',
+            // You can optionally add an eventCallback here to listen for checkout events
+        });
+
         async function startSubscription(plan) {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -105,37 +112,29 @@
             }
 
             try {
-                const res = await fetch('/api/payment/create-session', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ plan })
+                // Fetch user profile to get email for checkout
+                const res = await fetch('/api/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Failed to initialize payment');
+                const user = await res.json();
+                if (!res.ok) throw new Error('Could not fetch user profile');
 
-                if (data.subscription_id) {
-                    var options = {
-                        key: data.key_id,
-                        subscription_id: data.subscription_id,
-                        name: "Premium Subscription",
-                        description: "Monthly or Yearly plan",
-                        handler: function (response){
-                            // Callback after successful payment authorization
-                            window.location.href = `/settings?sub_id=${data.subscription_id}&status=success`;
-                        },
-                        theme: {
-                            color: "#4f46e5"
-                        }
-                    };
-                    var rzp1 = new Razorpay(options);
-                    rzp1.open();
-                } else {
-                    throw new Error('No checkout session received');
-                }
+                const priceId = plan === 'yearly' ? 'pri_01kwber8q7vkm3qdq2zw0wcr0t' : 'pri_01kwber8bgb20ha08dshjza212';
+
+                Paddle.Checkout.open({
+                    items: [
+                        { priceId: priceId, quantity: 1 }
+                    ],
+                    customer: {
+                        email: user.email
+                    },
+                    customData: {
+                        customer_email: user.email
+                    },
+                    settings: {
+                        successUrl: window.location.origin + '/settings?status=success'
+                    }
+                });
             } catch (err) {
                 alert(err.message);
             }

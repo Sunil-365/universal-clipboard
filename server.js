@@ -81,7 +81,11 @@ io.on('connection', (socket) => {
 });
 
 // --- Feedback System ---
-app.use(express.json());
+app.use(express.json({
+    verify: (req, res, buf) => {
+        req.rawBody = buf.toString();
+    }
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
@@ -386,77 +390,54 @@ app.delete('/api/room/:roomId', authenticateToken, async (req, res) => {
     }
 });
 // -----------------------
-// --- Cashfree Payment Gateway & Settings ---
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
+// --- Paddle Billing Integration ---
+const { Paddle, Environment } = require('@paddle/paddle-node-sdk');
 
-const razorpayInstance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
+const paddle = new Paddle(process.env.PADDLE_API_KEY || 'fallback_key', {
+    environment: Environment.sandbox, // Change to production for live
 });
 
-// 1. Create Subscription Session
-app.post('/api/payment/create-session', authenticateToken, async (req, res) => {
+// Webhook Listener for Paddle Billing events
+app.post('/api/webhooks/paddle', async (req, res) => {
     try {
-        const { plan } = req.body; // 'monthly' or 'yearly'
-        const user = await User.findById(req.user.id);
-        if (!user) return res.status(404).json({ error: "User not found" });
-
-        // Ideally, these Plan IDs should come from your database or environment variables 
-        // after generating them via setup-plans.js
-        const planId = plan === 'yearly' ? 'plan_yearly_id_here' : 'plan_monthly_id_here'; 
-
-        const options = {
-            plan_id: planId,
-            total_count: plan === 'yearly' ? 5 : 12,
-            customer_notify: 1,
-            notes: {
-                customer_email: user.email // Store email in notes so we can retrieve it in webhook
-            }
-        };
-
-        const subscription = await razorpayInstance.subscriptions.create(options);
+        const signature = req.headers['paddle-signature'];
+        const secret = process.env.PADDLE_WEBHOOK_SECRET || 'fallback_secret';
         
-        res.json({
-            subscription_id: subscription.id,
-            payment_session_id: subscription.id, // Return the Razorpay Subscription ID
-            key_id: process.env.RAZORPAY_KEY_ID
-        });
-    } catch (err) {
-        console.error("Razorpay subscription error:", err);
-        res.status(500).json({ error: "Failed to initialize subscription" });
-    }
-});
+        // Use req.rawBody populated by express.json middleware
+        if (!req.rawBody) {
+            console.error('No raw body found for webhook verification');
+            return res.status(400).send('No raw body');
+        }
 
-// 2. Webhook Listener for Subscription events
-app.post('/api/webhooks/razorpay', express.json(), async (req, res) => {
-    try {
-        const secret = process.env.RAZORPAY_WEBHOOK_SECRET || 'fallback_secret';
-        const signature = req.headers['x-razorpay-signature'];
-        
-        const expectedSignature = crypto.createHmac('sha256', secret)
-            .update(JSON.stringify(req.body))
-            .digest('hex');
-
-        if (expectedSignature !== signature) {
+        let eventData;
+        try {
+            eventData = paddle.webhooks.unmarshal(req.rawBody, secret, signature);
+        } catch (e) {
+            console.error('Signature verification failed:', e);
             return res.status(400).send('Invalid signature');
         }
 
-        const event = req.body;
-        console.log('Razorpay Webhook Event received:', event.event);
+        console.log('Paddle Webhook Event received:', eventData.eventType);
 
-        if (event.event === 'subscription.charged' || event.event === 'subscription.activated') {
-            const customerEmail = event.payload.subscription.entity.notes?.customer_email;
-            
+        // Paddle uses 'transaction.completed' or 'subscription.activated'
+        if (eventData.eventType === 'transaction.completed' || eventData.eventType === 'subscription.activated') {
+            // Retrieve customer email from customData passed during checkout
+            let customerEmail = null;
+            if (eventData.data && eventData.data.customData && eventData.data.customData.customer_email) {
+                customerEmail = eventData.data.customData.customer_email;
+            }
+
             if (customerEmail) {
                 const user = await User.findOne({ email: customerEmail });
                 if (user) {
                     user.isPremium = true;
                     user.subscriptionStatus = 'active';
-                    user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Add 30 days
+                    user.subscriptionEndsAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
                     await user.save();
-                    console.log(`Updated user ${user.email} subscription status to active via webhook`);
+                    console.log(`Updated user ${user.email} subscription status to active via Paddle webhook`);
                 }
+            } else {
+                console.warn('Webhook received but no customer email found in customData.');
             }
         }
 

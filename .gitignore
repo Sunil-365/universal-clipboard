@@ -3,3 +3,4 @@ node_modules/
 .DS_Store
 cashfree-mcp/
 razorpay-mcp-server/
+.env

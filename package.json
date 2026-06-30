@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@paddle/paddle-node-sdk": "^3.8.0",
     "axios": "^1.18.1",
     "bcrypt": "^6.0.0",
     "cashfree-pg": "^6.0.4",
@@ -22,7 +23,6 @@
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.3",
-    "razorpay": "^2.9.6",
     "socket.io": "^4.8.3"
   }
 }
