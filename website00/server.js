@@ -26,7 +26,7 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 200, // Limit each IP to 200 requests per windowMs
     message: "Too many requests from this IP, please try again later.",
-    standardHeaders: true, 
+    standardHeaders: true,
     legacyHeaders: false,
 });
 app.use(limiter);
@@ -43,9 +43,9 @@ io.on('connection', (socket) => {
     socket.on('join-room', (roomId) => {
         socket.join(roomId);
         console.log(`Socket ${socket.id} joined room ${roomId}`);
-        
+
         // If it's a new standard random room (Free Tier), set a 10 min timeout
-        if (roomId && !roomId.startsWith('desk-')) { 
+        if (roomId && !roomId.startsWith('desk-')) {
             if (!roomTimeouts[roomId]) {
                 roomTimeouts[roomId] = setTimeout(() => {
                     io.to(roomId).emit('session-expired');
@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
     socket.on('send-data', async (data) => {
         // data contains { roomId, type: 'text'|'url'|'file', content: '...', token?: '...' }
         socket.to(data.roomId).emit('receive-data', data);
-        
+
         // History Log Integration
         if (data.token) {
             try {
@@ -151,9 +151,9 @@ const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-    
+
     if (!token) return res.status(401).json({ error: "Access denied. No token provided." });
-    
+
     jwt.verify(token, JWT_SECRET, async (err, decodedUser) => {
         if (err) return res.status(403).json({ error: "Invalid or expired token." });
         try {
@@ -184,7 +184,7 @@ app.post('/api/auth/google', async (req, res) => {
         if (!MONGODB_URI) return res.status(500).json({ error: "Database not configured" });
 
         let user = await User.findOne({ email });
-        
+
         if (user) {
             if (!user.googleId) {
                 user.googleId = googleId;
@@ -196,7 +196,7 @@ app.post('/api/auth/google', async (req, res) => {
         }
 
         const token = jwt.sign({ id: user._id, email: user.email, isPremium: user.isPremium }, JWT_SECRET, { expiresIn: '7d' });
-        
+
         // If request came from a full-page form redirect, return HTML to set localStorage and redirect to premium.html
         if (req.headers['content-type'] && req.headers['content-type'].includes('application/x-www-form-urlencoded')) {
             return res.send(`
@@ -236,7 +236,7 @@ app.post('/api/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({ email, password: hashedPassword });
         await user.save();
-        
+
         const token = jwt.sign({ id: user._id, email: user.email, isPremium: user.isPremium }, JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({ token, user: { email: user.email, isPremium: user.isPremium } });
     } catch (err) {
@@ -292,7 +292,7 @@ app.post('/api/clips', authenticateToken, async (req, res) => {
 
         const { content } = req.body;
         if (!content || content.trim().length === 0) return res.status(400).json({ error: "Content cannot be empty" });
-        
+
         const newClip = new Clip({
             userId: req.user.id,
             content: content.trim()
@@ -309,10 +309,10 @@ app.delete('/api/clips/:id', authenticateToken, async (req, res) => {
     try {
 
         const clipId = req.params.id;
-        
+
         const deletedClip = await Clip.findOneAndDelete({ _id: clipId, userId: req.user.id });
         if (!deletedClip) return res.status(404).json({ error: "Clip not found or unauthorized" });
-        
+
         res.json({ message: "Clip deleted successfully" });
     } catch (err) {
         console.error("Error deleting clip:", err);
@@ -325,10 +325,10 @@ app.delete('/api/clips/:id', authenticateToken, async (req, res) => {
 app.post('/api/room/claim', authenticateToken, async (req, res) => {
     try {
 
-        
+
         const { customRoomId } = req.body;
         if (!customRoomId) return res.status(400).json({ error: "Room name required." });
-        
+
         // Clean the custom room ID (letters and numbers only)
         const cleanRoomId = customRoomId.replace(/[^a-zA-Z0-9]/g, '');
         if (cleanRoomId.length < 3) return res.status(400).json({ error: "Room name must be at least 3 alphanumeric characters." });
@@ -340,18 +340,18 @@ app.post('/api/room/claim', authenticateToken, async (req, res) => {
         }
 
         let user = await User.findById(req.user.id);
-        
+
         // Prevent exceeding limit
         if (user.customRoomIds.length >= 5) {
             return res.status(400).json({ error: "Maximum of 5 spaces allowed." });
         }
-        
+
         // Add if not already present
         if (!user.customRoomIds.includes(cleanRoomId)) {
             user.customRoomIds.push(cleanRoomId);
             await user.save();
         }
-        
+
         res.json({ message: "Room claimed successfully!", customRoomIds: user.customRoomIds });
     } catch (err) {
         console.error("Room claim error:", err);
