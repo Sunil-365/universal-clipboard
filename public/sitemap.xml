@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://yourdomain.com/</loc>
+    <loc>https://dropconnect.up.railway.app/</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/login</loc>
+    <loc>https://dropconnect.up.railway.app/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/sender</loc>
+    <loc>https://dropconnect.up.railway.app/sender</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/receiver</loc>
+    <loc>https://dropconnect.up.railway.app/receiver</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/contact</loc>
+    <loc>https://dropconnect.up.railway.app/contact</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/privacy</loc>
+    <loc>https://dropconnect.up.railway.app/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://yourdomain.com/terms</loc>
+    <loc>https://dropconnect.up.railway.app/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
