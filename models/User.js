@@ -25,25 +25,6 @@ const userSchema = new mongoose.Schema({
         sparse: true
     },
     isPremium: { type: Boolean, default: true }, // Automatically grant premium features to all users
-    subscriptionStatus: {
-        type: String,
-        enum: ['none', 'trial', 'active', 'cancelled'],
-        default: 'none'
-    },
-    subscriptionPlan: {
-        type: String,
-        enum: ['monthly', 'yearly', null],
-        default: null
-    },
-    trialEndsAt: {
-        type: Date
-    },
-    subscriptionEndsAt: {
-        type: Date
-    },
-    cashfreeSubscriptionId: {
-        type: String
-    },
     customRoomIds: {
         type: [String],
         default: []
