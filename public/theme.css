@@ -226,3 +226,49 @@ input:focus { outline: none; border-color: var(--accent-primary); }
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .navbar {
+        padding: 0 15px;
+    }
+    .nav-brand {
+        font-size: 1rem;
+    }
+    .nav-links {
+        gap: 10px;
+    }
+    .nav-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    .header, .clips-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        gap: 15px;
+    }
+    .header h1, .clips-header h2 {
+        justify-content: center;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+    .received-card .btn {
+        width: auto;
+        margin-bottom: 0;
+    }
+    .theme-toggle-btn {
+        bottom: 15px;
+        right: 15px;
+    }
+    .cards-container {
+        padding: 0 15px;
+    }
+    .action-card {
+        min-width: 100%;
+    }
+}
