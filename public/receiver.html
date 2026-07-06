@@ -28,9 +28,10 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Receive Files - DropConnect">
     <meta name="twitter:description" content="Display this DropConnect screen on your desktop to instantly receive files, links, and text from your other devices.">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.3/socket.io.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    <script src="socket.io.min.js"></script>
+    <script src="qrcode.min.js"></script>
+    <script src="crypto-js.min.js"></script>
+    <script src="vanilla-tilt.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js"></script>
@@ -66,7 +67,7 @@
             <p class="subtitle" style="margin-bottom: 20px;">Scan the QR code with your phone to establish a secure connection.</p>
             
             <div class="qr-wrapper">
-                <img id="qrcode" src="" alt="Loading QR..." />
+                <div id="qrcode" style="display: flex; justify-content: center; align-items: center; background: white;"></div>
                 <div class="timer-bar-container">
                     <div class="timer-bar" id="timerBar"></div>
                 </div>
@@ -134,7 +135,21 @@
                 const currentUrl = window.location.origin;
                 const senderUrl = `${currentUrl}/sender?room=${persistentRoomId}`;
                 
-                document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
+                const qrcodeContainer = document.getElementById('qrcode');
+                qrcodeContainer.innerHTML = '';
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(qrcodeContainer, {
+                        text: senderUrl,
+                        width: 180,
+                        height: 180,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.M
+                    });
+                } else {
+                    qrcodeContainer.innerHTML = '<div style="color: var(--danger); font-size: 0.8rem; text-align: center;">QR Error</div>';
+                }
+                
                 if (socket) {
                     socket.emit('join-room', persistentRoomId);
                 }
@@ -148,7 +163,21 @@
             const currentUrl = window.location.origin;
             const senderUrl = `${currentUrl}/sender?room=${newSessionId}#key=${encryptionKey}`;
 
-            document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = '';
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(qrcodeContainer, {
+                    text: senderUrl,
+                    width: 180,
+                    height: 180,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.M
+                });
+            } else {
+                qrcodeContainer.innerHTML = '<div style="color: var(--danger); font-size: 0.8rem; text-align: center;">QR Error</div>';
+            }
+            
             if (socket) {
                 socket.emit('join-room', newSessionId);
             }

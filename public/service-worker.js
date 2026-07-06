@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dropconnect-v9';
+const CACHE_NAME = 'dropconnect-v10';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -6,7 +6,12 @@ const ASSETS_TO_CACHE = [
   '/theme.js',
   '/navbar.js',
   '/favicon.svg',
-  '/manifest.json'
+  '/manifest.json',
+  '/socket.io.min.js',
+  '/qrcode.min.js',
+  '/crypto-js.min.js',
+  '/html5-qrcode.min.js',
+  '/vanilla-tilt.min.js'
 ];
 
 self.addEventListener('install', event => {
