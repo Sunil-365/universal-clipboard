@@ -44,6 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const outline = document.createElement('div');
         
         dot.className = 'custom-cursor-dot';
+        dot.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 512 512" style="display: block;">
+                <rect width="512" height="512" rx="112" fill="var(--accent-primary)"/>
+                <path d="M120 256 L400 120 L280 400 L240 296 L120 256 Z" fill="#FFFFFF"/>
+            </svg>
+        `;
         outline.className = 'custom-cursor-outline';
         
         document.body.appendChild(dot);
