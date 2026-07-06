@@ -259,9 +259,16 @@
                 btn.textContent = 'Open Link';
                 btn.onclick = () => window.open(data.content, '_blank');
             } else {
-                showSuccess("Text Received!");
+                // Auto-copy received text to clipboard
+                try {
+                    await navigator.clipboard.writeText(data.content);
+                    showSuccess("Auto-Copied to Clipboard!");
+                } catch (e) {
+                    console.warn("Auto-copy blocked by browser security.", e);
+                    showSuccess("Text Received!");
+                }
+
                 btn.textContent = 'Copy Text';
-                
                 btn.onclick = async () => {
                     try {
                         await navigator.clipboard.writeText(data.content);
