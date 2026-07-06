@@ -272,3 +272,50 @@ input:focus { outline: none; border-color: var(--accent-primary); }
         min-width: 100%;
     }
 }
+
+/* Custom Premium Cursor */
+@media (pointer: fine) {
+    html, body, a, button, input, select, textarea, [role="button"], .action-card, .theme-toggle-btn {
+        cursor: none !important;
+    }
+    
+    .custom-cursor-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--accent-primary);
+        border-radius: 50%;
+        position: fixed;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 99999;
+        opacity: 0;
+        transition: width 0.2s, height 0.2s, background-color 0.2s, opacity 0.3s ease;
+    }
+    
+    .custom-cursor-outline {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--accent-primary);
+        border-radius: 50%;
+        position: fixed;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 99998;
+        opacity: 0;
+        transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s, opacity 0.3s ease;
+    }
+    
+    /* Hover state for interactive elements */
+    .custom-cursor-hover .custom-cursor-dot {
+        width: 4px;
+        height: 4px;
+        background-color: #ffffff;
+    }
+    
+    .custom-cursor-hover .custom-cursor-outline {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(37, 99, 235, 0.15); /* Light semi-transparent blue */
+        border-color: var(--accent-primary);
+    }
+}
