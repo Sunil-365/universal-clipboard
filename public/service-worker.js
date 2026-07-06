@@ -1,16 +1,21 @@
-const CACHE_NAME = 'dropconnect-v16';
+const CACHE_NAME = 'dropconnect-v18';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
+  '/sender.html',
+  '/receiver.html',
+  '/login.html',
+  '/premium.html',
+  '/reset-password.html',
   '/theme.css',
   '/theme.js',
   '/navbar.js',
   '/favicon.svg',
   '/manifest.json',
-  '/supabase-js.js',
   '/supabase-config.js',
-  '/qrcode.min.js',
   '/crypto-js.min.js',
+  '/qrcode.min.js',
+  '/supabase-js.js',
   '/html5-qrcode.min.js',
   '/vanilla-tilt.min.js'
 ];

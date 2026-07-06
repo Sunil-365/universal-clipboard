@@ -68,8 +68,11 @@
                     <label>Email Address</label>
                     <input type="email" id="email" required placeholder="you@example.com">
                 </div>
-                <div class="input-group">
-                    <label>Password</label>
+                <div class="input-group" id="password-group">
+                    <label style="display: flex; justify-content: space-between;">
+                        Password
+                        <a href="#" id="forgot-password-link" style="color: var(--accent-primary); text-decoration: none; font-size: 0.85rem;">Forgot?</a>
+                    </label>
                     <input type="password" id="password" required placeholder="••••••••">
                 </div>
                 <button type="submit" class="btn" id="submit-btn" style="width: 100%;">Log In</button>
@@ -102,24 +105,56 @@
         }
 
         let isLogin = true;
+        let isForgotPassword = false;
         const formTitle = document.getElementById('form-title');
         const submitBtn = document.getElementById('submit-btn');
         const toggleMode = document.getElementById('toggle-mode');
         const errorMsg = document.getElementById('error-msg');
         const form = document.getElementById('auth-form');
+        const passwordGroup = document.getElementById('password-group');
+        const passwordInput = document.getElementById('password');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        const googleBtn = document.getElementById('google-btn');
+        const divider = document.querySelector('.divider');
+
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isForgotPassword = true;
+            formTitle.innerText = "Reset Password";
+            submitBtn.innerText = "Send Reset Link";
+            passwordGroup.style.display = 'none';
+            passwordInput.removeAttribute('required');
+            googleBtn.style.display = 'none';
+            divider.style.display = 'none';
+            toggleMode.innerHTML = "Remember your password? <span>Log In</span>";
+            errorMsg.innerText = "";
+        });
 
         toggleMode.addEventListener('click', () => {
-            isLogin = !isLogin;
+            if (isForgotPassword) {
+                isForgotPassword = false;
+                isLogin = true;
+                passwordGroup.style.display = 'block';
+                passwordInput.setAttribute('required', 'true');
+                googleBtn.style.display = 'flex';
+                divider.style.display = 'flex';
+            } else {
+                isLogin = !isLogin;
+            }
+            
             if (isLogin) {
                 formTitle.innerText = "Welcome Back";
                 submitBtn.innerText = "Log In";
                 toggleMode.innerHTML = "Don't have an account? <span>Sign Up</span>";
+                forgotPasswordLink.style.display = 'inline';
             } else {
                 formTitle.innerText = "Create Account";
                 submitBtn.innerText = "Sign Up";
                 toggleMode.innerHTML = "Already have an account? <span>Log In</span>";
+                forgotPasswordLink.style.display = 'none';
             }
             errorMsg.innerText = "";
+            errorMsg.style.color = 'var(--danger)';
         });
 
         form.addEventListener('submit', async (e) => {
@@ -133,7 +168,23 @@
             if (typeof supabaseClient === 'undefined') {
                 errorMsg.innerText = "Supabase not configured.";
                 submitBtn.disabled = false;
-                submitBtn.innerText = isLogin ? "Log In" : "Sign Up";
+                submitBtn.innerText = isForgotPassword ? "Send Reset Link" : (isLogin ? "Log In" : "Sign Up");
+                return;
+            }
+
+            if (isForgotPassword) {
+                const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + '/reset-password',
+                });
+                if (error) {
+                    errorMsg.innerText = error.message;
+                    errorMsg.style.color = 'var(--danger)';
+                } else {
+                    errorMsg.innerText = "Password reset link sent to your email!";
+                    errorMsg.style.color = 'var(--success)';
+                }
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Send Reset Link";
                 return;
             }
 
