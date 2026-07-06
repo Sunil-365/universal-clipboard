@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS public.clips (
 ALTER TABLE public.clips ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow authenticated users to manage their own clips
+DROP POLICY IF EXISTS "Users can manage their own clips" ON public.clips;
 CREATE POLICY "Users can manage their own clips" ON public.clips
     FOR ALL TO authenticated USING (auth.uid() = user_id);
 
@@ -28,10 +29,12 @@ CREATE TABLE IF NOT EXISTS public.rooms (
 ALTER TABLE public.rooms ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow authenticated users to manage their own custom rooms
+DROP POLICY IF EXISTS "Users can manage their own rooms" ON public.rooms;
 CREATE POLICY "Users can manage their own rooms" ON public.rooms
     FOR ALL TO authenticated USING (auth.uid() = owner_id);
 
 -- Create policy to allow anyone to select rooms (for checking existence when joining)
+DROP POLICY IF EXISTS "Anyone can check rooms" ON public.rooms;
 CREATE POLICY "Anyone can check rooms" ON public.rooms
     FOR SELECT TO anon, authenticated USING (true);
 
@@ -47,10 +50,12 @@ CREATE TABLE IF NOT EXISTS public.reviews (
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow anyone to view reviews
+DROP POLICY IF EXISTS "Anyone can view reviews" ON public.reviews;
 CREATE POLICY "Anyone can view reviews" ON public.reviews
     FOR SELECT TO anon, authenticated USING (true);
 
 -- Create policy to allow anyone to post reviews (limited to 500 chars)
+DROP POLICY IF EXISTS "Anyone can submit reviews" ON public.reviews;
 CREATE POLICY "Anyone can submit reviews" ON public.reviews
     FOR INSERT TO anon, authenticated WITH CHECK (length(content) <= 500);
 
@@ -66,6 +71,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Allow users to manage their own profile
+DROP POLICY IF EXISTS "Users can manage own profiles" ON public.profiles;
 CREATE POLICY "Users can manage own profiles" ON public.profiles
     FOR ALL TO authenticated USING (auth.uid() = id);
 
@@ -79,6 +85,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_auth_user_created
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
