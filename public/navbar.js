@@ -1,7 +1,15 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    const authLink = token 
-        ? `<a href="settings">Settings</a><a href="premium" class="nav-btn" style="background: var(--card-border); color: var(--text-primary) !important;">Dashboard</a><a href="#" onclick="localStorage.removeItem('token'); window.location.href='/';" class="nav-btn" style="background: rgba(239, 68, 68, 0.1); color: var(--danger) !important; border: 1px solid var(--danger); margin-left: 10px;">Log Out</a>`
+document.addEventListener('DOMContentLoaded', async () => {
+    let isAuthenticated = false;
+    if (typeof supabaseClient !== 'undefined') {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        isAuthenticated = !!user;
+    } else {
+        // Fallback if supabase isn't loaded
+        isAuthenticated = !!localStorage.getItem('token');
+    }
+
+    const authLink = isAuthenticated 
+        ? `<a href="settings">Settings</a><a href="premium" class="nav-btn" style="background: var(--card-border); color: var(--text-primary) !important;">Dashboard</a><a href="#" onclick="if(typeof supabaseClient !== 'undefined') { supabaseClient.auth.signOut().then(() => window.location.href='/'); } else { localStorage.removeItem('token'); window.location.href='/'; }" class="nav-btn" style="background: rgba(239, 68, 68, 0.1); color: var(--danger) !important; border: 1px solid var(--danger); margin-left: 10px;">Log Out</a>`
         : `<a href="login" class="nav-btn">Log In</a>`;
 
     const navbarHtml = `
@@ -13,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </svg>
                 DropConnect
             </a>
-            <div class="nav-links">
+            <div class="nav-links" id="nav-auth-links">
                 ${authLink}
             </div>
         </nav>

@@ -38,77 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Append to body
     document.body.appendChild(toggleBtn);
 
-    // --- Custom Premium Cursor Animation ---
-    if (window.matchMedia('(pointer: fine)').matches) {
-        const dot = document.createElement('div');
-        const outline = document.createElement('div');
-        
-        dot.className = 'custom-cursor-dot';
-        dot.innerHTML = `
-            <svg width="24" height="24" viewBox="0 0 512 512" style="display: block;">
-                <rect width="512" height="512" rx="112" fill="var(--accent-primary)"/>
-                <path d="M120 256 L400 120 L280 400 L240 296 L120 256 Z" fill="#FFFFFF"/>
-            </svg>
-        `;
-        outline.className = 'custom-cursor-outline';
-        
-        document.body.appendChild(dot);
-        document.body.appendChild(outline);
-        
-        let mouseX = 0;
-        let mouseY = 0;
-        let outlineX = 0;
-        let outlineY = 0;
-        let hasMoved = false;
-        
-        document.addEventListener('mousemove', (e) => {
-            if (!hasMoved) {
-                dot.style.opacity = '1';
-                outline.style.opacity = '1';
-                hasMoved = true;
-            }
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            dot.style.left = mouseX + 'px';
-            dot.style.top = mouseY + 'px';
-        });
-        
-        const animateOutline = () => {
-            outlineX += (mouseX - outlineX) * 0.15;
-            outlineY += (mouseY - outlineY) * 0.15;
-            
-            outline.style.left = outlineX + 'px';
-            outline.style.top = outlineY + 'px';
-            
-            requestAnimationFrame(animateOutline);
-        };
-        requestAnimationFrame(animateOutline);
-        
-        const interactiveSelector = 'a, button, input, select, textarea, .action-card, .btn, .theme-toggle-btn, [role="button"]';
-        
-        document.addEventListener('mouseover', (e) => {
-            if (e.target.closest(interactiveSelector)) {
-                document.body.classList.add('custom-cursor-hover');
-            }
-        });
-        
-        document.addEventListener('mouseout', (e) => {
-            if (!e.target.closest(interactiveSelector)) {
-                document.body.classList.remove('custom-cursor-hover');
-            }
-        });
-        
-        document.addEventListener('mouseleave', () => {
-            dot.style.opacity = '0';
-            outline.style.opacity = '0';
-            hasMoved = false;
-        });
-        
-        document.addEventListener('mouseenter', () => {
-            hasMoved = false;
-        });
-    }
+
 });
 
 // --- Anti-Copy & Anti-Inspect Protections ---
