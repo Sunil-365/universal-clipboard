@@ -297,7 +297,10 @@
                             if (originalText) {
                                 try {
                                     await navigator.clipboard.writeText(originalText);
-                                } catch (e) { console.error("Auto-copy failed:", e); }
+                                    window.showToast('Auto-copied to clipboard!');
+                                } catch (e) { 
+                                    console.error("Auto-copy failed:", e); 
+                                }
 
                                 const receiverBox = document.getElementById('dashboard-receiver');
                                 const empty = document.getElementById('dashboard-empty');
