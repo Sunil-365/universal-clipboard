@@ -321,10 +321,13 @@
                                 copyBtn.style.width = 'auto';
                                 copyBtn.style.fontSize = '0.85rem';
                                 copyBtn.innerHTML = 'Copy';
-                                copyBtn.onclick = () => {
-                                    navigator.clipboard.writeText(originalText);
-                                    copyBtn.innerHTML = 'Copied!';
-                                    setTimeout(() => copyBtn.innerHTML = 'Copy', 2000);
+                                copyBtn.onclick = async () => {
+                                    try {
+                                        await navigator.clipboard.writeText(originalText);
+                                        window.showToast('Copied to clipboard!');
+                                    } catch(e) {
+                                        window.showToast('Failed to copy', 'error');
+                                    }
                                 };
                                 
                                 card.appendChild(contentDiv);
@@ -440,9 +443,9 @@
                 const textarea = document.createElement('textarea');
                 textarea.innerHTML = text;
                 navigator.clipboard.writeText(textarea.value).then(() => {
-                    alert("Copied to clipboard!");
+                    window.showToast("Copied to clipboard!");
                 }).catch(() => {
-                    alert("Failed to copy.");
+                    window.showToast("Failed to copy.", "error");
                 });
             };
 

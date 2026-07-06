@@ -262,6 +262,7 @@
                 // Auto-copy received text to clipboard
                 try {
                     await navigator.clipboard.writeText(data.content);
+                    window.showToast("Copied to clipboard!");
                     showSuccess("Auto-Copied to Clipboard!");
                 } catch (e) {
                     console.warn("Auto-copy blocked by browser security.", e);
@@ -272,14 +273,9 @@
                 btn.onclick = async () => {
                     try {
                         await navigator.clipboard.writeText(data.content);
-                        btn.textContent = 'Copied!';
-                        btn.style.background = 'var(--success)';
-                        setTimeout(() => {
-                            btn.textContent = 'Copy Text';
-                            btn.style.background = '';
-                        }, 2000);
+                        window.showToast("Copied to clipboard!");
                     } catch(e) {
-                        alert("Failed to copy text. Please try again.");
+                        window.showToast("Failed to copy text", "error");
                     }
                 };
             }

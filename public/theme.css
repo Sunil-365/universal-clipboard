@@ -306,3 +306,37 @@ body.dark-theme .premium-banner {
     }
 }
 
+
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(50px);
+    background: var(--card-bg);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 9999;
+}
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+.toast-success svg {
+    color: var(--success);
+}
+.toast-error svg {
+    color: var(--danger);
+}
