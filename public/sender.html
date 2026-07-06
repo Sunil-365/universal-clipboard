@@ -97,10 +97,15 @@
     <div id="toast" class="status-toast">Sent successfully!</div>
     
     <script>
-        const socketUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
-            ? '' 
-            : 'https://dropconnect.up.railway.app';
-        const socket = io(socketUrl);
+        let socket;
+        if (typeof io !== 'undefined') {
+            const socketUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+                ? '' 
+                : 'https://dropconnect.up.railway.app';
+            socket = io(socketUrl);
+        } else {
+            console.error("Socket.io library not loaded. Running in offline/disconnected mode.");
+        }
         const input = document.getElementById('msgInput');
         const sendBtn = document.getElementById('sendBtn');
         const startScanBtn = document.getElementById('startScanBtn');
@@ -161,6 +166,11 @@
                 sendBtn.innerHTML = '<div class="loader-small"></div>';
                 
                 setTimeout(() => {
+                    if (!socket) {
+                        alert("Not connected to the server. Please check your internet connection.");
+                        sendBtn.innerHTML = originalContent;
+                        return;
+                    }
                     socket.emit('send-data', {
                         roomId: roomId,
                         type: type,

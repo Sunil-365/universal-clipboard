@@ -95,10 +95,15 @@
     </div>
 
     <script>
-        const socketUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
-            ? '' 
-            : 'https://dropconnect.up.railway.app';
-        const socket = io(socketUrl);
+        let socket;
+        if (typeof io !== 'undefined') {
+            const socketUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+                ? '' 
+                : 'https://dropconnect.up.railway.app';
+            socket = io(socketUrl);
+        } else {
+            console.error("Socket.io library not loaded.");
+        }
         const statusEl = document.getElementById('status');
         const receivedItemsEl = document.getElementById('receivedItems');
         const timerBar = document.getElementById('timerBar');
@@ -116,10 +121,12 @@
             if (adBanner) adBanner.style.display = 'none';
         }
 
-        socket.on('session-expired', () => {
-            alert("Free session expired (10 minutes max). Please refresh for a new session or upgrade to Premium.");
-            window.location.reload();
-        });
+        if (socket) {
+            socket.on('session-expired', () => {
+                alert("Free session expired (10 minutes max). Please refresh for a new session or upgrade to Premium.");
+                window.location.reload();
+            });
+        }
 
         function refreshQRCode() {
             if (persistentRoomId) {
@@ -128,7 +135,9 @@
                 const senderUrl = `${currentUrl}/sender?room=${persistentRoomId}`;
                 
                 document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
-                socket.emit('join-room', persistentRoomId);
+                if (socket) {
+                    socket.emit('join-room', persistentRoomId);
+                }
                 
                 document.querySelector('.timer-bar-container').style.display = 'none';
                 return; // Stop here, no timer needed
@@ -140,7 +149,9 @@
             const senderUrl = `${currentUrl}/sender?room=${newSessionId}#key=${encryptionKey}`;
 
             document.getElementById('qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(senderUrl)}`;
-            socket.emit('join-room', newSessionId);
+            if (socket) {
+                socket.emit('join-room', newSessionId);
+            }
 
             timerBar.style.animation = 'none';
             timerBar.offsetHeight; 
@@ -168,7 +179,8 @@
             }, 3000);
         }
 
-        socket.on('receive-data', async (data) => {
+        if (socket) {
+            socket.on('receive-data', async (data) => {
             if (!encryptionKey) {
                 showSuccess("Awaiting PIN entry...");
                 return;
@@ -230,6 +242,7 @@
             
             receivedItemsEl.insertBefore(card, receivedItemsEl.firstChild);
         });
+        }
 
         // Only initialize VanillaTilt on desktop (pointer: fine) devices
         if (window.matchMedia('(pointer: fine)').matches && typeof VanillaTilt !== 'undefined') {
