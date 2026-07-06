@@ -48,7 +48,7 @@
 
 
     <div class="container" style="margin-top: 40px; padding: 0;">
-        <div class="card" data-tilt data-tilt-max="2" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1" style="display: flex; flex-direction: column;">
+        <div class="card" style="display: flex; flex-direction: column;">
             
             <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
                 <h2 style="margin: 0; font-size: 1.4rem;">Mobile Sender</h2>
@@ -247,6 +247,16 @@
         }
 
         stopScanBtn.addEventListener('click', stopScanner);
+
+        // Only initialize VanillaTilt on desktop (pointer: fine) devices
+        if (window.matchMedia('(pointer: fine)').matches && typeof VanillaTilt !== 'undefined') {
+            VanillaTilt.init(document.querySelectorAll(".card"), {
+                max: 2,
+                speed: 400,
+                glare: true,
+                "max-glare": 0.1
+            });
+        }
     </script>
 </body>
 </html>

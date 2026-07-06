@@ -158,8 +158,7 @@
         </div>
 
         <div class="cards-container">
-            <a href="receiver" class="action-card receive" data-tilt data-tilt-max="5" data-tilt-speed="400"
-                data-tilt-glare="true" data-tilt-max-glare="0.2">
+            <a href="receiver" class="action-card receive">
                 <div class="icon-wrapper">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -173,8 +172,7 @@
                     QR code to receive data.</p>
             </a>
 
-            <a href="sender" class="action-card send" data-tilt data-tilt-max="5" data-tilt-speed="400"
-                data-tilt-glare="true" data-tilt-max-glare="0.2">
+            <a href="sender" class="action-card send">
                 <div class="icon-wrapper">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -210,6 +208,16 @@
             if (token) {
                 const adBanner = document.getElementById('index-ad-banner');
                 if (adBanner) adBanner.style.display = 'none';
+            }
+
+            // Only initialize VanillaTilt on desktop (pointer: fine) devices
+            if (window.matchMedia('(pointer: fine)').matches && typeof VanillaTilt !== 'undefined') {
+                VanillaTilt.init(document.querySelectorAll(".action-card"), {
+                    max: 5,
+                    speed: 400,
+                    glare: true,
+                    "max-glare": 0.2
+                });
             }
         });
     </script>
