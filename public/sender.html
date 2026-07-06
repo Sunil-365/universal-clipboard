@@ -28,7 +28,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Send Files - DropConnect">
     <meta name="twitter:description" content="Quickly send files, links, and text from your phone or device directly to your desktop using DropConnect.">
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.3/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
@@ -97,7 +97,10 @@
     <div id="toast" class="status-toast">Sent successfully!</div>
     
     <script>
-        const socket = io();
+        const socketUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+            ? '' 
+            : 'https://dropconnect.up.railway.app';
+        const socket = io(socketUrl);
         const input = document.getElementById('msgInput');
         const sendBtn = document.getElementById('sendBtn');
         const startScanBtn = document.getElementById('startScanBtn');

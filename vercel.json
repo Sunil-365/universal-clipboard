@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://dropconnect.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/socket.io/:path*",
+      "destination": "https://dropconnect.up.railway.app/socket.io/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/public/$1"
+    }
+  ]
+}

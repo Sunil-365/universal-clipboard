@@ -15,7 +15,12 @@ const Clip = require('./models/Clip');
 const app = express();
 app.set('trust proxy', 1); // Trust first proxy (Railway/Heroku) for rate limiting
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
 // --- Security Middleware ---
 // 1. Helmet sets various secure HTTP headers. We disable CSP to allow inline scripts & CDNs.

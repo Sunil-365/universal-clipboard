@@ -28,7 +28,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Receive Files - DropConnect">
     <meta name="twitter:description" content="Display this DropConnect screen on your desktop to instantly receive files, links, and text from your other devices.">
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.3/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -95,7 +95,10 @@
     </div>
 
     <script>
-        const socket = io();
+        const socketUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+            ? '' 
+            : 'https://dropconnect.up.railway.app';
+        const socket = io(socketUrl);
         const statusEl = document.getElementById('status');
         const receivedItemsEl = document.getElementById('receivedItems');
         const timerBar = document.getElementById('timerBar');
