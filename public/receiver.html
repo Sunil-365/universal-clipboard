@@ -200,14 +200,10 @@
 
             timerBar.style.animation = 'none';
             timerBar.offsetHeight; 
-            timerBar.style.animation = 'countdown 30s linear forwards';
+            timerBar.style.animation = 'countdown 600s linear forwards';
         }
 
         refreshQRCode();
-
-        if (!persistentRoomId) {
-            setInterval(refreshQRCode, 30000);
-        }
 
         function showSuccess(message) {
             statusEl.className = 'success';

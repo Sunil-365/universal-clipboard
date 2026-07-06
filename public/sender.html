@@ -157,6 +157,36 @@
             }
         }
 
+        let currentChannel;
+
+        function connectToRoomChannel(targetRoomId) {
+            if (!targetRoomId) return;
+            if (currentChannel) {
+                currentChannel.unsubscribe();
+            }
+
+            if (typeof supabaseClient === 'undefined') {
+                console.error("Supabase client is not configured.");
+                return;
+            }
+
+            currentChannel = supabaseClient.channel(`room:${targetRoomId}`, {
+                config: {
+                    broadcast: { self: false }
+                }
+            });
+
+            currentChannel.subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    console.log(`Connected to broadcast channel for room: ${targetRoomId}`);
+                }
+            });
+        }
+
+        if (roomId) {
+            connectToRoomChannel(roomId);
+        }
+
         function sendMessage(msg) {
             let message = msg || input.value.trim();
             if (message && roomId) {
@@ -182,6 +212,11 @@
                     sendBtn.innerHTML = originalContent;
                     return;
                 }
+
+                if (!currentChannel) {
+                    alert("Not connected to a Desk Display. Connecting now...");
+                    connectToRoomChannel(roomId);
+                }
                 
                 const payload = {
                     roomId: roomId,
@@ -190,38 +225,27 @@
                     rawContent: message
                 };
 
-                const channel = supabaseClient.channel(`room:${roomId}`, {
-                    config: {
-                        broadcast: { self: false }
-                    }
+                // Pushes event instantly over established WebSocket
+                currentChannel.send({
+                    type: 'broadcast',
+                    event: 'send-data',
+                    payload: payload
                 });
 
-                channel.subscribe((status) => {
-                    if (status === 'SUBSCRIBED') {
-                        channel.send({
-                            type: 'broadcast',
-                            event: 'send-data',
-                            payload: payload
-                        }).then(() => {
-                            saveClipToDatabase(message);
-                            
-                            if (!msg) input.value = '';
-                            
-                            sendBtn.innerHTML = '✅ Sent!';
-                            sendBtn.style.background = 'var(--success)';
-                            sendBtn.style.borderColor = 'var(--success)';
-                            
-                            setTimeout(() => {
-                                sendBtn.innerHTML = originalContent;
-                                sendBtn.style.background = '';
-                                sendBtn.style.borderColor = '';
-                            }, 2000);
-                        });
-                    } else if (status === 'TIMED_OUT' || status === 'CHANNEL_ERROR') {
-                        alert("Not connected to the server. Please check your internet connection.");
-                        sendBtn.innerHTML = originalContent;
-                    }
-                });
+                // Since broadcast is fire-and-forget, execute UI updates immediately
+                saveClipToDatabase(message);
+                
+                if (!msg) input.value = '';
+                
+                sendBtn.innerHTML = '✅ Sent!';
+                sendBtn.style.background = 'var(--success)';
+                sendBtn.style.borderColor = 'var(--success)';
+                
+                setTimeout(() => {
+                    sendBtn.innerHTML = originalContent;
+                    sendBtn.style.background = '';
+                    sendBtn.style.borderColor = '';
+                }, 2000);
             } else if (!roomId) {
                 alert("Not connected to a Desk Display. Please scan a QR code first.");
             }
@@ -260,6 +284,7 @@
                                     encryptionKey = ''; // trigger modal
                                 }
                                 window.history.pushState({}, '', decodedText); 
+                                connectToRoomChannel(roomId);
                                 showToast("Connected securely!");
                                 return;
                             }
