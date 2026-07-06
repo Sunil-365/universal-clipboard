@@ -33,6 +33,8 @@
     <meta name="twitter:description" content="Leave anonymous feedback for DropConnect to help us improve the file sharing experience.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
+    <script src="supabase-js.js"></script>
+    <script src="supabase-config.js"></script>
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
@@ -242,9 +244,18 @@
         // Fetch and display reviews on load
         async function loadReviews() {
             try {
-                const res = await fetch(API_URL);
-                const reviews = await res.json();
-                renderReviews(reviews);
+                if (typeof supabaseClient === 'undefined') {
+                    reviewsList.innerHTML = `<div class="empty-state">Database config missing.</div>`;
+                    return;
+                }
+                
+                const { data, error } = await supabaseClient
+                    .from('reviews')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                renderReviews(data || []);
             } catch (err) {
                 console.error("Failed to load reviews", err);
                 reviewsList.innerHTML = `<div class="empty-state">Failed to load feedback.</div>`;
@@ -269,7 +280,7 @@
             div.className = 'review-card';
             
             // Format date nicely
-            const date = new Date(review.date);
+            const date = new Date(review.created_at || review.date);
             const formattedDate = date.toLocaleDateString(undefined, { 
                 month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
             });
@@ -292,42 +303,42 @@
             submitBtn.textContent = 'Submitting...';
 
             try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content })
-                });
-
-                if (res.ok) {
-                    const newReview = await res.json();
-                    
-                    // Remove empty state if present
-                    if (reviewsList.querySelector('.empty-state')) {
-                        reviewsList.innerHTML = '';
-                    }
-
-                    // Prepend new review
-                    const card = createReviewCard(newReview);
-                    reviewsList.insertBefore(card, reviewsList.firstChild);
-
-                    // Reset form
-                    feedbackText.value = '';
-                    charCount.textContent = '0 / 500';
-                    
-                    // Show success
-                    submitBtn.textContent = 'Submitted!';
-                    submitBtn.style.background = 'var(--success)';
-                    
-                    setTimeout(() => {
-                        submitBtn.textContent = 'Submit Anonymously';
-                        submitBtn.style.background = '';
-                        submitBtn.disabled = false;
-                    }, 2000);
-                } else {
-                    throw new Error("Server error");
+                if (typeof supabaseClient === 'undefined') {
+                    throw new Error("Supabase is not configured.");
                 }
+
+                const { data: newReview, error } = await supabaseClient
+                    .from('reviews')
+                    .insert([{ content: content }])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // Remove empty state if present
+                if (reviewsList.querySelector('.empty-state')) {
+                    reviewsList.innerHTML = '';
+                }
+
+                // Prepend new review
+                const card = createReviewCard(newReview);
+                reviewsList.insertBefore(card, reviewsList.firstChild);
+
+                // Reset form
+                feedbackText.value = '';
+                charCount.textContent = '0 / 500';
+                
+                // Show success
+                submitBtn.textContent = 'Submitted!';
+                submitBtn.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    submitBtn.textContent = 'Submit Anonymously';
+                    submitBtn.style.background = '';
+                    submitBtn.disabled = false;
+                }, 2000);
             } catch (err) {
-                alert("Failed to submit feedback. Please try again.");
+                alert("Failed to submit feedback: " + err.message);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Anonymously';
             }

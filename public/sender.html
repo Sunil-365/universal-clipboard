@@ -98,14 +98,6 @@
     
     <script>
         let socket;
-        if (typeof io !== 'undefined') {
-            const socketUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
-                ? '' 
-                : 'https://dropconnect.up.railway.app';
-            socket = io(socketUrl);
-        } else {
-            console.error("Socket.io library not loaded. Running in offline/disconnected mode.");
-        }
         const input = document.getElementById('msgInput');
         const sendBtn = document.getElementById('sendBtn');
         const startScanBtn = document.getElementById('startScanBtn');
@@ -126,23 +118,42 @@
         }
         
         const premiumSection = document.getElementById('premium-banner-section');
-        const token = localStorage.getItem('token');
-
-        if (token) {
-            document.querySelectorAll('.ad-banner').forEach(el => el.style.display = 'none');
-        } else {
-            premiumSection.style.display = 'block';
-            premiumSection.innerHTML = `
-                <div class="divider" style="margin: 10px 0;">Premium</div>
-                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; text-align: center;">Log in to unlock Auto-History & Ad-Free Experience!</div>
-                <button class="btn btn-outline" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.location.href='login'">Log In to Unlock</button>
-            `;
+        
+        async function checkAuthStatus() {
+            if (typeof supabaseClient === 'undefined') return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                document.querySelectorAll('.ad-banner').forEach(el => el.style.display = 'none');
+            } else {
+                premiumSection.style.display = 'block';
+                premiumSection.innerHTML = `
+                    <div class="divider" style="margin: 10px 0;">Premium</div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; text-align: center;">Log in to unlock Auto-History & Ad-Free Experience!</div>
+                    <button class="btn btn-outline" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.location.href='login'">Log In to Unlock</button>
+                `;
+            }
         }
+        checkAuthStatus();
 
         function showToast(message) {
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        async function saveClipToDatabase(content) {
+            if (typeof supabaseClient === 'undefined') return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (user) {
+                const { error } = await supabaseClient
+                    .from('clips')
+                    .insert([{ user_id: user.id, content: content }]);
+                if (error) {
+                    console.error("Failed to save clip to database:", error);
+                } else {
+                    console.log("Saved clip to database history.");
+                }
+            }
         }
 
         function sendMessage(msg) {
@@ -165,32 +176,51 @@
                 const originalContent = sendBtn.innerHTML;
                 sendBtn.innerHTML = '<div class="loader-small"></div>';
                 
-                setTimeout(() => {
-                    if (!socket) {
+                if (typeof supabaseClient === 'undefined') {
+                    alert("Database / Connection settings missing.");
+                    sendBtn.innerHTML = originalContent;
+                    return;
+                }
+                
+                const payload = {
+                    roomId: roomId,
+                    type: type,
+                    content: encryptedContent,
+                    rawContent: message
+                };
+
+                const channel = supabaseClient.channel(`room:${roomId}`, {
+                    config: {
+                        broadcast: { self: false }
+                    }
+                });
+
+                channel.subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        channel.send({
+                            type: 'broadcast',
+                            event: 'send-data',
+                            payload: payload
+                        }).then(() => {
+                            saveClipToDatabase(message);
+                            
+                            if (!msg) input.value = '';
+                            
+                            sendBtn.innerHTML = '✅ Sent!';
+                            sendBtn.style.background = 'var(--success)';
+                            sendBtn.style.borderColor = 'var(--success)';
+                            
+                            setTimeout(() => {
+                                sendBtn.innerHTML = originalContent;
+                                sendBtn.style.background = '';
+                                sendBtn.style.borderColor = '';
+                            }, 2000);
+                        });
+                    } else if (status === 'TIMED_OUT' || status === 'CHANNEL_ERROR') {
                         alert("Not connected to the server. Please check your internet connection.");
                         sendBtn.innerHTML = originalContent;
-                        return;
                     }
-                    socket.emit('send-data', {
-                        roomId: roomId,
-                        type: type,
-                        content: encryptedContent,
-                        rawContent: message,
-                        token: localStorage.getItem('token')
-                    });
-                    
-                    if (!msg) input.value = '';
-                    
-                    sendBtn.innerHTML = '✅ Sent!';
-                    sendBtn.style.background = 'var(--success)';
-                    sendBtn.style.borderColor = 'var(--success)';
-                    
-                    setTimeout(() => {
-                        sendBtn.innerHTML = originalContent;
-                        sendBtn.style.background = '';
-                        sendBtn.style.borderColor = '';
-                    }, 2000);
-                }, 400); 
+                });
             } else if (!roomId) {
                 alert("Not connected to a Desk Display. Please scan a QR code first.");
             }

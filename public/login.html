@@ -24,6 +24,8 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
+    <script src="supabase-js.js"></script>
+    <script src="supabase-config.js"></script>
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
@@ -88,18 +90,18 @@
         async function handleGoogleResponse(response) {
             const errorMsg = document.getElementById('error-msg');
             try {
-                const res = await fetch('/api/auth/google', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ credential: response.credential })
+                if (typeof supabaseClient === 'undefined') {
+                    errorMsg.innerText = "Supabase not configured.";
+                    return;
+                }
+                const { data, error } = await supabaseClient.auth.signInWithIdToken({
+                    provider: 'google',
+                    token: response.credential
                 });
-                const data = await res.json();
                 
-                if (!res.ok) {
-                    errorMsg.innerText = data.error || "Google Auth failed.";
+                if (error) {
+                    errorMsg.innerText = error.message;
                 } else {
-                    localStorage.setItem('token', data.token);
-                    
                     const redirect = sessionStorage.getItem('redirectAfterLogin');
                     if (redirect) {
                         sessionStorage.removeItem('redirectAfterLogin');
@@ -109,7 +111,7 @@
                     }
                 }
             } catch (err) {
-                errorMsg.innerText = "Network error during Google Sign-In.";
+                errorMsg.innerText = "Google Sign-In failed.";
             }
         }
 
@@ -142,30 +144,40 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "Processing...";
 
-            const endpoint = isLogin ? '/api/login' : '/api/register';
+            if (typeof supabaseClient === 'undefined') {
+                errorMsg.innerText = "Supabase not configured.";
+                submitBtn.disabled = false;
+                submitBtn.innerText = isLogin ? "Log In" : "Sign Up";
+                return;
+            }
+
             try {
-                const res = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-                
-                if (!res.ok) {
-                    errorMsg.innerText = data.error || "Authentication failed.";
+                let result;
+                if (isLogin) {
+                    result = await supabaseClient.auth.signInWithPassword({ email, password });
                 } else {
-                    localStorage.setItem('token', data.token);
-                    
-                    const redirect = sessionStorage.getItem('redirectAfterLogin');
-                    if (redirect) {
-                        sessionStorage.removeItem('redirectAfterLogin');
-                        window.location.href = redirect;
+                    result = await supabaseClient.auth.signUp({ email, password });
+                }
+                
+                const { data, error } = result;
+                if (error) {
+                    errorMsg.innerText = error.message;
+                } else {
+                    if (!isLogin && !data.session) {
+                        alert("Sign up successful! Please check your email for verification link.");
+                        window.location.href = 'login';
                     } else {
-                        window.location.href = 'premium';
+                        const redirect = sessionStorage.getItem('redirectAfterLogin');
+                        if (redirect) {
+                            sessionStorage.removeItem('redirectAfterLogin');
+                            window.location.href = redirect;
+                        } else {
+                            window.location.href = 'premium';
+                        }
                     }
                 }
             } catch (err) {
-                errorMsg.innerText = "Network error. Please try again.";
+                errorMsg.innerText = "Authentication error. Please try again.";
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerText = isLogin ? "Log In" : "Sign Up";

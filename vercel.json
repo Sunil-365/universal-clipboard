@@ -9,14 +9,6 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "https://dropconnect.up.railway.app/api/$1"
-    },
-    {
-      "src": "/socket.io/(.*)",
-      "dest": "https://dropconnect.up.railway.app/socket.io/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/public/$1"
     }

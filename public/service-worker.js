@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dropconnect-v10';
+const CACHE_NAME = 'dropconnect-v11';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -7,7 +7,8 @@ const ASSETS_TO_CACHE = [
   '/navbar.js',
   '/favicon.svg',
   '/manifest.json',
-  '/socket.io.min.js',
+  '/supabase-js.js',
+  '/supabase-config.js',
   '/qrcode.min.js',
   '/crypto-js.min.js',
   '/html5-qrcode.min.js',

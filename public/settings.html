@@ -23,6 +23,8 @@
     <meta name="twitter:description" content="Manage your DropConnect account settings, profile, and security.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
+    <script src="supabase-js.js"></script>
+    <script src="supabase-config.js"></script>
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
@@ -120,10 +122,20 @@
     </div>
 
     <script>
-        const token = localStorage.getItem('token');
-        if (!token) {
+        if (typeof supabaseClient === 'undefined') {
+            alert("Supabase is not configured.");
             window.location.href = 'login';
         }
+
+        async function checkAuth() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                window.location.href = 'login';
+            } else {
+                loadProfile(user);
+            }
+        }
+        checkAuth();
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -133,19 +145,18 @@
             document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
-        async function loadProfile() {
+        async function loadProfile(user) {
             try {
-                const res = await fetch('/api/user/profile', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const user = await res.json();
-
                 document.getElementById('user-email').innerText = user.email;
-                if (user.phone) document.getElementById('user-phone-input').value = user.phone;
-                document.getElementById('user-auth').innerText = user.authProvider === 'google' ? 'Google Sign-In' : 'Email & Password';
-                document.getElementById('user-joined').innerText = new Date(user.createdAt).toLocaleDateString();
+                
+                const phone = user.user_metadata?.phone || '';
+                document.getElementById('user-phone-input').value = phone;
+                
+                const provider = user.app_metadata?.provider || 'email';
+                document.getElementById('user-auth').innerText = provider === 'google' ? 'Google Sign-In' : 'Email & Password';
+                document.getElementById('user-joined').innerText = new Date(user.created_at).toLocaleDateString();
 
-                if (user.authProvider === 'google') {
+                if (provider === 'google') {
                     document.getElementById('password-form').innerHTML = '<p style="color: var(--text-secondary);">Your account is managed via Google Sign-In. Password reset is not applicable.</p>';
                 }
             } catch (e) {
@@ -163,16 +174,14 @@
             msg.innerText = '';
             
             try {
-                const res = await fetch('/api/user/profile', {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone })
+                const { data, error } = await supabaseClient.auth.updateUser({
+                    data: { phone: phone }
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Failed to update profile');
+                
+                if (error) throw error;
 
                 msg.className = 'msg success';
-                msg.innerText = data.message;
+                msg.innerText = "Profile updated successfully!";
             } catch (err) {
                 msg.className = 'msg error';
                 msg.innerText = err.message;
@@ -185,23 +194,20 @@
             e.preventDefault();
             const btn = document.getElementById('pass-btn');
             const msg = document.getElementById('pass-msg');
-            const currentPassword = document.getElementById('current-password').value;
             const newPassword = document.getElementById('new-password').value;
 
             btn.disabled = true;
             msg.innerText = '';
             
             try {
-                const res = await fetch('/api/user/change-password', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ currentPassword, newPassword })
+                const { data, error } = await supabaseClient.auth.updateUser({
+                    password: newPassword
                 });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Failed to change password');
+                
+                if (error) throw error;
 
                 msg.className = 'msg success';
-                msg.innerText = data.message;
+                msg.innerText = "Password updated successfully!";
                 document.getElementById('password-form').reset();
             } catch (err) {
                 msg.className = 'msg error';
@@ -210,8 +216,6 @@
                 btn.disabled = false;
             }
         });
-
-        loadProfile();
     </script>
 </body>
 </html>

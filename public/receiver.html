@@ -96,15 +96,6 @@
     </div>
 
     <script>
-        let socket;
-        if (typeof io !== 'undefined') {
-            const socketUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
-                ? '' 
-                : 'https://dropconnect.up.railway.app';
-            socket = io(socketUrl);
-        } else {
-            console.error("Socket.io library not loaded.");
-        }
         const statusEl = document.getElementById('status');
         const receivedItemsEl = document.getElementById('receivedItems');
         const timerBar = document.getElementById('timerBar');
@@ -113,6 +104,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const persistentRoomId = urlParams.get('room');
 
+        let currentChannel;
+
         if (persistentRoomId) {
             // It's a Premium Custom Room. Use the room ID as the encryption key
             encryptionKey = persistentRoomId;
@@ -120,13 +113,39 @@
             // Hide Ads for Custom Rooms (Premium only)
             const adBanner = document.getElementById('receiver-ad-banner');
             if (adBanner) adBanner.style.display = 'none';
-        }
-
-        if (socket) {
-            socket.on('session-expired', () => {
+        } else {
+            // Start a 10-minute session timeout for free-tier rooms
+            setTimeout(() => {
                 alert("Free session expired (10 minutes max). Please refresh for a new session or upgrade to Premium.");
                 window.location.reload();
+            }, 10 * 60 * 1000); // 10 minutes
+        }
+
+        function joinRoomChannel(roomId) {
+            if (currentChannel) {
+                currentChannel.unsubscribe();
+            }
+
+            if (typeof supabaseClient === 'undefined') {
+                console.error("Supabase client is not configured.");
+                return;
+            }
+
+            currentChannel = supabaseClient.channel(`room:${roomId}`, {
+                config: {
+                    broadcast: { self: false }
+                }
             });
+
+            currentChannel
+                .on('broadcast', { event: 'send-data' }, ({ payload }) => {
+                    handleReceiveData(payload);
+                })
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log(`Successfully joined sync channel for room: ${roomId}`);
+                    }
+                });
         }
 
         function refreshQRCode() {
@@ -150,9 +169,7 @@
                     qrcodeContainer.innerHTML = '<div style="color: var(--danger); font-size: 0.8rem; text-align: center;">QR Error</div>';
                 }
                 
-                if (socket) {
-                    socket.emit('join-room', persistentRoomId);
-                }
+                joinRoomChannel(persistentRoomId);
                 
                 document.querySelector('.timer-bar-container').style.display = 'none';
                 return; // Stop here, no timer needed
@@ -178,9 +195,7 @@
                 qrcodeContainer.innerHTML = '<div style="color: var(--danger); font-size: 0.8rem; text-align: center;">QR Error</div>';
             }
             
-            if (socket) {
-                socket.emit('join-room', newSessionId);
-            }
+            joinRoomChannel(newSessionId);
 
             timerBar.style.animation = 'none';
             timerBar.offsetHeight; 
@@ -208,8 +223,7 @@
             }, 3000);
         }
 
-        if (socket) {
-            socket.on('receive-data', async (data) => {
+        async function handleReceiveData(data) {
             if (!encryptionKey) {
                 showSuccess("Awaiting PIN entry...");
                 return;
@@ -270,7 +284,6 @@
             card.appendChild(btn);
             
             receivedItemsEl.insertBefore(card, receivedItemsEl.firstChild);
-        });
         }
 
         // Only initialize VanillaTilt on desktop (pointer: fine) devices
