@@ -87,6 +87,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Revoke execute from public to fix security warnings
 REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon, authenticated;
+-- Grant execute back to the roles that need it (Supabase Auth uses supabase_auth_admin)
+GRANT EXECUTE ON FUNCTION public.handle_new_user() TO postgres, service_role, supabase_auth_admin;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
