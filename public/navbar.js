@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
                 <div>© ${new Date().getFullYear()} DropConnect. All rights reserved.</div>
                 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <a href="contact" style="color: var(--text-secondary); text-decoration: none;">Contact Us</a>
                     <a href="terms" style="color: var(--text-secondary); text-decoration: none;">Terms & Conditions</a>
                     <a href="refund" style="color: var(--text-secondary); text-decoration: none;">Refund & Cancellation</a>
                     <a href="privacy" style="color: var(--text-secondary); text-decoration: none;">Privacy Policy</a>
