@@ -593,6 +593,10 @@
     <script>
         // Modal State
         document.addEventListener('DOMContentLoaded', () => {
+            // Bypass demo welcome modal when loaded in iframe
+            if (window.self !== window.top) {
+                return;
+            }
             const onboarded = localStorage.getItem('demo-onboarded');
             if (!onboarded) {
                 showOnboarding(true);
