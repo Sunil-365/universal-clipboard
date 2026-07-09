@@ -222,7 +222,7 @@
         }
 
         async function saveClipToDatabase(content) {
-            if (typeof supabaseClient === 'undefined') return;
+            if (typeof supabaseClient === 'undefined') return false;
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
                 // Encrypt clipboard item content using Zero-Knowledge history key
@@ -235,10 +235,13 @@
                     .insert([{ user_id: user.id, content: contentToSave }]);
                 if (error) {
                     console.error("Failed to save clip to database:", error);
+                    return false;
                 } else {
                     console.log("Saved clip to database history.");
+                    return true;
                 }
             }
+            return false;
         }
 
         let currentChannel;
@@ -302,11 +305,15 @@
                     connectToRoomChannel(roomId);
                 }
                 
+                // Save to database first if phone is logged in
+                const savedToDb = await saveClipToDatabase(message);
+                
                 const payload = {
                     roomId: roomId,
                     type: type,
                     content: encryptedContent,
-                    rawContent: message
+                    rawContent: message,
+                    savedToDb: savedToDb
                 };
 
                 // Pushes event instantly over established WebSocket
@@ -315,9 +322,6 @@
                     event: 'send-data',
                     payload: payload
                 });
-
-                // Since broadcast is fire-and-forget, execute UI updates immediately
-                saveClipToDatabase(message);
                 
                 if (!msg) input.value = '';
                 

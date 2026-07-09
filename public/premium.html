@@ -323,6 +323,25 @@
                             const originalText = bytes.toString(CryptoJS.enc.Utf8);
                             
                             if (originalText) {
+                                // Auto-save received clip to Zero-Knowledge database clips history (if not saved by sender)
+                                const historyKey = localStorage.getItem('history-key');
+                                if (historyKey) {
+                                    if (!payload.savedToDb) {
+                                        try {
+                                            const encryptedForDb = CryptoJS.AES.encrypt(originalText, historyKey).toString();
+                                            const { error: dbError } = await supabaseClient
+                                                .from('clips')
+                                                .insert([{ user_id: user.id, content: encryptedForDb }]);
+                                            if (dbError) throw dbError;
+                                            fetchClips(); // Refresh history list
+                                        } catch (dbErr) {
+                                            console.error("Failed to save received clip to database history:", dbErr);
+                                        }
+                                    } else {
+                                        // Sender already saved it, just refresh the list to display it
+                                        fetchClips();
+                                    }
+                                }
                                 try {
                                     await navigator.clipboard.writeText(originalText);
                                     window.showToast('Auto-copied to clipboard!');
