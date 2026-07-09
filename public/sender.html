@@ -120,7 +120,7 @@
                     Secure connection established.
                 </p>
                 
-                <input type="text" id="msgInput" placeholder="Type a message or URL..." autocomplete="off" />
+                <textarea id="msgInput" placeholder="Type or paste a list, text, or URL..." autocomplete="off" rows="3" style="resize: vertical; min-height: 80px;"></textarea>
                 <button class="btn" id="sendBtn">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -327,8 +327,10 @@
         }
         
         sendBtn.addEventListener('click', () => sendMessage());
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+        input.addEventListener('keydown', (e) => {
+            // Submit on Ctrl+Enter or Cmd+Enter on desktop, allowing normal Enter for newlines
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
                 sendMessage();
             }
         });

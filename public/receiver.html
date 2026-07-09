@@ -50,7 +50,7 @@
         @keyframes countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
         .received-items { display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; padding-right: 5px; max-height: 250px; }
         .received-card { background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; text-align: left; }
-        .received-content { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 15px; color: var(--text-primary); font-weight: 500; font-size: 0.95rem; }
+        .received-content { flex: 1; white-space: pre-wrap; word-break: break-word; margin-right: 15px; color: var(--text-primary); font-weight: 500; font-size: 0.95rem; }
     </style>
 </head>
 <body>

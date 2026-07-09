@@ -137,7 +137,7 @@ h2 { font-size: 1.5rem; font-weight: 700; margin-top: 0; margin-bottom: 20px; co
 p.subtitle { color: var(--text-secondary); text-align: center; margin-top: 0; margin-bottom: 30px; line-height: 1.5; font-size: 1.05rem; }
 
 /* Inputs & Buttons */
-input {
+input, textarea {
     width: 100%;
     padding: 14px 16px;
     border: 1px solid var(--card-border);
@@ -150,7 +150,7 @@ input {
     margin-bottom: 15px;
     transition: border-color 0.2s;
 }
-input:focus { outline: none; border-color: var(--accent-primary); }
+input:focus, textarea:focus { outline: none; border-color: var(--accent-primary); }
 
 .btn {
     width: 100%;
