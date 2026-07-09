@@ -348,18 +348,20 @@
             }
         });
 
-        startScanBtn.addEventListener('click', () => {
+        startScanBtn.addEventListener('click', async () => {
             readerDiv.style.display = 'block';
             startScanBtn.style.display = 'none';
             stopScanBtn.style.display = 'flex'; 
 
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            
-            html5QrCode.start(
-                { facingMode: "environment" },
-                config,
-                (decodedText, decodedResult) => {
+            try {
+                if (typeof Html5Qrcode === 'undefined') {
+                    throw new Error("Scanner library not loaded yet.");
+                }
+                
+                html5QrCode = new Html5Qrcode("reader");
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                
+                const onScanSuccess = (decodedText, decodedResult) => {
                     stopScanner();
                     
                     if (decodedText.includes('/sender?room=')) {
@@ -387,12 +389,50 @@
                     }
 
                     sendMessage(decodedText);
-                },
-                (errorMessage) => {}
-            ).catch((err) => {
-                alert(`Error starting camera: ${err}`);
+                };
+
+                // Try back camera first
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess,
+                    (errorMessage) => {}
+                ).catch(err => {
+                    console.warn("Back camera failed, trying front camera...", err);
+                    // Fallback 1: Try front camera
+                    html5QrCode.start(
+                        { facingMode: "user" },
+                        config,
+                        onScanSuccess,
+                        (errorMessage) => {}
+                    ).catch(err2 => {
+                        console.warn("Front camera failed, fetching devices...", err2);
+                        // Fallback 2: Get any available camera list and try the first one
+                        Html5Qrcode.getCameras().then(devices => {
+                            if (devices && devices.length > 0) {
+                                html5QrCode.start(
+                                    devices[0].id,
+                                    config,
+                                    onScanSuccess,
+                                    (errorMessage) => {}
+                                ).catch(err3 => {
+                                    alert(`Error starting camera: ${err3.message || err3}`);
+                                    stopScanner();
+                                });
+                            } else {
+                                alert(`No cameras found: ${err2.message || err2}`);
+                                stopScanner();
+                            }
+                        }).catch(err3 => {
+                            alert(`Error accessing camera list: ${err3.message || err3}`);
+                            stopScanner();
+                        });
+                    });
+                });
+            } catch (err) {
+                alert(`Scanner error: ${err.message || err}`);
                 stopScanner();
-            });
+            }
         });
 
         function stopScanner() {
