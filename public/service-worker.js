@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dropconnect-v30';
+const CACHE_NAME = 'dropconnect-v31';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
