@@ -349,7 +349,14 @@
         });
 
         startScanBtn.addEventListener('click', async () => {
+            // First check if browser context supports mediaDevices/getUserMedia APIs
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Camera access is not supported by your current browser or in-app webview. Please open this page directly in Safari (on iOS) or Chrome (on Android) to scan QR codes!");
+                return;
+            }
+
             readerDiv.style.display = 'block';
+            readerDiv.innerHTML = `<div id="reader-loading" style="padding: 40px 20px; text-align: center; color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;"><div class="loader-small" style="border-left-color: var(--accent-primary); width: 24px; height: 24px; border-width: 3px; margin-bottom: 12px;"></div><br/>Starting secure camera feed...</div>`;
             startScanBtn.style.display = 'none';
             stopScanBtn.style.display = 'flex'; 
 
@@ -440,11 +447,19 @@
                 html5QrCode.stop().then(() => {
                     html5QrCode.clear();
                     readerDiv.style.display = 'none';
+                    readerDiv.innerHTML = '';
                     startScanBtn.style.display = 'flex';
                     stopScanBtn.style.display = 'none';
-                }).catch(err => console.error(err));
+                }).catch(err => {
+                    console.error(err);
+                    readerDiv.style.display = 'none';
+                    readerDiv.innerHTML = '';
+                    startScanBtn.style.display = 'flex';
+                    stopScanBtn.style.display = 'none';
+                });
             } else {
                 readerDiv.style.display = 'none';
+                readerDiv.innerHTML = '';
                 startScanBtn.style.display = 'flex';
                 stopScanBtn.style.display = 'none';
             }
