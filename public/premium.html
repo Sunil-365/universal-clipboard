@@ -161,6 +161,14 @@
             authGuard.style.display = 'none';
             dashboard.style.display = 'block';
 
+            // Zero-Knowledge local history key initialization
+            if (!localStorage.getItem('history-key')) {
+                const hexKey = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+                localStorage.setItem('history-key', hexKey);
+            }
+
             let customRooms = [];
             let currentActiveRoom = null;
             let currentActiveChannel = null;
@@ -255,9 +263,18 @@
                     claimSection.style.display = 'none';
                     activeSection.style.display = 'flex';
                     
-                    // Generate local QR Code
+                    // Generate local QR Code with Zero-Knowledge encryption keys embedded in URL Hash
                     const currentUrl = window.location.origin;
-                    const senderUrl = `${currentUrl}/sender?room=${currentActiveRoom}`;
+                    const roomKeyName = `room-key:${currentActiveRoom}`;
+                    if (!localStorage.getItem(roomKeyName)) {
+                        const hexKey = Array.from(crypto.getRandomValues(new Uint8Array(16)))
+                            .map(b => b.toString(16).padStart(2, '0'))
+                            .join('');
+                        localStorage.setItem(roomKeyName, hexKey);
+                    }
+                    const roomKey = localStorage.getItem(roomKeyName);
+                    const historyKey = localStorage.getItem('history-key') || '';
+                    const senderUrl = `${currentUrl}/sender?room=${currentActiveRoom}#key=${roomKey}&hkey=${historyKey}`;
                     
                     // qrcode.js rendering target
                     if (qrImg.tagName === 'IMG') {
@@ -301,7 +318,8 @@
                     
                     currentActiveChannel
                         .on('broadcast', { event: 'send-data' }, async ({ payload }) => {
-                            const bytes = CryptoJS.AES.decrypt(payload.content, currentActiveRoom);
+                            const roomKey = localStorage.getItem(`room-key:${currentActiveRoom}`) || currentActiveRoom;
+                            const bytes = CryptoJS.AES.decrypt(payload.content, roomKey);
                             const originalText = bytes.toString(CryptoJS.enc.Utf8);
                             
                             if (originalText) {
@@ -425,18 +443,34 @@
                     return;
                 }
 
-                clipsList.innerHTML = clips.map(clip => `
-                    <div class="clip-card" id="clip-${clip.id}">
-                        <pre class="clip-content">${escapeHTML(clip.content)}</pre>
-                        <div class="clip-meta">
-                            <span>${new Date(clip.created_at).toLocaleString()}</span>
-                            <div class="clip-actions">
-                                <button onclick="copyClip('${escapeHTML(clip.content.replace(/'/g, "\\'").replace(/\n/g, '\\n'))}')">Copy</button>
-                                <button class="delete" onclick="deleteClip('${clip.id}')">Delete</button>
+                const historyKey = localStorage.getItem('history-key') || '';
+
+                clipsList.innerHTML = clips.map(clip => {
+                    let decryptedContent = clip.content;
+                    if (historyKey) {
+                        try {
+                            const bytes = CryptoJS.AES.decrypt(clip.content, historyKey);
+                            const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+                            if (decrypted) {
+                                decryptedContent = decrypted;
+                            }
+                        } catch (err) {
+                            console.warn("Failed to decrypt history clip:", err);
+                        }
+                    }
+                    return `
+                        <div class="clip-card" id="clip-${clip.id}">
+                            <pre class="clip-content">${escapeHTML(decryptedContent)}</pre>
+                            <div class="clip-meta">
+                                <span>${new Date(clip.created_at).toLocaleString()}</span>
+                                <div class="clip-actions">
+                                    <button onclick="copyClip('${escapeHTML(decryptedContent.replace(/'/g, "\\'").replace(/\n/g, '\\n'))}')">Copy</button>
+                                    <button class="delete" onclick="deleteClip('${clip.id}')">Delete</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             window.deleteClip = async (id) => {

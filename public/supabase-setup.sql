@@ -33,10 +33,8 @@ DROP POLICY IF EXISTS "Users can manage their own rooms" ON public.rooms;
 CREATE POLICY "Users can manage their own rooms" ON public.rooms
     FOR ALL TO authenticated USING (auth.uid() = owner_id);
 
--- Create policy to allow anyone to select rooms (for checking existence when joining)
+-- Delete public selection policy to ensure rooms metadata is private to owners
 DROP POLICY IF EXISTS "Anyone can check rooms" ON public.rooms;
-CREATE POLICY "Anyone can check rooms" ON public.rooms
-    FOR SELECT TO anon, authenticated USING (true);
 
 
 -- 3. REVIEWS TABLE (Stores user feedback submissions)

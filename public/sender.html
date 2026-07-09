@@ -160,10 +160,14 @@
         const urlParams = new URLSearchParams(window.location.search);
         let roomId = urlParams.get('room');
         let encryptionKey = '';
+        let historyKey = '';
         let html5QrCode;
 
         if (window.location.hash.startsWith('#key=')) {
-            encryptionKey = window.location.hash.substring(5);
+            // Parse room key and history key parameters from client-side URL hash
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            encryptionKey = hashParams.get('key') || '';
+            historyKey = hashParams.get('hkey') || '';
         } else if (roomId) {
             // Missing key for Custom Room. Use the room ID as the encryption key
             encryptionKey = roomId;
@@ -221,9 +225,14 @@
             if (typeof supabaseClient === 'undefined') return;
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (user) {
+                // Encrypt clipboard item content using Zero-Knowledge history key
+                let contentToSave = content;
+                if (historyKey) {
+                    contentToSave = CryptoJS.AES.encrypt(content, historyKey).toString();
+                }
                 const { error } = await supabaseClient
                     .from('clips')
-                    .insert([{ user_id: user.id, content: content }]);
+                    .insert([{ user_id: user.id, content: contentToSave }]);
                 if (error) {
                     console.error("Failed to save clip to database:", error);
                 } else {
@@ -356,10 +365,13 @@
                             if (newRoomId) {
                                 roomId = newRoomId;
                                 if (url.hash.startsWith('#key=')) {
-                                    encryptionKey = url.hash.substring(5);
+                                    const hashParams = new URLSearchParams(url.hash.substring(1));
+                                    encryptionKey = hashParams.get('key') || '';
+                                    historyKey = hashParams.get('hkey') || '';
                                 } else {
                                     // Missing key for Custom Room. Use the room ID as the encryption key
                                     encryptionKey = newRoomId;
+                                    historyKey = '';
                                 }
                                 window.history.pushState({}, '', decodedText); 
                                 connectToRoomChannel(roomId);

@@ -117,8 +117,13 @@
         let currentChannel;
 
         if (persistentRoomId) {
-            // It's a Premium Custom Room. Use the room ID as the encryption key
-            encryptionKey = persistentRoomId;
+            // It's a Premium Custom Room. Retrieve the persistent key from local storage or URL hash.
+            let storedRoomKey = localStorage.getItem(`room-key:${persistentRoomId}`);
+            if (!storedRoomKey && window.location.hash.startsWith('#key=')) {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                storedRoomKey = hashParams.get('key');
+            }
+            encryptionKey = storedRoomKey || persistentRoomId;
             
             // Hide Ads for Custom Rooms (Premium only)
             const adBanner = document.getElementById('receiver-ad-banner');
@@ -162,7 +167,15 @@
             if (persistentRoomId) {
                 // Persistent Premium Room
                 const currentUrl = window.location.origin;
-                const senderUrl = `${currentUrl}/sender?room=${persistentRoomId}`;
+                const roomKey = localStorage.getItem(`room-key:${persistentRoomId}`) || '';
+                const historyKey = localStorage.getItem('history-key') || '';
+                let senderUrl = `${currentUrl}/sender?room=${persistentRoomId}`;
+                if (roomKey) {
+                    senderUrl += `#key=${roomKey}`;
+                    if (historyKey) {
+                        senderUrl += `&hkey=${historyKey}`;
+                    }
+                }
                 
                 const qrcodeContainer = document.getElementById('qrcode');
                 qrcodeContainer.innerHTML = '';
