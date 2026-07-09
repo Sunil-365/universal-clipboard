@@ -356,7 +356,8 @@
                                 if (url.hash.startsWith('#key=')) {
                                     encryptionKey = url.hash.substring(5);
                                 } else {
-                                    encryptionKey = ''; // trigger modal
+                                    // Missing key for Custom Room. Use the room ID as the encryption key
+                                    encryptionKey = newRoomId;
                                 }
                                 window.history.pushState({}, '', decodedText); 
                                 connectToRoomChannel(roomId);
