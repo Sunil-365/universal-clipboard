@@ -274,7 +274,7 @@
             connectToRoomChannel(roomId);
         }
 
-        function sendMessage(msg) {
+        async function sendMessage(msg) {
             let message = msg || input.value.trim();
             if (message && roomId) {
                 let type = 'text';
