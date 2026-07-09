@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dropconnect-v29';
+const CACHE_NAME = 'dropconnect-v30';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -11,6 +11,8 @@ const ASSETS_TO_CACHE = [
   '/theme.js',
   '/navbar.js',
   '/favicon.svg',
+  '/icon-192.png',
+  '/icon-512.png',
   '/manifest.json',
   '/supabase-config.js',
   '/crypto-js.min.js',
