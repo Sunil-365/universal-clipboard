@@ -9,17 +9,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const authLink = isAuthenticated 
-        ? `<a href="settings">Settings</a><a href="premium" class="nav-btn" style="background: var(--card-border); color: var(--text-primary) !important;">Dashboard</a><a href="#" onclick="if(typeof supabaseClient !== 'undefined') { supabaseClient.auth.signOut().then(() => window.location.href='/'); } else { localStorage.removeItem('token'); window.location.href='/'; }" class="nav-btn" style="background: rgba(239, 68, 68, 0.1); color: var(--danger) !important; border: 1px solid var(--danger); margin-left: 10px;">Log Out</a>`
+        ? `<a href="settings">Settings</a><a href="premium" class="nav-btn nav-btn-dashboard">Dashboard</a><a href="#" onclick="if(typeof supabaseClient !== 'undefined') { supabaseClient.auth.signOut().then(() => window.location.href='/'); } else { localStorage.removeItem('token'); window.location.href='/'; }" class="nav-btn nav-btn-logout">Log Out</a>`
         : `<a href="login" class="nav-btn">Log In</a>`;
 
     const navbarHtml = `
         <nav class="navbar">
             <a href="/" class="nav-brand">
-                <svg width="24" height="24" viewBox="0 0 512 512" style="border-radius: 5px;">
+                <svg width="24" height="24" viewBox="0 0 512 512" style="border-radius: 5px; flex-shrink: 0;">
                     <rect width="512" height="512" rx="112" fill="var(--accent-primary)"/>
                     <path d="M120 256 L400 120 L280 400 L240 296 L120 256 Z" fill="#FFFFFF"/>
                 </svg>
-                DropConnect
+                <span class="brand-text">DropConnect</span>
             </a>
             <div class="nav-links" id="nav-auth-links">
                 ${authLink}
