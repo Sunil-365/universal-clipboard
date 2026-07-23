@@ -1,0 +1,23 @@
+# DropConnect Full Documentation
+
+> Complete developer, user, and agent documentation for DropConnect cross-device clipboard sync.
+
+## Overview
+DropConnect is a web-based universal clipboard tool that enables real-time clipboard synchronization and file transfer between mobile and desktop devices without installing native mobile applications.
+
+## Technical Architecture
+- **WebSockets / Supabase Realtime**: Broadcasts encrypted clipboard channels.
+- **Client-Side AES Encryption**: All clipboard contents are encrypted with secret key stored only in URL query parameter (`key=...`) or local storage.
+- **Service Worker**: PWA offline support with network-first navigation routing.
+
+## Page Index
+- [Home Page](https://dropconnect.up.railway.app/): Main landing page.
+- [Desk Display Receiver](https://dropconnect.up.railway.app/receiver): Displays room QR code.
+- [Mobile Sender](https://dropconnect.up.railway.app/sender): Camera scanner and text sender.
+- [Login Page](https://dropconnect.up.railway.app/login): User authentication.
+- [Premium Dashboard](https://dropconnect.up.railway.app/premium): Space management.
+- [Account Settings](https://dropconnect.up.railway.app/settings): Profile settings.
+- [Feedback](https://dropconnect.up.railway.app/feedback): Anonymous feedback.
+- [Privacy Policy](https://dropconnect.up.railway.app/privacy): Privacy policy.
+- [Terms & Conditions](https://dropconnect.up.railway.app/terms): Terms of service.
+- [Refund Policy](https://dropconnect.up.railway.app/refund): Cancellation and refund policy.

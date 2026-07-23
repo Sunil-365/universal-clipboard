@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dropconnect-v35';
+const CACHE_NAME = 'dropconnect-v36';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -20,6 +20,8 @@ const ASSETS_TO_CACHE = [
   '/privacy.html',
   '/refund',
   '/refund.html',
+  '/llms.txt',
+  '/llms-full.txt',
   '/theme.css',
   '/theme.js',
   '/navbar.js',
