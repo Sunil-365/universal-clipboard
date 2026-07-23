@@ -9,18 +9,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <title>Desk Display Receiver - DropConnect</title>
-    <meta name="description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data from your mobile devices.">
-    <meta name="keywords" content="DropConnect receiver, desk display, QR clipboard receive">
+    <meta name="description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data and files from your mobile devices.">
+    <meta name="keywords" content="DropConnect receiver, desk display, QR clipboard receive, file transfer">
     <link rel="canonical" href="https://dropconnect.up.railway.app/receiver">
     <meta property="og:title" content="Desk Display Receiver - DropConnect">
-    <meta property="og:description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data from your mobile devices.">
+    <meta property="og:description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data and files from your mobile devices.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://dropconnect.up.railway.app/receiver">
     <meta property="og:image" content="https://dropconnect.up.railway.app/favicon.svg">
     <meta property="og:site_name" content="DropConnect">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Desk Display Receiver - DropConnect">
-    <meta name="twitter:description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data from your mobile devices.">
+    <meta name="twitter:description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data and files from your mobile devices.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
     <script src="supabase-js.js"></script>
@@ -99,7 +99,7 @@
             flex-direction: column;
             gap: 12px;
             width: 100%;
-            max-height: 380px;
+            max-height: 420px;
             overflow-y: auto;
             padding-right: 4px;
         }
@@ -159,6 +159,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            text-decoration: none;
         }
 
         .btn-copy:hover {
@@ -168,7 +169,7 @@
 </head>
 <body>
     
-    <div class="container" style="margin-top: 20px; max-width: 560px;">
+    <div class="container" style="margin-top: 20px; max-width: 580px;">
         <!-- Logo Branding -->
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px; justify-content: center;">
             <svg width="32" height="32" viewBox="0 0 512 512" style="border-radius: 8px;">
@@ -186,7 +187,7 @@
                     E2EE
                 </div>
             </div>
-            <p class="subtitle" style="margin-bottom: 24px;">Scan this QR code with your phone camera or Mobile Sender to establish a link.</p>
+            <p class="subtitle" style="margin-bottom: 20px;">Scan this QR code or drop files below to stream instantly.</p>
             
             <div class="qr-wrapper">
                 <div id="qrcode" style="display: flex; justify-content: center; align-items: center; background: white;"></div>
@@ -200,10 +201,10 @@
             </div>
 
             <!-- Active Connected Devices Widget -->
-            <div id="devicesCard" style="margin-top: 14px; margin-bottom: 16px; width: 100%; text-align: left; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 12px 16px; box-sizing: border-box;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <div id="devicesCard" style="margin-top: 10px; margin-bottom: 12px; width: 100%; text-align: left; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 12px 16px; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                     <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                             <line x1="8" y1="21" x2="16" y2="21"></line>
                             <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -219,6 +220,18 @@
                 </div>
             </div>
 
+            <!-- File Dropzone for Desk Display -->
+            <div class="dropzone" id="receiverDropzone" onclick="document.getElementById('receiverFileInput').click()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <div style="font-weight: 600; font-size: 0.85rem;">Drag & drop images/files or <span style="color: var(--accent-primary); text-decoration: underline;">browse</span></div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Max file size: 5MB • End-to-End Encrypted</div>
+                <input type="file" id="receiverFileInput" style="display: none;" onchange="handleReceiverFileSelect(event)">
+            </div>
+
             <div class="received-items" id="receivedItems">
                 <div id="emptyState" style="color: var(--text-secondary); text-align: center; margin-top: 24px; font-style: italic;">
                     <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px; opacity: 0.35;">
@@ -226,7 +239,7 @@
                         <line x1="8" y1="21" x2="16" y2="21"></line>
                         <line x1="12" y1="17" x2="12" y2="21"></line>
                     </svg><br/>
-                    No items received yet.<br/>Scan the QR code to begin streaming!
+                    No items received yet.<br/>Scan the QR code or drop files to begin streaming!
                 </div>
             </div>
             
@@ -476,22 +489,208 @@
             }, 3000);
         }
 
-        async function handleReceiveData(data) {
-            if (!encryptionKey) {
-                showSuccess("Awaiting PIN entry...");
+        // Drag & Drop Setup for Desk Display
+        const receiverDropzone = document.getElementById('receiverDropzone');
+        if (receiverDropzone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                receiverDropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    receiverDropzone.classList.add('dragover');
+                }, false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                receiverDropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    receiverDropzone.classList.remove('dragover');
+                }, false);
+            });
+            receiverDropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length > 0) {
+                    processAndSendFile(files[0]);
+                }
+            });
+        }
+
+        function handleReceiverFileSelect(e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                processAndSendFile(files[0]);
+            }
+        }
+
+        function processAndSendFile(file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert("File size exceeds 5MB limit.");
                 return;
             }
-            
-            try {
-                const bytes = CryptoJS.AES.decrypt(data.content, encryptionKey);
-                const originalText = bytes.toString(CryptoJS.enc.Utf8);
-                
-                if (!originalText) throw new Error('Decryption resulted in empty string');
-                data.content = originalText;
-            } catch (err) {
-                console.error("Decryption failed:", err);
-                showSuccess("Decryption Failed! Bad PIN/Key.");
+            if (!encryptionKey) {
+                alert("Encryption key missing.");
                 return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const fileDataUrl = evt.target.result;
+                const encryptedContent = CryptoJS.AES.encrypt(fileDataUrl, encryptionKey).toString();
+                
+                const activeRoom = persistentRoomId || (currentChannel ? currentChannel.topic.replace('room:', '') : '');
+                
+                const payload = {
+                    roomId: activeRoom,
+                    type: 'file',
+                    fileName: file.name,
+                    fileSize: file.size,
+                    fileType: file.type,
+                    content: encryptedContent
+                };
+
+                if (currentChannel) {
+                    currentChannel.send({
+                        type: 'broadcast',
+                        event: 'send-data',
+                        payload: payload
+                    });
+                    
+                    // Render locally as sent file
+                    handleReceiveData({
+                        type: 'file',
+                        fileName: file.name,
+                        fileSize: file.size,
+                        fileType: file.type,
+                        content: fileDataUrl, // unencrypted local copy
+                        isUnencryptedLocal: true
+                    });
+
+                    showSuccess(`Transferred file: ${file.name}`);
+                    if (typeof window.showToast === 'function') {
+                        window.showToast(`File "${file.name}" sent!`, "success");
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        // Rich Snippet Renderer
+        function buildRichSnippetHtml(data, decryptedContent) {
+            const isFile = data.type === 'file' || decryptedContent.startsWith('data:');
+            
+            if (isFile) {
+                const fileName = data.fileName || 'Shared_File';
+                const fileSize = data.fileSize ? formatBytes(data.fileSize) : '';
+                const isImage = (data.fileType && data.fileType.startsWith('image/')) || decryptedContent.startsWith('data:image/');
+                const icon = isImage ? '🖼️' : '📄';
+
+                let html = `
+                    <div class="file-card-preview">
+                        <span class="file-card-icon">${icon}</span>
+                        <div class="file-card-info">
+                            <div class="file-card-name">${escapeHTML(fileName)}</div>
+                            <div class="file-card-size">${fileSize ? fileSize + ' • ' : ''}Encrypted File Transfer</div>
+                        </div>
+                    </div>
+                `;
+
+                if (isImage) {
+                    html += `<img src="${decryptedContent}" class="snippet-img-thumb" alt="${escapeHTML(fileName)}" onclick="window.open(this.src)" title="Click to open image">`;
+                }
+
+                return { html, isFile: true, downloadUrl: decryptedContent, fileName };
+            }
+
+            // URL check
+            const text = decryptedContent.trim();
+            const isUrl = /^https?:\/\//i.test(text) || /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/.test(text);
+
+            if (isUrl) {
+                let fullUrl = text;
+                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+                    fullUrl = 'https://' + fullUrl;
+                }
+                try {
+                    const parsed = new URL(fullUrl);
+                    const domain = parsed.hostname;
+                    const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+
+                    // Check if URL is direct image link
+                    const isImgLink = /\.(png|jpg|jpeg|webp|gif|svg)(\?.*)?$/i.test(parsed.pathname);
+
+                    let html = `
+                        <a href="${escapeHTML(fullUrl)}" target="_blank" rel="noopener noreferrer" class="link-preview-card">
+                            <img src="${faviconUrl}" class="link-favicon" alt="Icon" onerror="this.src='/favicon.svg'">
+                            <div style="flex: 1; overflow: hidden; text-align: left;">
+                                <div style="font-weight: 700; font-size: 0.9rem; color: var(--accent-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(domain)}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(fullUrl)}</div>
+                            </div>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                    `;
+
+                    if (isImgLink) {
+                        html += `<img src="${escapeHTML(fullUrl)}" class="snippet-img-thumb" alt="Link Image Preview" onclick="window.open(this.src)" title="Click to view full image">`;
+                    }
+
+                    return { html, isUrl: true, fullUrl };
+                } catch(e) {}
+            }
+
+            // Code check
+            const isCode = text.includes('\n') && (
+                text.includes('{') || text.includes('function') || text.includes('const ') || 
+                text.includes('let ') || text.includes('import ') || text.includes('class ') || 
+                text.includes('def ') || text.includes('</') || text.includes('SELECT ') ||
+                text.startsWith('{') || text.startsWith('[')
+            );
+
+            if (isCode) {
+                let lang = 'CODE';
+                if (text.startsWith('{') || text.startsWith('[')) lang = 'JSON';
+                else if (text.includes('function') || text.includes('const ') || text.includes('let ')) lang = 'JS';
+                else if (text.includes('</') || text.includes('<div')) lang = 'HTML';
+                else if (text.includes('def ') || text.includes('import ')) lang = 'PYTHON';
+                else if (text.includes('SELECT ') || text.includes('FROM ')) lang = 'SQL';
+
+                const html = `
+                    <div class="snippet-code-box">
+                        <span class="snippet-code-badge">${lang}</span>
+                        <code>${escapeHTML(text)}</code>
+                    </div>
+                `;
+                return { html, isCode: true };
+            }
+
+            // Default plain text
+            return { html: `<div class="card-content">${escapeHTML(text)}</div>` };
+        }
+
+        async function handleReceiveData(data) {
+            let decryptedContent = data.content;
+
+            if (!data.isUnencryptedLocal) {
+                if (!encryptionKey) {
+                    showSuccess("Awaiting PIN entry...");
+                    return;
+                }
+                
+                try {
+                    const bytes = CryptoJS.AES.decrypt(data.content, encryptionKey);
+                    decryptedContent = bytes.toString(CryptoJS.enc.Utf8);
+                    
+                    if (!decryptedContent) throw new Error('Decryption resulted in empty string');
+                } catch (err) {
+                    console.error("Decryption failed:", err);
+                    showSuccess("Decryption Failed! Bad PIN/Key.");
+                    return;
+                }
             }
 
             const emptyState = document.getElementById('emptyState');
@@ -501,34 +700,61 @@
             card.className = 'received-card';
 
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const snippet = buildRichSnippetHtml(data, decryptedContent);
+
+            let actionButtonHtml = `
+                <button class="btn-copy" onclick="copyCardContent(this)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Text
+                </button>
+            `;
+
+            if (snippet.isFile) {
+                actionButtonHtml = `
+                    <a class="btn-copy" href="${snippet.downloadUrl}" download="${escapeHTML(snippet.fileName)}" style="background: var(--success);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download File
+                    </a>
+                `;
+            } else if (snippet.isUrl) {
+                actionButtonHtml = `
+                    <a class="btn-copy" href="${escapeHTML(snippet.fullUrl)}" target="_blank" rel="noopener noreferrer">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        Open Link
+                    </a>
+                `;
+            }
 
             card.innerHTML = `
-                <div class="card-content">${escapeHTML(data.content)}</div>
+                ${snippet.html}
                 <div class="card-actions">
                     <span class="card-time">${timeStr}</span>
-                    <button class="btn-copy" onclick="copyCardContent(this)">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                        Copy Text
-                    </button>
+                    ${actionButtonHtml}
                 </div>
             `;
 
             receivedItemsEl.insertBefore(card, receivedItemsEl.firstChild);
-            showSuccess("New snippet received & copied!");
+            showSuccess(snippet.isFile ? "New file received!" : "New snippet received & copied!");
 
-            if (navigator.clipboard) {
+            if (!snippet.isFile && navigator.clipboard) {
                 try {
-                    await navigator.clipboard.writeText(data.content);
+                    await navigator.clipboard.writeText(decryptedContent);
                 } catch(e) {}
             }
         }
 
         function copyCardContent(button) {
             const card = button.closest('.received-card');
-            const content = card.querySelector('.card-content').innerText;
+            const codeEl = card.querySelector('code');
+            const contentEl = card.querySelector('.card-content');
+            const content = codeEl ? codeEl.innerText : (contentEl ? contentEl.innerText : '');
 
             navigator.clipboard.writeText(content).then(() => {
                 const originalText = button.innerHTML;
@@ -540,7 +766,7 @@
                 `;
                 button.style.background = 'var(--success)';
                 if (typeof window.showToast === 'function') {
-                    window.showToast("Copied text to clipboard!", "success");
+                    window.showToast("Copied content to clipboard!", "success");
                 }
                 setTimeout(() => {
                     button.innerHTML = originalText;
@@ -550,7 +776,8 @@
         }
 
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, 
                 tag => ({
                     '&': '&amp;',
                     '<': '&lt;',

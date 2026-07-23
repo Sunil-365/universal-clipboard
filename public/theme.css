@@ -475,3 +475,126 @@ body.dark-theme .premium-banner {
         height: 44px;
     }
 }
+
+/* Drag & Drop Zone Styles */
+.dropzone {
+    border: 2px dashed var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    text-align: center;
+    background: var(--bg-surface);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+.dropzone:hover, .dropzone.dragover {
+    border-color: var(--accent-primary);
+    background: rgba(29, 78, 216, 0.05);
+    color: var(--accent-primary);
+}
+
+/* Rich Snippet Cards */
+.file-card-preview {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--card-border);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-top: 8px;
+}
+.file-card-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+.file-card-info {
+    flex: 1;
+    overflow: hidden;
+    text-align: left;
+}
+.file-card-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.file-card-size {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Image Thumbnail Container */
+.snippet-img-thumb {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--card-border);
+    margin-top: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+.snippet-img-thumb:hover {
+    transform: scale(1.01);
+}
+
+/* Code Snippet Dark Block */
+.snippet-code-box {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+    font-size: 0.85rem;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin-top: 8px;
+    text-align: left;
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    position: relative;
+    line-height: 1.5;
+}
+.snippet-code-badge {
+    position: absolute;
+    top: 8px; right: 12px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Interactive Link Preview Card */
+.link-preview-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--card-border);
+    padding: 12px;
+    border-radius: var(--radius-md);
+    margin-top: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+.link-preview-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-sm);
+}
+.link-favicon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    background: var(--card-border);
+}
+
