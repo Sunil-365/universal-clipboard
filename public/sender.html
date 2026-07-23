@@ -38,33 +38,50 @@
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
-        #reader { width: 100%; margin-top: 20px; border-radius: 8px; overflow: hidden; display: none; background-color: var(--card-bg); border: 1px solid var(--card-border); }
-        .status-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); background: var(--success); color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 600; transition: transform 0.3s ease; box-shadow: var(--shadow-md); z-index: 100; white-space: nowrap; }
-        .status-toast.show { transform: translateX(-50%) translateY(0); }
-        .loader-small { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-left-color: white; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
+        #reader { 
+            width: 100%; 
+            margin-top: 20px; 
+            border-radius: var(--radius-lg); 
+            overflow: hidden; 
+            display: none; 
+            background-color: var(--card-bg); 
+            border: 1px solid var(--card-border); 
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .loader-small { 
+            width: 18px; 
+            height: 18px; 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-left-color: white; 
+            border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+            display: inline-block; 
+        }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .card {
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            padding: 0;
+        .sender-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 36px 28px;
             width: 100%;
-            max-width: 420px;
-            box-sizing: border-box;
+            max-width: 440px;
+            box-shadow: var(--shadow-glass);
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Large, round blue scan button */
         .btn-scan {
-            background: var(--accent-primary);
+            background: var(--accent-gradient);
             color: white;
             border: none;
-            padding: 16px 32px;
-            border-radius: var(--radius-lg);
-            font-size: 1.1rem;
+            padding: 16px 28px;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
             width: 100%;
@@ -72,11 +89,12 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: background-color 0.2s, transform 0.1s;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px var(--accent-glow);
         }
         .btn-scan:hover {
-            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
         }
         .btn-scan:active {
             transform: scale(0.98);
@@ -85,28 +103,29 @@
 </head>
 <body>
 
-
-    <div class="container" style="margin-top: 50px; padding: 0 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box;">
+    <div class="container" style="margin-top: 20px;">
         
         <!-- Logo Block 'D' -->
-        <div style="display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: var(--accent-primary); border-radius: 16px; color: white; font-weight: 800; font-size: 2.2rem; margin: 0 auto 16px auto; box-shadow: var(--shadow-sm); user-select: none;">
+        <div style="display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; background: var(--accent-gradient); border-radius: var(--radius-lg); color: white; font-weight: 800; font-size: 2rem; margin: 0 auto 16px auto; box-shadow: 0 8px 16px var(--accent-glow); user-select: none;">
             D
         </div>
         
-        <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--text-primary); text-align: center; letter-spacing: -0.5px;">Mobile Sender</h1>
-        <p class="subtitle" style="margin-top: 6px; margin-bottom: 40px; color: var(--text-secondary); text-align: center; font-size: 1.05rem; font-weight: 500;">Secure Clipboard Transfer</p>
+        <h1 style="font-size: 1.85rem; margin-bottom: 6px;">Mobile Sender</h1>
+        <p class="subtitle" style="margin-bottom: 32px;">Seamless End-to-End Encrypted Clipboard Transfer</p>
 
-        <div class="card">
+        <div class="sender-card">
             <!-- Disconnected State (Scan QR) -->
             <div id="state-disconnected" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-                <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-top: 0; margin-bottom: 30px; text-align: center; max-width: 270px; font-weight: 500;">
-                    Tap below to scan the Desk Display QR code and connect.
+                <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-top: 0; margin-bottom: 24px; text-align: center; max-width: 290px; font-weight: 500;">
+                    Tap below to scan a Desk Display QR code and link your device session instantly.
                 </p>
                 
                 <button class="btn-scan" id="startScanBtn">
-                    📸 Scan QR Code
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    Scan QR Code
                 </button>
-                <button class="btn" id="stopScanBtn" style="background: var(--danger); display: none; margin-top: 15px;">
+                
+                <button class="btn" id="stopScanBtn" style="background: var(--danger); display: none; margin-top: 16px; box-shadow: none;">
                     Stop Scanner
                 </button>
                 
@@ -115,47 +134,44 @@
 
             <!-- Connected State (Enter and Send Text) -->
             <div id="state-connected" style="display: none; flex-direction: column; width: 100%;">
-                <p style="color: var(--success); font-size: 0.9rem; margin-top: 0; margin-bottom: 20px; text-align: center; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    Secure connection established.
-                </p>
+                <div style="background: var(--success-bg); color: var(--success); padding: 10px 16px; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Secure connection active
+                </div>
                 
-                <textarea id="msgInput" placeholder="Type or paste a list, text, or URL..." autocomplete="off" rows="3" style="resize: vertical; min-height: 80px;"></textarea>
+                <textarea id="msgInput" placeholder="Type or paste text, links, or lists to send..." autocomplete="off" rows="4" style="resize: vertical; min-height: 100px; font-size: 0.95rem; line-height: 1.5;"></textarea>
+                
                 <button class="btn" id="sendBtn">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
-                    Send Data
+                    Send to Display
                 </button>
 
-                <div class="divider" style="margin: 24px 0;">or connect to another display</div>
+                <div class="divider" style="margin: 24px 0;">or switch receiver</div>
 
-                <button class="btn btn-outline" id="reScanBtn" style="font-size: 0.85rem; padding: 10px;" onclick="disconnectSession()">
+                <button class="btn btn-outline" id="reScanBtn" style="font-size: 0.9rem; padding: 10px;" onclick="disconnectSession()">
                     Scan New Display QR
                 </button>
             </div>
             
-            <div id="premium-banner-section" style="display: none; width: 100%; margin-top: 25px;">
+            <div id="premium-banner-section" style="display: none; width: 100%; margin-top: 24px;">
             </div>
         </div>
         
-        <div class="ad-banner" style="margin-top: 40px; width: 100%; max-width: 420px; min-height: 50px; height: auto; background: var(--card-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-size: 0.8rem; border: 1px solid var(--card-border); padding: 10px; box-sizing: border-box; text-align: center;">
-            <div style="font-weight: 700; color: var(--accent-primary); font-size: 0.85rem;">🔒 Fully Encrypted Transfer</div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary);">End-to-End Encrypted using client-side AES.</div>
+        <div class="ad-banner" style="margin-top: 32px; width: 100%; max-width: 440px; background: var(--card-bg); backdrop-filter: var(--backdrop-blur); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius-lg); font-size: 0.85rem; border: 1px solid var(--card-border); padding: 14px; box-sizing: border-box; text-align: center;">
+            <div style="font-weight: 700; color: var(--accent-primary); font-size: 0.9rem;">🔒 End-to-End Encrypted</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Data is encrypted client-side via AES before transmission.</div>
         </div>
     </div>
     
-    <div id="toast" class="status-toast">Sent successfully!</div>
-    
     <script>
-        let socket;
         const input = document.getElementById('msgInput');
         const sendBtn = document.getElementById('sendBtn');
         const startScanBtn = document.getElementById('startScanBtn');
         const stopScanBtn = document.getElementById('stopScanBtn');
         const readerDiv = document.getElementById('reader');
-        const toast = document.getElementById('toast');
         
         const urlParams = new URLSearchParams(window.location.search);
         let roomId = urlParams.get('room');
@@ -164,12 +180,10 @@
         let html5QrCode;
 
         if (window.location.hash.startsWith('#key=')) {
-            // Parse room key and history key parameters from client-side URL hash
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
             encryptionKey = hashParams.get('key') || '';
             historyKey = hashParams.get('hkey') || '';
         } else if (roomId) {
-            // Missing key for Custom Room. Use the room ID as the encryption key
             encryptionKey = roomId;
         }
         
@@ -177,17 +191,19 @@
         
         async function checkAuthStatus() {
             if (typeof supabaseClient === 'undefined') return;
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) {
-                document.querySelectorAll('.ad-banner').forEach(el => el.style.display = 'none');
-            } else {
-                premiumSection.style.display = 'block';
-                premiumSection.innerHTML = `
-                    <div class="divider" style="margin: 10px 0;">Premium</div>
-                    <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 10px; text-align: center;">Log in to unlock Auto-History & Ad-Free Experience!</div>
-                    <button class="btn btn-outline" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.location.href='login'">Log In to Unlock</button>
-                `;
-            }
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    document.querySelectorAll('.ad-banner').forEach(el => el.style.display = 'none');
+                } else {
+                    premiumSection.style.display = 'block';
+                    premiumSection.innerHTML = `
+                        <div class="divider" style="margin: 12px 0;">Premium</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px; text-align: center;">Log in to unlock Auto-History & Ad-Free Experience!</div>
+                        <button class="btn btn-outline" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.location.href='/login'">Log In to Unlock</button>
+                    `;
+                }
+            } catch(e) {}
         }
         checkAuthStatus();
 
@@ -215,32 +231,25 @@
             updateUIState();
         };
 
-        function showToast(message) {
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
         async function saveClipToDatabase(content) {
             if (typeof supabaseClient === 'undefined') return false;
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) {
-                // Encrypt clipboard item content using Zero-Knowledge history key
-                let contentToSave = content;
-                if (historyKey) {
-                    contentToSave = CryptoJS.AES.encrypt(content, historyKey).toString();
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    let contentToSave = content;
+                    if (historyKey) {
+                        contentToSave = CryptoJS.AES.encrypt(content, historyKey).toString();
+                    }
+                    const { error } = await supabaseClient
+                        .from('clips')
+                        .insert([{ user_id: user.id, content: contentToSave }]);
+                    if (error) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
-                const { error } = await supabaseClient
-                    .from('clips')
-                    .insert([{ user_id: user.id, content: contentToSave }]);
-                if (error) {
-                    console.error("Failed to save clip to database:", error);
-                    return false;
-                } else {
-                    console.log("Saved clip to database history.");
-                    return true;
-                }
-            }
+            } catch(e) {}
             return false;
         }
 
@@ -253,7 +262,6 @@
             }
 
             if (typeof supabaseClient === 'undefined') {
-                console.error("Supabase client is not configured.");
                 return;
             }
 
@@ -301,11 +309,9 @@
                 }
 
                 if (!currentChannel) {
-                    alert("Not connected to a Desk Display. Connecting now...");
                     connectToRoomChannel(roomId);
                 }
                 
-                // Save to database first if phone is logged in
                 const savedToDb = await saveClipToDatabase(message);
                 
                 const payload = {
@@ -316,7 +322,6 @@
                     savedToDb: savedToDb
                 };
 
-                // Pushes event instantly over established WebSocket
                 currentChannel.send({
                     type: 'broadcast',
                     event: 'send-data',
@@ -327,12 +332,13 @@
                 
                 sendBtn.innerHTML = '✅ Sent!';
                 sendBtn.style.background = 'var(--success)';
-                sendBtn.style.borderColor = 'var(--success)';
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Data sent successfully!", "success");
+                }
                 
                 setTimeout(() => {
                     sendBtn.innerHTML = originalContent;
                     sendBtn.style.background = '';
-                    sendBtn.style.borderColor = '';
                 }, 2000);
             } else if (!roomId) {
                 alert("Not connected to a Desk Display. Please scan a QR code first.");
@@ -341,7 +347,6 @@
         
         sendBtn.addEventListener('click', () => sendMessage());
         input.addEventListener('keydown', (e) => {
-            // Submit on Ctrl+Enter or Cmd+Enter on desktop, allowing normal Enter for newlines
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
                 sendMessage();
@@ -349,24 +354,23 @@
         });
 
         startScanBtn.addEventListener('click', async () => {
-            // First check if browser context supports mediaDevices/getUserMedia APIs
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert("Camera access is not supported by your current browser or in-app webview. Please open this page directly in Safari (on iOS) or Chrome (on Android) to scan QR codes!");
+                alert("Camera access is not supported by your current browser. Please open this page in Safari or Chrome to scan QR codes!");
                 return;
             }
 
             readerDiv.style.display = 'block';
-            readerDiv.innerHTML = `<div id="reader-loading" style="padding: 40px 20px; text-align: center; color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;"><div class="loader-small" style="border-left-color: var(--accent-primary); width: 24px; height: 24px; border-width: 3px; margin-bottom: 12px;"></div><br/>Starting secure camera feed...</div>`;
+            readerDiv.innerHTML = `<div id="reader-loading" style="padding: 30px 20px; text-align: center; color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;"><div class="loader-small" style="border-left-color: var(--accent-primary); width: 22px; height: 22px; border-width: 3px; margin-bottom: 10px;"></div><br/>Initializing camera...</div>`;
             startScanBtn.style.display = 'none';
             stopScanBtn.style.display = 'flex'; 
 
             try {
                 if (typeof Html5Qrcode === 'undefined') {
-                    throw new Error("Scanner library not loaded yet.");
+                    throw new Error("Scanner library not loaded.");
                 }
                 
                 html5QrCode = new Html5Qrcode("reader");
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                const config = { fps: 10, qrbox: { width: 240, height: 240 } };
                 
                 const onScanSuccess = (decodedText, decodedResult) => {
                     stopScanner();
@@ -382,13 +386,14 @@
                                     encryptionKey = hashParams.get('key') || '';
                                     historyKey = hashParams.get('hkey') || '';
                                 } else {
-                                    // Missing key for Custom Room. Use the room ID as the encryption key
                                     encryptionKey = newRoomId;
                                     historyKey = '';
                                 }
                                 window.history.pushState({}, '', decodedText); 
                                 connectToRoomChannel(roomId);
-                                showToast("Connected securely!");
+                                if (typeof window.showToast === 'function') {
+                                    window.showToast("Connected securely!", "success");
+                                }
                                 updateUIState();
                                 return;
                             }
@@ -398,23 +403,18 @@
                     sendMessage(decodedText);
                 };
 
-                // Try back camera first
                 html5QrCode.start(
                     { facingMode: "environment" },
                     config,
                     onScanSuccess,
                     (errorMessage) => {}
                 ).catch(err => {
-                    console.warn("Back camera failed, trying front camera...", err);
-                    // Fallback 1: Try front camera
                     html5QrCode.start(
                         { facingMode: "user" },
                         config,
                         onScanSuccess,
                         (errorMessage) => {}
                     ).catch(err2 => {
-                        console.warn("Front camera failed, fetching devices...", err2);
-                        // Fallback 2: Get any available camera list and try the first one
                         Html5Qrcode.getCameras().then(devices => {
                             if (devices && devices.length > 0) {
                                 html5QrCode.start(
@@ -427,11 +427,10 @@
                                     stopScanner();
                                 });
                             } else {
-                                alert(`No cameras found: ${err2.message || err2}`);
+                                alert(`No camera found: ${err2.message || err2}`);
                                 stopScanner();
                             }
                         }).catch(err3 => {
-                            alert(`Error accessing camera list: ${err3.message || err3}`);
                             stopScanner();
                         });
                     });
@@ -451,7 +450,6 @@
                     startScanBtn.style.display = 'flex';
                     stopScanBtn.style.display = 'none';
                 }).catch(err => {
-                    console.error(err);
                     readerDiv.style.display = 'none';
                     readerDiv.innerHTML = '';
                     startScanBtn.style.display = 'flex';
@@ -466,8 +464,6 @@
         }
 
         stopScanBtn.addEventListener('click', stopScanner);
-
-
     </script>
 </body>
 </html>

@@ -5,16 +5,13 @@
     <meta name="theme-color" content="#2563eb">
     <link rel="apple-touch-icon" href="/favicon.svg">
     <meta name="google-adsense-account" content="ca-pub-4223443909078451">
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RSVYPTE9QZ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-RSVYPTE9QZ');
     </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -41,86 +38,76 @@
         .page-wrapper {
             width: 100%;
             max-width: 850px;
-            margin: 40px auto;
+            margin: 20px auto 40px auto;
             padding: 0 20px;
-            box-sizing: border-box;
         }
 
         .header-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 24px;
         }
 
         .header-title h1 {
             font-weight: 800;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             margin: 0;
             color: var(--text-primary);
-            letter-spacing: -0.5px;
+            letter-spacing: -0.8px;
         }
 
         .feedback-card {
             background: var(--card-bg);
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
             border: 1px solid var(--card-border);
-            border-radius: var(--radius-lg);
-            padding: 35px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 40px;
-            box-sizing: border-box;
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            box-shadow: var(--shadow-glass);
+            margin-bottom: 36px;
         }
 
         textarea {
             width: 100%;
-            background: var(--bg-color);
+            background: var(--bg-surface);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-md);
-            padding: 18px;
+            padding: 16px;
             color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
+            font-family: inherit;
+            font-size: 0.95rem;
             min-height: 140px;
             resize: vertical;
-            box-sizing: border-box;
-            margin-bottom: 15px;
-            transition: border-color 0.2s, background-color 0.2s;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-        }
-
-        textarea::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.7;
+            margin-bottom: 12px;
+            line-height: 1.5;
         }
 
         .submit-btn {
             width: 100%;
-            background: var(--accent-primary);
+            background: var(--accent-gradient);
             color: white;
             border: none;
             border-radius: var(--radius-md);
             padding: 14px;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px var(--accent-glow);
         }
 
         .submit-btn:hover {
-            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px var(--accent-glow);
         }
 
         .submit-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .reviews-header {
-            font-size: 1.5rem;
+            font-size: 1.45rem;
             font-weight: 700;
             margin-bottom: 20px;
             display: flex;
@@ -132,11 +119,12 @@
         .reviews-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 16px;
         }
 
         .review-card {
             background: var(--card-bg);
+            backdrop-filter: var(--backdrop-blur);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-lg);
             padding: 24px;
@@ -145,7 +133,7 @@
 
         .review-meta {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
@@ -153,17 +141,18 @@
         }
 
         .review-badge {
-            background: rgba(79, 70, 229, 0.15);
+            background: var(--success-bg);
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 700;
-            color: var(--accent-primary);
+            color: var(--success);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .review-content {
-            font-size: 1.05rem;
+            font-size: 1rem;
             line-height: 1.6;
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -172,7 +161,7 @@
 
         .empty-state {
             text-align: center;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             padding: 40px 0;
             font-style: italic;
         }
@@ -184,16 +173,16 @@
             padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .skeleton {
             background: var(--card-border);
             border-radius: 4px;
-            opacity: 0.6;
+            opacity: 0.5;
         }
         
-        .skeleton-line { height: 16px; width: 100%; }
+        .skeleton-line { height: 14px; width: 100%; }
         .skeleton-line.short { width: 40%; }
     </style>
 </head>
@@ -206,15 +195,15 @@
 
         <div class="feedback-card">
             <textarea id="feedbackText" placeholder="Share your anonymous thoughts, feature requests, or bug reports..." maxlength="500"></textarea>
-            <div id="charCount" style="text-align: right; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 15px; margin-top: -5px;">0 / 500</div>
+            <div id="charCount" style="text-align: right; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; margin-top: -4px;">0 / 500</div>
             <button id="submitBtn" class="submit-btn" onclick="submitFeedback()">Submit Anonymously</button>
         </div>
 
         <div class="reviews-header">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-            Recent Feedback
+            Recent Community Feedback
         </div>
         
         <div class="reviews-list" id="reviewsList">
@@ -231,7 +220,6 @@
     </div>
 
     <script>
-        const API_URL = '/api/reviews';
         const reviewsList = document.getElementById('reviewsList');
         const submitBtn = document.getElementById('submitBtn');
         const feedbackText = document.getElementById('feedbackText');
@@ -241,7 +229,6 @@
             charCount.textContent = `${feedbackText.value.length} / 500`;
         });
 
-        // Fetch and display reviews on load
         async function loadReviews() {
             try {
                 if (typeof supabaseClient === 'undefined') {
@@ -279,7 +266,6 @@
             const div = document.createElement('div');
             div.className = 'review-card';
             
-            // Format date nicely
             const date = new Date(review.created_at || review.date);
             const formattedDate = date.toLocaleDateString(undefined, { 
                 month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
@@ -315,22 +301,21 @@
 
                 if (error) throw error;
 
-                // Remove empty state if present
                 if (reviewsList.querySelector('.empty-state')) {
                     reviewsList.innerHTML = '';
                 }
 
-                // Prepend new review
                 const card = createReviewCard(newReview);
                 reviewsList.insertBefore(card, reviewsList.firstChild);
 
-                // Reset form
                 feedbackText.value = '';
                 charCount.textContent = '0 / 500';
                 
-                // Show success
                 submitBtn.textContent = 'Submitted!';
                 submitBtn.style.background = 'var(--success)';
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Feedback submitted anonymously!", "success");
+                }
                 
                 setTimeout(() => {
                     submitBtn.textContent = 'Submit Anonymously';
@@ -344,7 +329,6 @@
             }
         }
 
-        // Basic XSS prevention
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, 
                 tag => ({
@@ -357,7 +341,6 @@
             );
         }
 
-        // Load initially
         loadReviews();
     </script>
 </body>

@@ -28,21 +28,63 @@
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
-        .auth-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; width: 100%; box-sizing: border-box; }
-        .auth-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow-sm); }
-        h1 { font-weight: 800; font-size: 2rem; margin-top: 0; margin-bottom: 25px; text-align: center; color: var(--text-primary); }
+        .auth-wrapper { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 40px 20px; 
+            width: 100%; 
+        }
+        .auth-container { 
+            background: var(--card-bg); 
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--card-border); 
+            border-radius: var(--radius-xl); 
+            padding: 40px 36px; 
+            width: 100%; 
+            max-width: 440px; 
+            box-shadow: var(--shadow-glass); 
+        }
+        h1 { 
+            font-weight: 800; 
+            font-size: 2rem; 
+            margin-top: 0; 
+            margin-bottom: 24px; 
+            text-align: center; 
+            color: var(--text-primary); 
+            letter-spacing: -0.5px;
+        }
         .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-secondary); font-size: 0.9rem; }
-        input { width: 100%; padding: 14px 15px; font-size: 1rem; background: var(--bg-color); border: 1px solid var(--card-border); border-radius: 8px; color: var(--text-primary); box-sizing: border-box; transition: border-color 0.2s; font-family: inherit; }
-        input:focus { outline: none; border-color: var(--accent-primary); }
-        .error-msg { color: var(--danger); font-size: 0.9rem; text-align: center; margin-bottom: 15px; min-height: 20px; font-weight: 500; }
-        .toggle-mode { text-align: center; font-size: 0.9rem; color: var(--text-secondary); cursor: pointer; margin-top: 20px; }
-        .toggle-mode span { color: var(--accent-primary); font-weight: 600; }
-        
-        .divider { display: flex; align-items: center; margin: 25px 0; color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--card-border); }
-        .divider::before { margin-right: 15px; }
-        .divider::after { margin-left: 15px; }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: var(--text-secondary); 
+            font-size: 0.9rem; 
+        }
+        .error-msg { 
+            color: var(--danger); 
+            font-size: 0.9rem; 
+            text-align: center; 
+            margin-bottom: 16px; 
+            min-height: 20px; 
+            font-weight: 600; 
+        }
+        .toggle-mode { 
+            text-align: center; 
+            font-size: 0.95rem; 
+            color: var(--text-secondary); 
+            cursor: pointer; 
+            margin-top: 24px; 
+            font-weight: 500;
+        }
+        .toggle-mode span { 
+            color: var(--accent-primary); 
+            font-weight: 700; 
+        }
     </style>
 </head>
 <body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
@@ -51,8 +93,8 @@
             <h1 id="form-title">Welcome Back</h1>
             <div class="error-msg" id="error-msg"></div>
             
-            <button type="button" class="btn btn-outline" id="google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; border-color: var(--card-border); background: var(--card-bg); color: var(--text-primary);" onclick="loginWithGoogle()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <button type="button" class="btn btn-outline" id="google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; border-color: var(--card-border); padding: 12px 18px; font-weight: 600;" onclick="loginWithGoogle()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
@@ -71,7 +113,7 @@
                 <div class="input-group" id="password-group">
                     <label style="display: flex; justify-content: space-between;">
                         Password
-                        <a href="#" id="forgot-password-link" style="color: var(--accent-primary); text-decoration: none; font-size: 0.85rem;">Forgot?</a>
+                        <a href="#" id="forgot-password-link" style="color: var(--accent-primary); text-decoration: none; font-size: 0.85rem; font-weight: 600;">Forgot?</a>
                     </label>
                     <input type="password" id="password" required placeholder="••••••••">
                 </div>
@@ -202,14 +244,14 @@
                 } else {
                     if (!isLogin && !data.session) {
                         alert("Sign up successful! Please check your email for verification link.");
-                        window.location.href = 'login';
+                        window.location.href = '/login';
                     } else {
                         const redirect = sessionStorage.getItem('redirectAfterLogin');
                         if (redirect) {
                             sessionStorage.removeItem('redirectAfterLogin');
                             window.location.href = redirect;
                         } else {
-                            window.location.href = 'premium';
+                            window.location.href = '/premium';
                         }
                     }
                 }

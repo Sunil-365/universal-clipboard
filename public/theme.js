@@ -7,10 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('dark-theme');
     }
     
-    // Create toggle button
+    // Create floating theme toggle button
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'theme-toggle-btn';
     toggleBtn.setAttribute('aria-label', 'Toggle Dark Mode');
+    toggleBtn.setAttribute('title', 'Toggle Dark Mode');
     
     // SVG Icons
     const moonIcon = `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
@@ -37,12 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Append to body
     document.body.appendChild(toggleBtn);
-
-
 });
 
 // --- Toast Notification System ---
 window.showToast = function(message, type = 'success') {
+    // Remove any existing toast
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     
@@ -62,26 +65,6 @@ window.showToast = function(message, type = 'success') {
         setTimeout(() => toast.remove(), 300); // Wait for CSS transition
     }, 3000);
 };
-
-// --- Anti-Copy & Anti-Inspect Protections ---
-// 1. Disable Right-Click context menu
-document.addEventListener('contextmenu', e => e.preventDefault());
-
-// 2. Disable common developer keyboard shortcuts
-document.addEventListener('keydown', e => {
-    // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U (and Mac equivalents)
-    if (
-        e.key === 'F12' || 
-        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
-        (e.ctrlKey && e.key.toUpperCase() === 'U') ||
-        (e.metaKey && e.altKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) ||
-        (e.metaKey && e.key.toUpperCase() === 'U')
-    ) {
-        e.preventDefault();
-        return false;
-    }
-});
-
 
 // Register PWA Service Worker
 if ('serviceWorker' in navigator) {

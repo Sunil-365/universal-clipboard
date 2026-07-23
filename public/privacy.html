@@ -26,33 +26,43 @@
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
-        .page-container { width: 100%; max-width: 900px; margin: 50px auto; padding: 0 20px; box-sizing: border-box; }
-        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 40px; box-shadow: var(--shadow-sm); line-height: 1.7; color: var(--text-secondary); }
-        h1 { font-weight: 800; font-size: 2.2rem; color: var(--text-primary); margin-bottom: 20px; }
-        h2 { font-weight: 700; font-size: 1.3rem; color: var(--text-primary); margin-top: 30px; margin-bottom: 10px; }
-        p { margin-bottom: 15px; }
+        .page-container { width: 100%; max-width: 900px; margin: 20px auto 40px auto; padding: 0 20px; }
+        .card { 
+            background: var(--card-bg); 
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--card-border); 
+            border-radius: var(--radius-xl); 
+            padding: 40px; 
+            box-shadow: var(--shadow-glass); 
+            line-height: 1.7; 
+            color: var(--text-secondary); 
+        }
+        h1 { font-weight: 800; font-size: 2.2rem; color: var(--text-primary); margin-bottom: 20px; letter-spacing: -0.8px; }
+        h2 { font-weight: 700; font-size: 1.3rem; color: var(--text-primary); margin-top: 32px; margin-bottom: 12px; }
+        p { margin-bottom: 16px; font-size: 1rem; }
     </style>
 </head>
 <body style="display: flex; flex-direction: column; min-height: 100vh;">
     <div class="page-container">
         <div class="card">
             <h1>Privacy Policy</h1>
-            <p>Your privacy is important to us. This Privacy Policy explains how DropConnect collects, uses, and safeguards your information.</p>
+            <p>Your privacy is paramount to us. This Privacy Policy explains how DropConnect collects, uses, and safeguards your information when you use our universal clipboard service.</p>
 
             <h2>1. Information We Collect</h2>
-            <p>We collect essential information required to provide our service, such as your email address, authentication provider credentials (Google Sign-In), and transaction details for subscription management.</p>
+            <p>We collect minimal essential information required to provide our service, such as your email address, authentication credentials (Google Sign-In), and account session tokens.</p>
 
-            <h2>2. Encryption & Data Security</h2>
-            <p>All temporary clipboard data and live WebSocket transmissions are encrypted using client-side AES encryption. We do not inspect or read your private transferred snippets.</p>
+            <h2>2. End-to-End Encryption & Security</h2>
+            <p>All temporary clipboard data and live stream transmissions are encrypted using client-side AES encryption. We do not inspect, log, or read your private transferred text, URLs, or clipboard snippets.</p>
 
-            <h2>3. Third-Party Payment Processing</h2>
-            <p>Payments are handled securely via Cashfree Payment Gateway. We do not store financial details like credit card numbers or banking passwords on our servers.</p>
+            <h2>3. Payment Processing</h2>
+            <p>Payments for premium features are handled securely via third-party payment gateways. We do not store sensitive financial details like credit card numbers or banking passwords on our servers.</p>
 
-            <h2>4. Cookies and Local Storage</h2>
-            <p>We use local storage strictly to maintain user authentication tokens and application state.</p>
+            <h2>4. Cookies & Local Storage</h2>
+            <p>We use local storage strictly to maintain user authentication tokens, theme preferences, and Zero-Knowledge session key parameters.</p>
 
             <h2>5. Contact Us</h2>
-            <p>For privacy queries, please reach out to <a href="mailto:support@dropconnect.com" style="color: var(--accent-primary);">support@dropconnect.com</a>.</p>
+            <p>For privacy inquiries or account requests, please reach out to <a href="mailto:support@dropconnect.com" style="color: var(--accent-primary); font-weight: 600;">support@dropconnect.com</a>.</p>
         </div>
     </div>
 </body>

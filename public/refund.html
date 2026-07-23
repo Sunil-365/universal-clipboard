@@ -26,22 +26,32 @@
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
-        .page-container { width: 100%; max-width: 900px; margin: 50px auto; padding: 0 20px; box-sizing: border-box; }
-        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 40px; box-shadow: var(--shadow-sm); line-height: 1.7; color: var(--text-secondary); }
-        h1 { font-weight: 800; font-size: 2.2rem; color: var(--text-primary); margin-bottom: 5px; }
-        .update-date { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 25px; display: block; }
-        p { margin-bottom: 18px; }
+        .page-container { width: 100%; max-width: 900px; margin: 20px auto 40px auto; padding: 0 20px; }
+        .card { 
+            background: var(--card-bg); 
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--card-border); 
+            border-radius: var(--radius-xl); 
+            padding: 40px; 
+            box-shadow: var(--shadow-glass); 
+            line-height: 1.7; 
+            color: var(--text-secondary); 
+        }
+        h1 { font-weight: 800; font-size: 2.2rem; color: var(--text-primary); margin-bottom: 6px; letter-spacing: -0.8px; }
+        .update-date { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; display: block; font-weight: 600; }
+        p { margin-bottom: 18px; font-size: 1rem; }
     </style>
 </head>
 <body style="display: flex; flex-direction: column; min-height: 100vh;">
     <div class="page-container">
         <div class="card">
             <h1>Cancellation & Refund Policy</h1>
-            <span class="update-date">Last updated on 29-06-2026</span>
+            <span class="update-date">Last updated on June 29, 2026</span>
 
-            <p><strong>This business does not guarantee refund and cancellation policy services.</strong></p>
-            <p>Since DropConnect provides instant digital access, services, and features upon purchase, all sales and subscription charges processed through our website are final. No refunds or service cancellations are guaranteed once digital services have been rendered.</p>
-            <p>For any billing inquiries, you may reach out to customer support at <a href="mailto:sunilohdar02@gmail.com" style="color: var(--accent-primary);">sunilohdar02@gmail.com</a>.</p>
+            <p><strong style="color: var(--text-primary);">Service Policy:</strong> Since DropConnect provides instant digital access, features, and custom spaces upon subscription or purchase, all digital transactions processed through our platform are final once digital services have been rendered.</p>
+
+            <p>For any billing or transaction inquiries, please reach out to customer support at <a href="mailto:sunilohdar02@gmail.com" style="color: var(--accent-primary); font-weight: 600;">sunilohdar02@gmail.com</a>.</p>
         </div>
     </div>
 </body>
