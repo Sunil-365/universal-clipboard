@@ -5,145 +5,170 @@
     <meta name="theme-color" content="#2563eb">
     <link rel="apple-touch-icon" href="/favicon.svg">
     <meta name="google-adsense-account" content="ca-pub-4223443909078451">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RSVYPTE9QZ"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-RSVYPTE9QZ');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <title>Receive Files - DropConnect</title>
-    <meta name="description" content="Display this DropConnect screen on your desktop to instantly receive files, links, and text from your other devices.">
-    <meta name="keywords" content="receive files, desktop display, DropConnect receiver">
+    <title>Desk Display Receiver - DropConnect</title>
+    <meta name="description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data from your mobile devices.">
+    <meta name="keywords" content="DropConnect receiver, desk display, QR clipboard receive">
     <link rel="canonical" href="https://dropconnect.up.railway.app/receiver">
-    <meta property="og:title" content="Receive Files - DropConnect">
-    <meta property="og:description" content="Display this DropConnect screen on your desktop to instantly receive files, links, and text from your other devices.">
+    <meta property="og:title" content="Desk Display Receiver - DropConnect">
+    <meta property="og:description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data from your mobile devices.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://dropconnect.up.railway.app/receiver">
     <meta property="og:image" content="https://dropconnect.up.railway.app/favicon.svg">
     <meta property="og:site_name" content="DropConnect">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Receive Files - DropConnect">
-    <meta name="twitter:description" content="Display this DropConnect screen on your desktop to instantly receive files, links, and text from your other devices.">
-    <script src="supabase-js.js"></script>
-    <script src="supabase-config.js"></script>
-    <script src="qrcode.min.js"></script>
-    <script src="crypto-js.min.js"></script>
-    <script src="vanilla-tilt.min.js"></script>
+    <meta name="twitter:title" content="Desk Display Receiver - DropConnect">
+    <meta name="twitter:description" content="Display QR code on desktop to receive end-to-end encrypted clipboard data from your mobile devices.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
+    <script src="supabase-js.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="crypto-js.min.js"></script>
+    <script src="qrcode.min.js"></script>
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
-        .qr-wrapper { 
-            position: relative; 
-            background: #ffffff; 
-            padding: 20px; 
-            border-radius: var(--radius-lg); 
-            display: inline-block; 
-            border: 1px solid var(--card-border); 
-            margin-bottom: 24px; 
-            align-self: center; 
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
-        }
-        #qrcode { 
-            display: block; 
-            border-radius: var(--radius-sm); 
-            width: 190px; 
-            height: 190px; 
-            background: #ffffff; 
-        }
-        .status-box { 
-            background: var(--bg-surface); 
-            padding: 14px 20px; 
-            border-radius: var(--radius-md); 
-            border: 1px solid var(--card-border); 
-            position: relative; 
-            overflow: hidden; 
-            min-height: 24px; 
-            margin-bottom: 20px; 
-        }
-        #status { 
-            color: var(--text-secondary); 
-            font-weight: 600; 
-            font-size: 0.95rem; 
-            margin: 0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-        }
-        #status.success { color: var(--success); }
-        .loader { 
-            border: 2px solid rgba(148, 163, 184, 0.3); 
-            border-left-color: var(--accent-primary); 
-            border-radius: 50%; 
-            width: 16px; 
-            height: 16px; 
-            animation: spin 0.8s linear infinite; 
-            display: inline-block; 
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .timer-bar-container { 
-            width: 100%; 
-            height: 4px; 
-            background: rgba(226, 232, 240, 0.8); 
-            border-radius: 2px; 
-            margin-top: 16px; 
-            overflow: hidden; 
-        }
-        .timer-bar { 
-            height: 100%; 
-            width: 100%; 
-            background: var(--accent-gradient); 
-            transform-origin: left; 
-        }
-        @keyframes countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
-        
-        .received-items { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            overflow-y: auto; 
-            flex: 1; 
-            padding-right: 4px; 
-            max-height: 280px; 
-        }
-        .received-card { 
-            background: var(--bg-surface); 
-            border: 1px solid var(--card-border); 
-            border-radius: var(--radius-md); 
-            padding: 14px 18px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            text-align: left; 
+        .qr-wrapper {
+            position: relative;
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--card-border);
             box-shadow: var(--shadow-sm);
-            animation: slideInUp 0.3s ease forwards;
+            margin: 0 auto 20px auto;
+            display: inline-block;
         }
-        @keyframes slideInUp {
+
+        .timer-bar-container {
+            width: 100%;
+            height: 4px;
+            background: var(--card-border);
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background: var(--accent-gradient);
+            width: 100%;
+            transform-origin: left;
+        }
+
+        @keyframes countdown {
+            0% { transform: scaleX(1); }
+            100% { transform: scaleX(0); }
+        }
+
+        .status-box {
+            margin: 10px 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-box .loader {
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--accent-primary);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-box.success {
+            color: var(--success);
+        }
+
+        .received-items {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .received-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: slideUp 0.3s ease-out;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes slideUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .received-content { 
-            flex: 1; 
-            white-space: pre-wrap; 
-            word-break: break-word; 
-            margin-right: 16px; 
-            color: var(--text-primary); 
-            font-weight: 500; 
-            font-size: 0.95rem; 
+
+        .card-content {
+            font-size: 0.95rem;
+            word-break: break-word;
+            white-space: pre-wrap;
+            color: var(--text-primary);
+            font-family: inherit;
             line-height: 1.5;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid var(--card-border);
+            padding-top: 10px;
+            margin-top: 4px;
+        }
+
+        .card-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .btn-copy {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-copy:hover {
+            background: var(--accent-hover);
         }
     </style>
 </head>
 <body>
     
-    <div class="container" style="margin-top: 20px; max-width: 540px;">
+    <div class="container" style="margin-top: 20px; max-width: 560px;">
         <!-- Logo Branding -->
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px; justify-content: center;">
             <svg width="32" height="32" viewBox="0 0 512 512" style="border-radius: 8px;">
@@ -156,7 +181,7 @@
         <div class="card" style="display: flex; flex-direction: column;">
             <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px;">
                 <h2 style="margin: 0; font-size: 1.45rem;">Desk Display</h2>
-                <div style="background: var(--success-bg); color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 4px;">
+                <div style="background: var(--success-bg); color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; border: 1px solid rgba(5, 150, 105, 0.2); display: flex; align-items: center; gap: 4px;">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     E2EE
                 </div>
@@ -172,6 +197,26 @@
             
             <div class="status-box">
                 <p id="status"><span class="loader" id="loader"></span> Waiting for connection...</p>
+            </div>
+
+            <!-- Active Connected Devices Widget -->
+            <div id="devicesCard" style="margin-top: 14px; margin-bottom: 16px; width: 100%; text-align: left; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 12px 16px; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                    <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        Active Connected Devices (<span id="deviceCount">1</span>)
+                    </div>
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--success); background: var(--success-bg); padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(5, 150, 105, 0.2); display: flex; align-items: center; gap: 4px;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block;"></span> LIVE
+                    </span>
+                </div>
+                <div id="devicesList" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <!-- Devices rendered dynamically -->
+                </div>
             </div>
 
             <div class="received-items" id="receivedItems">
@@ -202,6 +247,7 @@
         const persistentRoomId = urlParams.get('room');
 
         let currentChannel;
+        const myDeviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
 
         if (persistentRoomId) {
             let storedRoomKey = localStorage.getItem(`room-key:${persistentRoomId}`);
@@ -220,6 +266,97 @@
             }, 10 * 60 * 1000);
         }
 
+        function getDeviceMeta() {
+            const ua = navigator.userAgent;
+            let type = "desktop";
+            let name = "Desk Display";
+            let icon = "💻";
+
+            if (/iPhone|iPad|iPod|Android/i.test(ua)) {
+                type = "mobile";
+                icon = "📱";
+                if (/iPhone/i.test(ua)) name = "iPhone";
+                else if (/iPad/i.test(ua)) name = "iPad";
+                else if (/Android/i.test(ua)) name = "Android Device";
+                else name = "Mobile Device";
+            } else {
+                if (/Macintosh/i.test(ua)) name = "Mac";
+                else if (/Windows/i.test(ua)) name = "Windows PC";
+                else if (/Linux/i.test(ua)) name = "Linux PC";
+            }
+
+            if (/Chrome/i.test(ua) && !/Edg/i.test(ua)) name += " (Chrome)";
+            else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) name += " (Safari)";
+            else if (/Firefox/i.test(ua)) name += " (Firefox)";
+            else if (/Edg/i.test(ua)) name += " (Edge)";
+
+            return { 
+                id: myDeviceId, 
+                name: name, 
+                type: type, 
+                icon: icon, 
+                joinedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            };
+        }
+
+        function updateConnectedDevicesUI(presenceState) {
+            const devicesList = document.getElementById('devicesList');
+            const deviceCountEl = document.getElementById('deviceCount');
+            if (!devicesList || !deviceCountEl) return;
+
+            let devices = [];
+            Object.keys(presenceState).forEach(key => {
+                const presences = presenceState[key];
+                if (Array.isArray(presences)) {
+                    presences.forEach(p => {
+                        if (p && p.name && !devices.some(d => d.id === p.id)) {
+                            devices.push(p);
+                        }
+                    });
+                }
+            });
+
+            if (devices.length === 0) {
+                devices.push(getDeviceMeta());
+            }
+
+            deviceCountEl.textContent = devices.length;
+            devicesList.innerHTML = '';
+
+            devices.forEach(dev => {
+                const isMe = dev.id === myDeviceId;
+                const badge = document.createElement('div');
+                badge.style.cssText = `
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    background: var(--card-bg);
+                    border: 1px solid ${isMe ? 'var(--accent-primary)' : 'var(--card-border)'};
+                    padding: 5px 12px;
+                    border-radius: 16px;
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    box-shadow: var(--shadow-sm);
+                `;
+                badge.innerHTML = `
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 6px var(--success);"></span>
+                    <span>${dev.icon || '💻'}</span>
+                    <span>${escapeHTML(dev.name)} ${isMe ? '<span style="color: var(--text-muted); font-size: 0.7rem;">(This Device)</span>' : ''}</span>
+                `;
+                devicesList.appendChild(badge);
+            });
+
+            const hasMobile = devices.some(d => d.type === 'mobile' || (d.name && (d.name.toLowerCase().includes('phone') || d.name.toLowerCase().includes('android'))));
+            if (hasMobile) {
+                statusEl.className = 'success';
+                statusEl.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Mobile device connected & live sync active
+                `;
+            }
+        }
+
         function joinRoomChannel(roomId) {
             if (currentChannel) {
                 currentChannel.unsubscribe();
@@ -232,7 +369,8 @@
 
             currentChannel = supabaseClient.channel(`room:${roomId}`, {
                 config: {
-                    broadcast: { self: false }
+                    broadcast: { self: false },
+                    presence: { key: myDeviceId }
                 }
             });
 
@@ -240,9 +378,22 @@
                 .on('broadcast', { event: 'send-data' }, ({ payload }) => {
                     handleReceiveData(payload);
                 })
-                .subscribe((status) => {
+                .on('presence', { event: 'sync' }, () => {
+                    const state = currentChannel.presenceState();
+                    updateConnectedDevicesUI(state);
+                })
+                .on('presence', { event: 'join' }, () => {
+                    const state = currentChannel.presenceState();
+                    updateConnectedDevicesUI(state);
+                })
+                .on('presence', { event: 'leave' }, () => {
+                    const state = currentChannel.presenceState();
+                    updateConnectedDevicesUI(state);
+                })
+                .subscribe(async (status) => {
                     if (status === 'SUBSCRIBED') {
                         console.log(`Successfully joined sync channel for room: ${roomId}`);
+                        await currentChannel.track(getDeviceMeta());
                     }
                 });
         }
@@ -348,60 +499,66 @@
 
             const card = document.createElement('div');
             card.className = 'received-card';
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'received-content';
-            contentDiv.textContent = data.content;
-            
-            const btn = document.createElement('button');
-            btn.className = 'btn';
-            btn.style.width = 'auto';
-            btn.style.padding = '8px 16px';
-            btn.style.fontSize = '0.85rem';
-            
-            if (data.type === 'url') {
-                showSuccess("URL Received!");
-                btn.textContent = 'Open Link';
-                btn.onclick = () => window.open(data.content, '_blank');
-            } else {
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            card.innerHTML = `
+                <div class="card-content">${escapeHTML(data.content)}</div>
+                <div class="card-actions">
+                    <span class="card-time">${timeStr}</span>
+                    <button class="btn-copy" onclick="copyCardContent(this)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy Text
+                    </button>
+                </div>
+            `;
+
+            receivedItemsEl.insertBefore(card, receivedItemsEl.firstChild);
+            showSuccess("New snippet received & copied!");
+
+            if (navigator.clipboard) {
                 try {
                     await navigator.clipboard.writeText(data.content);
-                    if (typeof window.showToast === 'function') {
-                        window.showToast("Copied to clipboard!", "success");
-                    }
-                    showSuccess("Auto-Copied to Clipboard!");
-                } catch (e) {
-                    showSuccess("Text Received!");
-                }
-
-                btn.textContent = 'Copy Text';
-                btn.onclick = async () => {
-                    try {
-                        await navigator.clipboard.writeText(data.content);
-                        if (typeof window.showToast === 'function') {
-                            window.showToast("Copied to clipboard!", "success");
-                        }
-                    } catch(e) {
-                        if (typeof window.showToast === 'function') {
-                            window.showToast("Failed to copy text", "error");
-                        }
-                    }
-                };
+                } catch(e) {}
             }
-            
-            card.appendChild(contentDiv);
-            card.appendChild(btn);
-            
-            receivedItemsEl.insertBefore(card, receivedItemsEl.firstChild);
         }
 
-        if (window.matchMedia('(pointer: fine)').matches && typeof VanillaTilt !== 'undefined') {
-            VanillaTilt.init(document.querySelectorAll(".card"), {
-                max: 2,
-                speed: 400,
-                glare: true,
-                "max-glare": 0.1
+        function copyCardContent(button) {
+            const card = button.closest('.received-card');
+            const content = card.querySelector('.card-content').innerText;
+
+            navigator.clipboard.writeText(content).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Copied!
+                `;
+                button.style.background = 'var(--success)';
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Copied text to clipboard!", "success");
+                }
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '';
+                }, 2000);
             });
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag])
+            );
         }
     </script>
 </body>
