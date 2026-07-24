@@ -9,18 +9,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <title>Mobile Sender - DropConnect</title>
-    <meta name="description" content="Scan QR codes and send clipboard text, links, or files instantly to your desktop.">
-    <meta name="keywords" content="DropConnect sender, mobile sender, QR scanner clipboard, send files">
+    <meta name="description" content="Scan QR codes and send clipboard text or links instantly to your desktop.">
+    <meta name="keywords" content="DropConnect sender, mobile sender, QR scanner clipboard">
     <link rel="canonical" href="https://dropconnect.up.railway.app/sender">
     <meta property="og:title" content="Mobile Sender - DropConnect">
-    <meta property="og:description" content="Scan QR codes and send clipboard text, links, or files instantly to your desktop.">
+    <meta property="og:description" content="Scan QR codes and send clipboard text or links instantly to your desktop.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://dropconnect.up.railway.app/sender">
     <meta property="og:image" content="https://dropconnect.up.railway.app/favicon.svg">
     <meta property="og:site_name" content="DropConnect">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Mobile Sender - DropConnect">
-    <meta name="twitter:description" content="Scan QR codes and send clipboard text, links, or files instantly to your desktop.">
+    <meta name="twitter:description" content="Scan QR codes and send clipboard text or links instantly to your desktop.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
     <script src="supabase-js.js"></script>
@@ -125,19 +125,6 @@
 </head>
 <body>
     
-    <!-- Full-Screen Drag & Drop Overlay for Sender -->
-    <div class="global-drag-overlay" id="globalDragOverlay">
-        <div class="global-drag-box">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-            <div style="font-weight: 800; font-size: 1.1rem; color: white;">Drop File Anywhere</div>
-            <div style="font-size: 0.85rem; color: #cbd5e1;">Instant Encrypted Stream</div>
-        </div>
-    </div>
-
     <div class="container" style="margin-top: 20px; max-width: 480px;">
         <!-- Logo Branding -->
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px; justify-content: center;">
@@ -150,7 +137,7 @@
 
         <div class="card" style="display: flex; flex-direction: column; align-items: center;">
             <h2 style="margin-bottom: 6px; font-size: 1.45rem;">Mobile Sender</h2>
-            <p class="subtitle" style="margin-bottom: 24px;">Scan a Desk Display QR code or paste clipboard contents/files to stream instantly.</p>
+            <p class="subtitle" style="margin-bottom: 24px;">Scan a Desk Display QR code or paste clipboard contents to stream instantly.</p>
             
             <!-- Disconnected State (Camera Scan Trigger) -->
             <div id="state-disconnected" style="display: flex; flex-direction: column; width: 100%;">
@@ -169,7 +156,7 @@
                 <div id="reader"></div>
             </div>
 
-            <!-- Connected State (Enter and Send Text / Files) -->
+            <!-- Connected State (Enter and Send Text) -->
             <div id="state-connected" style="display: none; flex-direction: column; width: 100%;">
                 <div style="background: var(--success-bg); color: var(--success); padding: 10px 16px; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(5, 150, 105, 0.2);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -196,23 +183,7 @@
                     </div>
                 </div>
                 
-                <textarea id="msgInput" placeholder="Type or paste text, links, code snippets, or drop files to send..." autocomplete="off" rows="4" style="resize: vertical; min-height: 90px; font-size: 0.95rem; line-height: 1.5;"></textarea>
-
-                <!-- Drag & Drop Zone for Sender -->
-                <div class="dropzone" id="senderDropzone" onclick="document.getElementById('senderFileInput').click()">
-                    <div class="dropzone-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
-                    </div>
-                    <div style="text-align: left;">
-                        <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary);">Send Image or Document File</div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">Max size: 5MB • <span style="color: var(--accent-primary); font-weight: 600;">Browse File</span></div>
-                    </div>
-                    <input type="file" id="senderFileInput" style="display: none;" onchange="handleSenderFileSelect(event)">
-                </div>
+                <textarea id="msgInput" placeholder="Type or paste text, links, or code snippets to send..." autocomplete="off" rows="4" style="resize: vertical; min-height: 100px; font-size: 0.95rem; line-height: 1.5;"></textarea>
                 
                 <button class="btn" id="sendBtn">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -387,99 +358,6 @@
             window.history.pushState({}, '', window.location.pathname);
             updateUIState();
         };
-
-        // Full-Screen Drag & Drop Listener for Sender
-        const globalOverlay = document.getElementById('globalDragOverlay');
-        let dragCounter = 0;
-
-        window.addEventListener('dragenter', (e) => {
-            e.preventDefault();
-            dragCounter++;
-            globalOverlay.classList.add('active');
-        });
-
-        window.addEventListener('dragover', (e) => {
-            e.preventDefault();
-        });
-
-        window.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dragCounter--;
-            if (dragCounter <= 0) {
-                dragCounter = 0;
-                globalOverlay.classList.remove('active');
-            }
-        });
-
-        window.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dragCounter = 0;
-            globalOverlay.classList.remove('active');
-            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                processAndSendSenderFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        function handleSenderFileSelect(e) {
-            const files = e.target.files;
-            if (files && files.length > 0) {
-                processAndSendSenderFile(files[0]);
-            }
-        }
-
-        function processAndSendSenderFile(file) {
-            if (file.size > 5 * 1024 * 1024) {
-                alert("File size exceeds 5MB limit.");
-                return;
-            }
-            if (!roomId || !encryptionKey) {
-                alert("Not connected to a Desk Display room. Please scan a QR code first.");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const fileDataUrl = evt.target.result;
-                const encryptedContent = CryptoJS.AES.encrypt(fileDataUrl, encryptionKey).toString();
-
-                if (!currentChannel) {
-                    connectToRoomChannel(roomId);
-                }
-
-                const payload = {
-                    roomId: roomId,
-                    type: 'file',
-                    fileName: file.name,
-                    fileSize: file.size,
-                    fileType: file.type,
-                    content: encryptedContent
-                };
-
-                currentChannel.send({
-                    type: 'broadcast',
-                    event: 'send-data',
-                    payload: payload
-                });
-
-                sendBtn.innerHTML = `✅ File Sent!`;
-                sendBtn.style.background = 'var(--success)';
-                if (typeof window.showToast === 'function') {
-                    window.showToast(`File "${file.name}" sent to display!`, "success");
-                }
-
-                setTimeout(() => {
-                    sendBtn.innerHTML = `
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                        Send to Display
-                    `;
-                    sendBtn.style.background = '';
-                }, 2500);
-            };
-            reader.readAsDataURL(file);
-        }
 
         async function saveClipToDatabase(content) {
             if (typeof supabaseClient === 'undefined') return false;
