@@ -125,6 +125,19 @@
 </head>
 <body>
     
+    <!-- Full-Screen Drag & Drop Overlay for Sender -->
+    <div class="global-drag-overlay" id="globalDragOverlay">
+        <div class="global-drag-box">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <div style="font-weight: 800; font-size: 1.1rem; color: white;">Drop File Anywhere</div>
+            <div style="font-size: 0.85rem; color: #cbd5e1;">Instant Encrypted Stream</div>
+        </div>
+    </div>
+
     <div class="container" style="margin-top: 20px; max-width: 480px;">
         <!-- Logo Branding -->
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px; justify-content: center;">
@@ -186,14 +199,17 @@
                 <textarea id="msgInput" placeholder="Type or paste text, links, code snippets, or drop files to send..." autocomplete="off" rows="4" style="resize: vertical; min-height: 90px; font-size: 0.95rem; line-height: 1.5;"></textarea>
 
                 <!-- Drag & Drop Zone for Sender -->
-                <div class="dropzone" id="senderDropzone" onclick="document.getElementById('senderFileInput').click()" style="padding: 12px; margin-bottom: 14px;">
-                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.85rem;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="dropzone" id="senderDropzone" onclick="document.getElementById('senderFileInput').click()">
+                    <div class="dropzone-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="17 8 12 3 7 8"></polyline>
                             <line x1="12" y1="3" x2="12" y2="15"></line>
                         </svg>
-                        <span>Send Image / Document File (Max 5MB)</span>
+                    </div>
+                    <div style="text-align: left;">
+                        <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary);">Send Image or Document File</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Max size: 5MB • <span style="color: var(--accent-primary); font-weight: 600;">Browse File</span></div>
                     </div>
                     <input type="file" id="senderFileInput" style="display: none;" onchange="handleSenderFileSelect(event)">
                 </div>
@@ -372,29 +388,37 @@
             updateUIState();
         };
 
-        // File Selection & Drag Drop Handlers for Sender
-        const senderDropzone = document.getElementById('senderDropzone');
-        if (senderDropzone) {
-            ['dragenter', 'dragover'].forEach(eventName => {
-                senderDropzone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    senderDropzone.classList.add('dragover');
-                }, false);
-            });
-            ['dragleave', 'drop'].forEach(eventName => {
-                senderDropzone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    senderDropzone.classList.remove('dragover');
-                }, false);
-            });
-            senderDropzone.addEventListener('drop', (e) => {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                if (files && files.length > 0) {
-                    processAndSendSenderFile(files[0]);
-                }
-            });
-        }
+        // Full-Screen Drag & Drop Listener for Sender
+        const globalOverlay = document.getElementById('globalDragOverlay');
+        let dragCounter = 0;
+
+        window.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            dragCounter++;
+            globalOverlay.classList.add('active');
+        });
+
+        window.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        window.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                globalOverlay.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            globalOverlay.classList.remove('active');
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processAndSendSenderFile(e.dataTransfer.files[0]);
+            }
+        });
 
         function handleSenderFileSelect(e) {
             const files = e.target.files;

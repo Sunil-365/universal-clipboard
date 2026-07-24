@@ -97,7 +97,7 @@
             margin-top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             width: 100%;
             max-height: 420px;
             overflow-y: auto;
@@ -108,7 +108,7 @@
             background: var(--card-bg);
             backdrop-filter: var(--backdrop-blur);
             border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             padding: 16px;
             display: flex;
             flex-direction: column;
@@ -151,14 +151,14 @@
             color: white;
             border: none;
             border-radius: var(--radius-sm);
-            padding: 6px 12px;
+            padding: 6px 14px;
             font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             text-decoration: none;
         }
 
@@ -169,6 +169,25 @@
 </head>
 <body>
     
+    <!-- Full-Screen Drag & Drop Overlay -->
+    <div class="global-drag-overlay" id="globalDragOverlay">
+        <div class="global-drag-box">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <div style="font-weight: 800; font-size: 1.1rem; color: white;">Drop File Anywhere</div>
+            <div style="font-size: 0.85rem; color: #cbd5e1;">Instant Encrypted Stream</div>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+        <img id="lightboxImg" class="lightbox-img" src="" alt="Enlarged view">
+        <div style="margin-top: 16px; color: white; font-size: 0.85rem; font-weight: 600; background: rgba(255,255,255,0.15); padding: 6px 14px; border-radius: 20px; backdrop-filter: blur(8px);">Click anywhere to close</div>
+    </div>
+
     <div class="container" style="margin-top: 20px; max-width: 580px;">
         <!-- Logo Branding -->
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px; justify-content: center;">
@@ -187,7 +206,7 @@
                     E2EE
                 </div>
             </div>
-            <p class="subtitle" style="margin-bottom: 20px;">Scan this QR code or drop files below to stream instantly.</p>
+            <p class="subtitle" style="margin-bottom: 20px;">Scan QR code or drop files anywhere on screen to stream instantly.</p>
             
             <div class="qr-wrapper">
                 <div id="qrcode" style="display: flex; justify-content: center; align-items: center; background: white;"></div>
@@ -201,7 +220,7 @@
             </div>
 
             <!-- Active Connected Devices Widget -->
-            <div id="devicesCard" style="margin-top: 10px; margin-bottom: 12px; width: 100%; text-align: left; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 12px 16px; box-sizing: border-box;">
+            <div id="devicesCard" style="margin-top: 8px; margin-bottom: 14px; width: 100%; text-align: left; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 12px 16px; box-sizing: border-box;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                     <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,13 +241,17 @@
 
             <!-- File Dropzone for Desk Display -->
             <div class="dropzone" id="receiverDropzone" onclick="document.getElementById('receiverFileInput').click()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <div style="font-weight: 600; font-size: 0.85rem;">Drag & drop images/files or <span style="color: var(--accent-primary); text-decoration: underline;">browse</span></div>
-                <div style="font-size: 0.72rem; color: var(--text-muted);">Max file size: 5MB • End-to-End Encrypted</div>
+                <div class="dropzone-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </div>
+                <div style="text-align: left;">
+                    <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary);">Drop images or files here</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Max file size: 5MB • <span style="color: var(--accent-primary); font-weight: 600;">Browse File</span></div>
+                </div>
                 <input type="file" id="receiverFileInput" style="display: none;" onchange="handleReceiverFileSelect(event)">
             </div>
 
@@ -489,29 +512,37 @@
             }, 3000);
         }
 
-        // Drag & Drop Setup for Desk Display
-        const receiverDropzone = document.getElementById('receiverDropzone');
-        if (receiverDropzone) {
-            ['dragenter', 'dragover'].forEach(eventName => {
-                receiverDropzone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    receiverDropzone.classList.add('dragover');
-                }, false);
-            });
-            ['dragleave', 'drop'].forEach(eventName => {
-                receiverDropzone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    receiverDropzone.classList.remove('dragover');
-                }, false);
-            });
-            receiverDropzone.addEventListener('drop', (e) => {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                if (files && files.length > 0) {
-                    processAndSendFile(files[0]);
-                }
-            });
-        }
+        // Full-Screen Drag & Drop Listener
+        const globalOverlay = document.getElementById('globalDragOverlay');
+        let dragCounter = 0;
+
+        window.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            dragCounter++;
+            globalOverlay.classList.add('active');
+        });
+
+        window.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        window.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                globalOverlay.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            globalOverlay.classList.remove('active');
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processAndSendFile(e.dataTransfer.files[0]);
+            }
+        });
 
         function handleReceiverFileSelect(e) {
             const files = e.target.files;
@@ -553,13 +584,12 @@
                         payload: payload
                     });
                     
-                    // Render locally as sent file
                     handleReceiveData({
                         type: 'file',
                         fileName: file.name,
                         fileSize: file.size,
                         fileType: file.type,
-                        content: fileDataUrl, // unencrypted local copy
+                        content: fileDataUrl,
                         isUnencryptedLocal: true
                     });
 
@@ -580,7 +610,21 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         }
 
-        // Rich Snippet Renderer
+        function openLightbox(src) {
+            const modal = document.getElementById('lightboxModal');
+            const img = document.getElementById('lightboxImg');
+            if (modal && img) {
+                img.src = src;
+                modal.classList.add('show');
+            }
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightboxModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        // Upgraded Rich Snippet Renderer
         function buildRichSnippetHtml(data, decryptedContent) {
             const isFile = data.type === 'file' || decryptedContent.startsWith('data:');
             
@@ -588,20 +632,38 @@
                 const fileName = data.fileName || 'Shared_File';
                 const fileSize = data.fileSize ? formatBytes(data.fileSize) : '';
                 const isImage = (data.fileType && data.fileType.startsWith('image/')) || decryptedContent.startsWith('data:image/');
-                const icon = isImage ? '🖼️' : '📄';
+                const isZip = (data.fileType && (data.fileType.includes('zip') || data.fileType.includes('tar') || data.fileType.includes('compressed')));
+                const isCodeFile = (data.fileType && (data.fileType.includes('json') || data.fileType.includes('javascript') || data.fileType.includes('text')));
+
+                let badgeClass = 'document';
+                let iconSymbol = '📄';
+                let fileExt = fileName.split('.').pop().toUpperCase();
+                if (fileExt.length > 5) fileExt = 'FILE';
+
+                if (isImage) { badgeClass = 'image'; iconSymbol = '🖼️'; }
+                else if (isZip) { badgeClass = 'zip'; iconSymbol = '📦'; }
+                else if (isCodeFile) { badgeClass = 'code'; iconSymbol = '💻'; }
 
                 let html = `
                     <div class="file-card-preview">
-                        <span class="file-card-icon">${icon}</span>
+                        <div class="file-icon-badge ${badgeClass}">${iconSymbol}</div>
                         <div class="file-card-info">
-                            <div class="file-card-name">${escapeHTML(fileName)}</div>
+                            <div class="file-card-name">
+                                ${escapeHTML(fileName)}
+                                <span class="file-meta-tag">${fileExt}</span>
+                            </div>
                             <div class="file-card-size">${fileSize ? fileSize + ' • ' : ''}Encrypted File Transfer</div>
                         </div>
                     </div>
                 `;
 
                 if (isImage) {
-                    html += `<img src="${decryptedContent}" class="snippet-img-thumb" alt="${escapeHTML(fileName)}" onclick="window.open(this.src)" title="Click to open image">`;
+                    html += `
+                        <div class="snippet-img-wrapper">
+                            <img src="${decryptedContent}" class="snippet-img-thumb" alt="${escapeHTML(fileName)}" onclick="openLightbox(this.src)">
+                            <div class="img-expand-overlay">🔍 Click to Expand</div>
+                        </div>
+                    `;
                 }
 
                 return { html, isFile: true, downloadUrl: decryptedContent, fileName };
@@ -620,8 +682,6 @@
                     const parsed = new URL(fullUrl);
                     const domain = parsed.hostname;
                     const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-
-                    // Check if URL is direct image link
                     const isImgLink = /\.(png|jpg|jpeg|webp|gif|svg)(\?.*)?$/i.test(parsed.pathname);
 
                     let html = `
@@ -636,7 +696,12 @@
                     `;
 
                     if (isImgLink) {
-                        html += `<img src="${escapeHTML(fullUrl)}" class="snippet-img-thumb" alt="Link Image Preview" onclick="window.open(this.src)" title="Click to view full image">`;
+                        html += `
+                            <div class="snippet-img-wrapper">
+                                <img src="${escapeHTML(fullUrl)}" class="snippet-img-thumb" alt="Link Image Preview" onclick="openLightbox(this.src)">
+                                <div class="img-expand-overlay">🔍 Click to Expand</div>
+                            </div>
+                        `;
                     }
 
                     return { html, isUrl: true, fullUrl };
@@ -668,7 +733,6 @@
                 return { html, isCode: true };
             }
 
-            // Default plain text
             return { html: `<div class="card-content">${escapeHTML(text)}</div>` };
         }
 
