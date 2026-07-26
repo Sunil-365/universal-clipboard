@@ -110,6 +110,118 @@
     <script src="theme.js" defer></script>
     <script src="navbar.js" defer></script>
     <style>
+        /* ── Subtle Background Grid ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--card-border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--card-border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: -1;
+        }
+        body.dark-theme::before {
+            opacity: 0.1;
+        }
+
+        /* ── Hero Section ── */
+        .hero-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(37, 99, 235, 0.25);
+            color: var(--accent-primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(4px);
+        }
+        body.dark-theme .hero-badge {
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .hero-title {
+            font-size: clamp(2.4rem, 5.5vw, 3.6rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0 0 16px;
+            text-align: center;
+            letter-spacing: -1.5px;
+            line-height: 1.12;
+        }
+
+        .hero-subtitle {
+            color: var(--text-secondary);
+            text-align: center;
+            margin: 0 0 32px;
+            line-height: 1.65;
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+
+        /* ── Hero Illustration ── */
+        .hero-visual {
+            width: 100%;
+            max-width: 700px;
+            margin: 8px 0 10px;
+            position: relative;
+        }
+
+        .hero-visual svg {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .particle-1 {
+            width: 8px; height: 8px;
+            background: var(--accent-primary);
+            top: 15%; left: 8%;
+            animation: float 6s ease-in-out infinite;
+        }
+        .particle-2 {
+            width: 12px; height: 12px;
+            background: #10b981;
+            top: 60%; right: 12%;
+            animation: float 8s ease-in-out infinite 2s;
+        }
+        .particle-3 {
+            width: 6px; height: 6px;
+            background: #d97706;
+            bottom: 25%; left: 20%;
+            animation: float 5s ease-in-out infinite 1s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-18px) scale(1.2); }
+        }
+
+        /* ── Action Cards ── */
         .cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -131,7 +243,7 @@
             cursor: pointer;
             text-decoration: none;
             color: var(--text-primary);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -144,24 +256,38 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 4px;
-            transition: opacity 0.3s ease;
+            opacity: 0.8;
         }
 
         .action-card.receive::before {
-            background: linear-gradient(90deg, #10b981, #34d399);
+            background: linear-gradient(90deg, #059669, #34d399);
         }
-
         .action-card.send::before {
             background: var(--accent-gradient);
         }
 
+        /* Shine effect on hover */
+        .action-card::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -60%;
+            width: 40%; height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            transform: rotate(25deg);
+            transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .action-card:hover::after {
+            left: 120%;
+        }
+
         .action-card:hover {
-            box-shadow: 0 20px 35px -10px rgba(37, 99, 235, 0.15);
-            transform: translateY(-4px);
+            box-shadow: 0 24px 48px -12px rgba(37, 99, 235, 0.18);
+            transform: translateY(-5px);
         }
 
         .action-card.receive:hover {
             border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 24px 48px -12px rgba(16, 185, 129, 0.18);
         }
 
         .action-card.send:hover {
@@ -169,68 +295,366 @@
         }
 
         .icon-wrapper {
-            width: 72px;
-            height: 72px;
-            border-radius: 20px;
+            width: 76px;
+            height: 76px;
+            border-radius: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 24px;
-            transition: transform 0.3s ease;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
         }
 
         .action-card:hover .icon-wrapper {
-            transform: scale(1.08);
+            transform: scale(1.1) rotate(-3deg);
         }
 
         .action-card.receive .icon-wrapper {
             background: rgba(16, 185, 129, 0.12);
-            color: var(--success);
+            color: #059669;
+        }
+        body.dark-theme .action-card.receive .icon-wrapper {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
         }
 
         .action-card.send .icon-wrapper {
             background: rgba(37, 99, 235, 0.12);
             color: var(--accent-primary);
         }
-
-        body.dark-theme .action-card.receive .icon-wrapper {
-            background: rgba(16, 185, 129, 0.2);
-        }
-
         body.dark-theme .action-card.send .icon-wrapper {
             background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
         }
 
-        .hero-badge {
+        .action-card h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin: 0 0 10px;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .action-card p {
+            color: var(--text-secondary);
+            line-height: 1.55;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .card-arrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            transition: gap 0.3s ease;
+        }
+        .action-card:hover .card-arrow {
+            gap: 12px;
+        }
+        .action-card.receive .card-arrow {
+            color: #059669;
+        }
+        body.dark-theme .action-card.receive .card-arrow {
+            color: #34d399;
+        }
+
+        /* ── Premium Banner ── */
+        .premium-banner {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 36px;
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+            border: 1px solid rgba(124, 58, 237, 0.25);
+            backdrop-filter: var(--backdrop-blur);
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .premium-banner:hover {
+            border-color: rgba(124, 58, 237, 0.4);
+            box-shadow: 0 8px 30px -8px rgba(124, 58, 237, 0.15);
+        }
+        body.dark-theme .premium-banner {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+        }
+        .premium-banner-title {
+            font-weight: 800;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .premium-banner-text {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+        .premium-banner .btn-sm {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 16px;
-            border-radius: 50px;
-            background: rgba(37, 99, 235, 0.08);
-            border: 1px solid rgba(37, 99, 235, 0.2);
-            color: var(--accent-primary);
-            font-size: 0.85rem;
+            padding: 10px 24px;
+            background: var(--accent-gradient);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 14px var(--accent-glow);
+            transition: all 0.25s ease;
         }
-        body.dark-theme .hero-badge {
-            background: rgba(59, 130, 246, 0.15);
+        .premium-banner .btn-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+            filter: brightness(1.08);
         }
 
-        /* Onboarding Demo Modal */
+        /* ── Feedback Button ── */
+        .btn-feedback {
+            margin-top: 32px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.92rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            backdrop-filter: var(--backdrop-blur);
+            transition: all 0.3s ease;
+        }
+        .btn-feedback:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            background: rgba(37, 99, 235, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -8px var(--accent-glow);
+        }
+
+        /* ── SEO / How It Works / Features / FAQ Sections ── */
+        .seo-section {
+            margin-top: 64px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        .seo-section-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+        .seo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            text-align: left;
+        }
+        .seo-card {
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: var(--backdrop-blur);
+            transition: all 0.3s ease;
+        }
+        .seo-card:hover {
+            border-color: rgba(37, 99, 235, 0.2);
+            box-shadow: 0 8px 24px -8px rgba(37, 99, 235, 0.08);
+            transform: translateY(-2px);
+        }
+        .seo-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            font-size: 1.2rem;
+        }
+        .seo-card-icon.blue {
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--accent-primary);
+        }
+        .seo-card-icon.green {
+            background: rgba(16, 185, 129, 0.12);
+            color: #059669;
+        }
+        .seo-card-icon.amber {
+            background: rgba(217, 119, 6, 0.12);
+            color: #d97706;
+        }
+        .seo-card-icon.purple {
+            background: rgba(124, 58, 237, 0.12);
+            color: #7c3aed;
+        }
+        .seo-card-icon.rose {
+            background: rgba(244, 63, 94, 0.12);
+            color: #f43f5e;
+        }
+        .seo-card-icon.teal {
+            background: rgba(20, 184, 166, 0.12);
+            color: #14b8a6;
+        }
+        body.dark-theme .seo-card-icon.blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        body.dark-theme .seo-card-icon.green { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+        body.dark-theme .seo-card-icon.amber { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        body.dark-theme .seo-card-icon.purple { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+        body.dark-theme .seo-card-icon.rose { background: rgba(251, 113, 133, 0.2); color: #fb7185; }
+        body.dark-theme .seo-card-icon.teal { background: rgba(45, 212, 191, 0.2); color: #2dd4bf; }
+        .seo-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .seo-card-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        /* Step indicators */
+        .steps-container {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto 28px;
+        }
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        .step-indicator:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 60%;
+            right: -40%;
+            height: 2px;
+            background: var(--card-border);
+            z-index: 0;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-primary);
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 8px;
+        }
+        body.dark-theme .step-circle {
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
+        .step-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-align: center;
+            max-width: 100px;
+        }
+
+        /* FAQ */
+        .faq-container {
+            text-align: left;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+        .faq-item:hover {
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+        .faq-item[open] {
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+        .faq-summary {
+            font-weight: 700;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            list-style: none;
+            transition: color 0.2s ease;
+            user-select: none;
+        }
+        .faq-summary::-webkit-details-marker {
+            display: none;
+        }
+        .faq-summary::after {
+            content: '+';
+            font-size: 1.3rem;
+            font-weight: 300;
+            line-height: 1;
+            color: var(--text-muted);
+            transition: transform 0.3s ease, color 0.2s ease;
+            flex-shrink: 0;
+        }
+        .faq-item[open] .faq-summary::after {
+            transform: rotate(45deg);
+            color: var(--accent-primary);
+        }
+        .faq-answer {
+            padding: 0 22px 18px;
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ── Onboarding Demo Modal ── */
         .demo-modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(9, 13, 22, 0.65);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(9, 13, 22, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.35s ease;
         }
         .demo-modal-overlay.show {
             display: flex;
@@ -244,12 +668,12 @@
             backdrop-filter: var(--backdrop-blur);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-glass);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             transform: scale(0.94);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .demo-modal-overlay.show .demo-modal-content {
             transform: scale(1);
@@ -260,6 +684,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
         .demo-modal-title {
             margin: 0;
@@ -269,20 +694,23 @@
             align-items: center;
             gap: 10px;
             color: var(--text-primary);
+            letter-spacing: -0.3px;
         }
         .demo-modal-close {
             background: none;
             border: none;
             font-size: 1.6rem;
-            font-weight: bold;
+            font-weight: 300;
             color: var(--text-muted);
             cursor: pointer;
             line-height: 1;
-            padding: 4px;
-            transition: color 0.2s;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
         .demo-modal-close:hover {
             color: var(--text-primary);
+            background: rgba(148, 163, 184, 0.1);
         }
         .demo-modal-body {
             flex: 1;
@@ -300,6 +728,64 @@
             display: flex;
             justify-content: flex-end;
             background: var(--card-bg);
+            flex-shrink: 0;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: clamp(1.8rem, 6vw, 2.4rem);
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            .steps-container {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .step-indicator:not(:last-child)::after {
+                display: none;
+            }
+            .premium-banner {
+                padding: 20px;
+            }
+            .seo-section {
+                margin-top: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-card {
+                padding: 28px 20px;
+            }
+            .icon-wrapper {
+                width: 64px;
+                height: 64px;
+            }
+            .icon-wrapper svg {
+                width: 30px;
+                height: 30px;
+            }
+            .demo-modal-content {
+                height: 82vh;
+                width: 96%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .particle,
+            .action-card::after,
+            .action-card:hover,
+            .icon-wrapper,
+            .card-arrow {
+                animation: none !important;
+                transition: none !important;
+            }
+            .fade-in-up {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
         }
     </style>
 </head>
@@ -307,13 +793,77 @@
 <body>
     <main class="container-wide hero-wrapper">
         
-        <div class="hero-badge fade-in-up">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-            Zero Setup • End-to-End Encrypted
-        </div>
+        <!-- Floating background particles -->
+        <div class="particle particle-1" aria-hidden="true"></div>
+        <div class="particle particle-2" aria-hidden="true"></div>
+        <div class="particle particle-3" aria-hidden="true"></div>
 
-        <h1 class="fade-in-up delay-1">Universal Clipboard & File Sharing.<br><span class="gradient-text">Sync instantly across all devices.</span></h1>
-        <p class="subtitle fade-in-up delay-1" style="max-width: 620px;">The fastest web-based <strong>universal clipboard tool</strong> to copy, paste, and transfer text, links, and files seamlessly between PC, Mac, iPhone, and Android with <strong>zero app installation</strong> and <strong>end-to-end AES encryption</strong>.</p>
+        <div class="hero-content">
+            <div class="hero-badge fade-in-up">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Zero Setup &bull; End-to-End Encrypted
+            </div>
+
+            <h1 class="hero-title fade-in-up delay-1">Universal Clipboard &amp; File Sharing.<br><span class="gradient-text">Sync instantly across all devices.</span></h1>
+            <p class="hero-subtitle fade-in-up delay-1">The fastest web-based universal clipboard tool to copy, paste, and transfer text, links, and files seamlessly between PC, Mac, iPhone, and Android with <strong>zero installations</strong> and <strong>end-to-end AES encryption</strong>.</p>
+
+            <!-- Hero visual: cross-device sync illustration -->
+            <div class="hero-visual fade-in-up delay-1" aria-hidden="true">
+                <svg viewBox="0 0 700 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Laptop -->
+                    <rect x="20" y="30" width="260" height="160" rx="14" fill="var(--bg-surface)" stroke="var(--card-border)" stroke-width="1.5"/>
+                    <rect x="38" y="46" width="224" height="128" rx="4" fill="var(--bg-color)"/>
+                    <!-- QR code on laptop -->
+                    <rect x="100" y="65" width="48" height="48" rx="4" fill="#ffffff" stroke="#e2e8f0" stroke-width="0.5"/>
+                    <rect x="104" y="69" width="8" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="116" y="69" width="8" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="132" y="69" width="8" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="104" y="81" width="8" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="132" y="81" width="8" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="104" y="93" width="8" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="116" y="93" width="8" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="132" y="93" width="8" height="8" rx="1" fill="#0f172a"/>
+                    <!-- Laptop base -->
+                    <path d="M20 190 L280 190 L290 200 L10 200 Z" fill="var(--card-border)" opacity="0.4"/>
+                    <!-- Laptop label -->
+                    <text x="150" y="128" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text-muted)">Desk Display</text>
+
+                    <!-- Phone -->
+                    <rect x="440" y="38" width="108" height="172" rx="18" fill="var(--bg-surface)" stroke="var(--card-border)" stroke-width="1.5"/>
+                    <rect x="452" y="48" width="84" height="148" rx="10" fill="var(--bg-color)"/>
+                    <!-- Phone notch -->
+                    <rect x="480" y="38" width="28" height="6" rx="3" fill="var(--card-border)"/>
+                    <!-- Camera viewfinder on phone -->
+                    <rect x="468" y="85" width="52" height="52" rx="6" fill="rgba(37,99,235,0.08)" stroke="var(--accent-primary)" stroke-width="1.5" stroke-dasharray="4 3"/>
+                    <circle cx="494" cy="111" r="16" fill="none" stroke="rgba(37,99,235,0.15)" stroke-width="1"/>
+                    <line x1="494" y1="95" x2="494" y2="127" stroke="var(--accent-primary)" stroke-width="1.5" opacity="0.5"/>
+                    <line x1="478" y1="111" x2="510" y2="111" stroke="var(--accent-primary)" stroke-width="1.5" opacity="0.5"/>
+                    <!-- Phone home indicator -->
+                    <rect x="476" y="196" width="36" height="4" rx="2" fill="var(--card-border)"/>
+
+                    <!-- Animated connection lines -->
+                    <path d="M290 120 C330 80, 390 80, 430 120" stroke="var(--accent-primary)" stroke-width="2" stroke-dasharray="8 6" opacity="0.6">
+                        <animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.5s" repeatCount="indefinite"/>
+                    </path>
+                    <path d="M290 140 C330 180, 390 180, 430 140" stroke="#10b981" stroke-width="2" stroke-dasharray="8 6" opacity="0.5">
+                        <animate attributeName="stroke-dashoffset" from="0" to="28" dur="1.8s" repeatCount="indefinite"/>
+                    </path>
+
+                    <!-- Data dots moving along paths -->
+                    <circle r="4" fill="var(--accent-primary)" opacity="0.8">
+                        <animateMotion dur="2s" repeatCount="indefinite" path="M290 120 C330 80, 390 80, 430 120"/>
+                    </circle>
+                    <circle r="4" fill="#10b981" opacity="0.8">
+                        <animateMotion dur="2.4s" repeatCount="indefinite" path="M290 140 C330 180, 390 180, 430 140"/>
+                    </circle>
+
+                    <!-- Lock icon badge -->
+                    <rect x="320" y="55" width="60" height="24" rx="12" fill="rgba(16,185,129,0.12)" stroke="rgba(16,185,129,0.3)" stroke-width="0.5"/>
+                    <rect x="336" y="59" width="6" height="6" rx="1" fill="#10b981"/>
+                    <text x="346" y="70" font-size="9" font-weight="700" fill="#10b981">AES-256</text>
+                </svg>
+            </div>
+        </div>
 
         <nav class="cards-container fade-in-up delay-2" aria-label="Main navigation">
             <a href="/receiver" class="action-card receive">
@@ -326,7 +876,11 @@
                     </svg>
                 </div>
                 <h2>Desk Display Receiver</h2>
-                <p style="color: var(--text-secondary); line-height: 1.5; margin: 0; font-size: 0.95rem;">I am on my computer.<br>Generate a real-time QR code to receive clipboard data.</p>
+                <p>I am on my computer. Generate a real-time QR code to receive clipboard data.</p>
+                <span class="card-arrow">
+                    Open Receiver
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
             </a>
 
             <a href="/sender" class="action-card send">
@@ -338,17 +892,27 @@
                     </svg>
                 </div>
                 <h2>Mobile Device Sender</h2>
-                <p style="color: var(--text-secondary); line-height: 1.5; margin: 0; font-size: 0.95rem;">I am on my phone.<br>Scan a Desk Display QR code to instantly send content.</p>
+                <p>I am on my phone. Scan the Desk Display QR code to instantly send content.</p>
+                <span class="card-arrow">
+                    Open Sender
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
             </a>
         </nav>
 
-        <aside class="premium-banner fade-in-up delay-3" id="index-ad-banner"
-            style="margin-top: 36px; width: 100%; max-width: 800px; border-radius: var(--radius-lg); padding: 20px 24px; text-align: center; box-shadow: var(--shadow-sm);">
-            <div style="font-weight: 700; color: var(--accent-primary); font-size: 1rem; margin-bottom: 4px;">🚀 Unlock DropConnect Premium</div>
-            <div style="font-size: 0.9rem; color: var(--text-secondary);">Access persistent custom spaces, permanent clipboard history, and an ad-free experience.</div>
+        <aside class="premium-banner fade-in-up delay-3" id="index-ad-banner">
+            <div class="premium-banner-title">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Unlock DropConnect Premium
+            </div>
+            <div class="premium-banner-text">Access persistent custom rooms, permanent clipboard history, and an ad-free experience.</div>
+            <a href="/premium" class="btn-sm">
+                See Premium Features
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
         </aside>
 
-        <a href="/feedback" class="btn-outline btn-feedback fade-in-up delay-3">
+        <a href="/feedback" class="btn-feedback fade-in-up delay-3">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -356,39 +920,74 @@
             Leave Anonymous Feedback
         </a>
 
-        <!-- How It Works Section for On-Page SEO Keyword Density -->
+        <!-- How It Works Section -->
         <section class="seo-section fade-in-up delay-3">
-            <h2 class="seo-section-title">How DropConnect Cross-Device Clipboard Works</h2>
+            <h2 class="seo-section-title">How DropConnect Works</h2>
+            
+            <!-- Visual step indicators -->
+            <div class="steps-container">
+                <div class="step-indicator">
+                    <div class="step-circle">1</div>
+                    <span class="step-label">Open Desk Display</span>
+                </div>
+                <div class="step-indicator">
+                    <div class="step-circle">2</div>
+                    <span class="step-label">Scan with Phone</span>
+                </div>
+                <div class="step-indicator">
+                    <div class="step-circle">3</div>
+                    <span class="step-label">Instant Sync</span>
+                </div>
+            </div>
+
             <div class="seo-grid">
                 <article class="seo-card">
-                    <h3 class="seo-card-title">1. Open Desk Display</h3>
-                    <p class="seo-card-desc">Open DropConnect on your computer to automatically generate a secure session QR code.</p>
+                    <div class="seo-card-icon blue">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </div>
+                    <h3 class="seo-card-title">Open Desk Display</h3>
+                    <p class="seo-card-desc">Open DropConnect on your computer to automatically generate a secure session QR code — no sign-up needed.</p>
                 </article>
                 <article class="seo-card">
-                    <h3 class="seo-card-title">2. Scan with Phone</h3>
-                    <p class="seo-card-desc">Point your smartphone camera at the QR code to pair your devices instantly without registration.</p>
+                    <div class="seo-card-icon green">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <h3 class="seo-card-title">Scan with Phone</h3>
+                    <p class="seo-card-desc">Point your smartphone camera at the QR code to pair your devices instantly. Works on iOS and Android.</p>
                 </article>
                 <article class="seo-card">
-                    <h3 class="seo-card-title">3. Instant Copy & Paste</h3>
-                    <p class="seo-card-desc">Paste text, links, code snippets, or files on your phone and watch them appear on your PC instantly.</p>
+                    <div class="seo-card-icon amber">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    </div>
+                    <h3 class="seo-card-title">Instant Sync</h3>
+                    <p class="seo-card-desc">Paste text, links, code snippets, or files on your phone and watch them appear on your PC in real-time.</p>
                 </article>
             </div>
         </section>
 
         <section class="seo-section fade-in-up delay-3">
-            <h2 class="seo-section-title">Why Choose DropConnect Universal Clipboard?</h2>
+            <h2 class="seo-section-title">Why Choose DropConnect?</h2>
             <div class="seo-grid">
                 <div class="seo-card">
-                    <h3 class="seo-card-title">🔒 Zero-Knowledge AES Encryption</h3>
-                    <p class="seo-card-desc">All clipboard content is encrypted locally on your device before transmission. We never store or view your data.</p>
+                    <div class="seo-card-icon purple">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <h3 class="seo-card-title">Zero-Knowledge AES Encryption</h3>
+                    <p class="seo-card-desc">All content encrypted locally before transmission. We never have access to your clipboard data.</p>
                 </div>
                 <div class="seo-card">
-                    <h3 class="seo-card-title">⚡ Real-Time Web Socket Sync</h3>
-                    <p class="seo-card-desc">High-speed real-time synchronization between Windows, Mac, Linux, iPhone, and Android devices.</p>
+                    <div class="seo-card-icon teal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <h3 class="seo-card-title">Real-Time Sync</h3>
+                    <p class="seo-card-desc">High-speed synchronization across Windows, Mac, Linux, iPhone, and Android via WebSocket.</p>
                 </div>
                 <div class="seo-card">
-                    <h3 class="seo-card-title">📱 Zero App Installation Required</h3>
-                    <p class="seo-card-desc">Works 100% inside any web browser (Chrome, Safari, Edge, Firefox). No software download needed.</p>
+                    <div class="seo-card-icon rose">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    </div>
+                    <h3 class="seo-card-title">No App Installation</h3>
+                    <p class="seo-card-desc">Works 100% inside any browser — Chrome, Safari, Edge, Firefox. No downloads needed.</p>
                 </div>
             </div>
         </section>
@@ -397,15 +996,15 @@
             <h2 class="seo-section-title">Frequently Asked Questions</h2>
             <div class="faq-container">
                 <details class="faq-item">
-                    <summary class="faq-summary">Is DropConnect free to use for cross-device clipboard sync?</summary>
+                    <summary class="faq-summary">Is DropConnect free to use?</summary>
                     <p class="faq-answer">Yes! DropConnect offers a 100% free tier for instant clipboard and file sharing across devices. Premium features offer extended history and custom spaces.</p>
                 </details>
                 <details class="faq-item">
-                    <summary class="faq-summary">How secure is my copied text and shared files?</summary>
+                    <summary class="faq-summary">How secure is my data?</summary>
                     <p class="faq-answer">DropConnect uses end-to-end client-side AES encryption. Your clipboard contents are encrypted before leaving your browser and decrypted only on your connected receiving device.</p>
                 </details>
                 <details class="faq-item">
-                    <summary class="faq-summary">Which operating systems and devices are supported?</summary>
+                    <summary class="faq-summary">Which devices are supported?</summary>
                     <p class="faq-answer">DropConnect works across all major platforms including Windows, macOS, Linux, ChromeOS, iOS, and Android through any modern browser.</p>
                 </details>
             </div>
