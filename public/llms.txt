@@ -3,15 +3,15 @@
 > Universal cross-device clipboard synchronization and instant file transfer platform. End-to-end encrypted with zero setup required.
 
 ## Core Pages
-- [Home Page](https://dropconnect.up.railway.app/): Overview of DropConnect features, interactive onboarding demo, and quick navigation.
-- [Desk Display Receiver](https://dropconnect.up.railway.app/receiver): Computer display mode generating real-time QR codes and listening for incoming clipboard data.
-- [Mobile Sender](https://dropconnect.up.railway.app/sender): Mobile scanner interface for scanning QR codes and sending clipboard snippets or files to desktop displays.
-- [Authentication & Account](https://dropconnect.up.railway.app/login): Sign up or log in via Google OAuth or Email/Password.
-- [Premium Dashboard](https://dropconnect.up.railway.app/premium): Manage custom persistent room spaces and encrypted clip history.
-- [Account Settings](https://dropconnect.up.railway.app/settings): Manage user profile, phone number, and security credentials.
-- [Anonymous Feedback](https://dropconnect.up.railway.app/feedback): Submit anonymous feature requests or community reviews.
+- [Home Page](https://dropconnectt.vercel.app/): Overview of DropConnect features, interactive onboarding demo, and quick navigation.
+- [Desk Display Receiver](https://dropconnectt.vercel.app/receiver): Computer display mode generating real-time QR codes and listening for incoming clipboard data.
+- [Mobile Sender](https://dropconnectt.vercel.app/sender): Mobile scanner interface for scanning QR codes and sending clipboard snippets or files to desktop displays.
+- [Authentication & Account](https://dropconnectt.vercel.app/login): Sign up or log in via Google OAuth or Email/Password.
+- [Premium Dashboard](https://dropconnectt.vercel.app/premium): Manage custom persistent room spaces and encrypted clip history.
+- [Account Settings](https://dropconnectt.vercel.app/settings): Manage user profile, phone number, and security credentials.
+- [Anonymous Feedback](https://dropconnectt.vercel.app/feedback): Submit anonymous feature requests or community reviews.
 
 ## Documentation & Legal
-- [Privacy Policy](https://dropconnect.up.railway.app/privacy): Information regarding AES encryption, data privacy, and third-party processing.
-- [Terms & Conditions](https://dropconnect.up.railway.app/terms): Terms of service, acceptable use policies, and legal agreements.
-- [Cancellation & Refund Policy](https://dropconnect.up.railway.app/refund): Billing policies and refund terms.
+- [Privacy Policy](https://dropconnectt.vercel.app/privacy): Information regarding AES encryption, data privacy, and third-party processing.
+- [Terms & Conditions](https://dropconnectt.vercel.app/terms): Terms of service, acceptable use policies, and legal agreements.
+- [Cancellation & Refund Policy](https://dropconnectt.vercel.app/refund): Billing policies and refund terms.

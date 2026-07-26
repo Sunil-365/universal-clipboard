@@ -25,6 +25,7 @@
       "operatingSystem": "Web, Windows, macOS, iOS, Android",
       "applicationCategory": "UtilitiesApplication",
       "description": "DropConnect is a universal clipboard and file sharing tool that lets you sync text, links, and files across all your devices instantly.",
+      "url": "https://dropconnectt.vercel.app",
       "offers": {
         "@type": "Offer",
         "price": "0.00",
@@ -32,21 +33,73 @@
       }
     }
     </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "DropConnect",
+      "url": "https://dropconnectt.vercel.app",
+      "logo": "https://dropconnectt.vercel.app/favicon.svg",
+      "description": "Universal cross-device clipboard synchronization and instant file transfer platform."
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "DropConnect",
+      "url": "https://dropconnectt.vercel.app"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is DropConnect really free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! DropConnect offers a free tier with basic clipboard sync. Premium features include persistent rooms and extended history."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How secure is my data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "DropConnect uses end-to-end AES encryption. Your data is encrypted on your device and decrypted only on the receiving device. We never have access to your clipboard contents."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What devices are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "DropConnect works on any device with a modern web browser - Windows, macOS, Linux, iOS, and Android. No app installation required."
+          }
+        }
+      ]
+    }
+    </script>
     <meta name="description"
         content="DropConnect is the ultimate universal clipboard and file sharing tool. Securely sync text, files, and links across all your devices instantly without installing an app.">
     <meta name="keywords"
         content="universal clipboard, cross-device sync, share files, share text, clipboard sync, send to phone, web clipboard, dropconnect">
     <meta name="author" content="DropConnect">
-    <link rel="canonical" href="https://dropconnect.up.railway.app/">
+    <link rel="canonical" href="https://dropconnectt.vercel.app/">
     <meta property="og:title" content="DropConnect | Seamless Cross-Device Clipboard & File Sharing">
     <meta property="og:description" content="DropConnect is the ultimate universal clipboard and file sharing tool. Securely sync text, files, and links across all your devices instantly without installing an app.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://dropconnect.up.railway.app/">
-    <meta property="og:image" content="https://dropconnect.up.railway.app/favicon.svg">
+    <meta property="og:url" content="https://dropconnectt.vercel.app/">
+    <meta property="og:image" content="https://dropconnectt.vercel.app/favicon.svg">
     <meta property="og:site_name" content="DropConnect">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="DropConnect | Seamless Cross-Device Clipboard & File Sharing">
     <meta name="twitter:description" content="DropConnect is the ultimate universal clipboard and file sharing tool. Securely sync text, files, and links across all your devices instantly without installing an app.">
+    <meta name="twitter:image" content="https://dropconnectt.vercel.app/favicon.svg">
+    <meta property="og:locale" content="en_US">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -261,9 +314,9 @@
         </div>
 
         <h1 class="fade-in-up delay-1">Sync Your Clipboard.<br><span class="gradient-text">Instantly across devices.</span></h1>
-        <p class="subtitle fade-in-up delay-1" style="max-width: 580px;">The universal clipboard tool that lets you seamlessly transfer text, URLs, and files between desktop and mobile with zero app installation.</p>
+        <p class="subtitle fade-in-up delay-1" style="max-width: 580px;">The universal clipboard tool that lets you seamlessly transfer text, URLs, and files between desktop and mobile with zero app installation. <strong>Free cross-device clipboard sync</strong> with <strong>end-to-end encryption</strong>.</p>
 
-        <div class="cards-container fade-in-up delay-2">
+        <nav class="cards-container fade-in-up delay-2" aria-label="Main navigation">
             <a href="/receiver" class="action-card receive">
                 <div class="icon-wrapper">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -288,13 +341,13 @@
                 <h2>Mobile Sender</h2>
                 <p style="color: var(--text-secondary); line-height: 1.5; margin: 0; font-size: 0.95rem;">I am on my phone.<br>Scan a Desk Display QR code to send data.</p>
             </a>
-        </div>
+        </nav>
 
-        <div class="premium-banner fade-in-up delay-3" id="index-ad-banner"
+        <aside class="premium-banner fade-in-up delay-3" id="index-ad-banner"
             style="margin-top: 36px; width: 100%; max-width: 800px; border-radius: var(--radius-lg); padding: 20px 24px; text-align: center; box-shadow: var(--shadow-sm);">
             <div style="font-weight: 700; color: var(--accent-primary); font-size: 1rem; margin-bottom: 4px;">🚀 Unlock DropConnect Premium</div>
             <div style="font-size: 0.9rem; color: var(--text-secondary);">Unlock persistent custom room spaces and enjoy an ad-free experience.</div>
-        </div>
+        </aside>
 
         <a href="/feedback" class="btn-outline fade-in-up delay-3"
             style="margin-top: 32px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: var(--radius-md); font-weight: 600; font-size: 0.95rem;">
@@ -304,6 +357,42 @@
             </svg>
             Leave Anonymous Feedback
         </a>
+
+        <section style="margin-top: 48px; width: 100%; max-width: 800px; text-align: center;" class="fade-in-up delay-3">
+            <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 16px;">Why Choose DropConnect?</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; text-align: left;">
+                <div style="padding: 20px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--card-border);">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 8px;">🔒 Zero-Knowledge Encryption</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">All data is encrypted client-side with AES. We never see your clipboard contents.</p>
+                </div>
+                <div style="padding: 20px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--card-border);">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 8px;">⚡ Instant Sync</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Real-time clipboard synchronization between desktop and mobile devices.</p>
+                </div>
+                <div style="padding: 20px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--card-border);">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 8px;">📱 No App Required</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Works directly in your browser. Just scan a QR code and start sharing.</p>
+                </div>
+            </div>
+        </section>
+
+        <section style="margin-top: 48px; width: 100%; max-width: 800px; text-align: center;" class="fade-in-up delay-3">
+            <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 16px;">Frequently Asked Questions</h2>
+            <div style="text-align: left;">
+                <details style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); margin-bottom: 12px; padding: 16px 20px;">
+                    <summary style="font-weight: 700; color: var(--text-primary); cursor: pointer;">Is DropConnect really free?</summary>
+                    <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.95rem;">Yes! DropConnect offers a free tier with basic clipboard sync. Premium features include persistent rooms and extended history.</p>
+                </details>
+                <details style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); margin-bottom: 12px; padding: 16px 20px;">
+                    <summary style="font-weight: 700; color: var(--text-primary); cursor: pointer;">How secure is my data?</summary>
+                    <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.95rem;">DropConnect uses end-to-end AES encryption. Your data is encrypted on your device and decrypted only on the receiving device. We never have access to your clipboard contents.</p>
+                </details>
+                <details style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); margin-bottom: 12px; padding: 16px 20px;">
+                    <summary style="font-weight: 700; color: var(--text-primary); cursor: pointer;">What devices are supported?</summary>
+                    <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.95rem;">DropConnect works on any device with a modern web browser - Windows, macOS, Linux, iOS, and Android. No app installation required.</p>
+                </details>
+            </div>
+        </section>
     </div>
 
     <!-- Onboarding Demo Modal Overlay -->

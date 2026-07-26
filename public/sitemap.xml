@@ -1,44 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://dropconnect.up.railway.app/</loc>
+    <loc>https://dropconnectt.vercel.app/</loc>
     <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://dropconnect.up.railway.app/login</loc>
+    <loc>https://dropconnectt.vercel.app/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://dropconnect.up.railway.app/sender</loc>
+    <loc>https://dropconnectt.vercel.app/sender</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://dropconnect.up.railway.app/receiver</loc>
+    <loc>https://dropconnectt.vercel.app/receiver</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://dropconnect.up.railway.app/privacy</loc>
+    <loc>https://dropconnectt.vercel.app/demo</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dropconnectt.vercel.app/premium</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://dropconnectt.vercel.app/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://dropconnect.up.railway.app/terms</loc>
+    <loc>https://dropconnectt.vercel.app/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://dropconnect.up.railway.app/feedback</loc>
+    <loc>https://dropconnectt.vercel.app/feedback</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://dropconnect.up.railway.app/refund</loc>
+    <loc>https://dropconnectt.vercel.app/refund</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
