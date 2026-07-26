@@ -527,5 +527,78 @@ body.dark-theme .premium-banner {
     background: var(--card-border);
 }
 
-
-
+/* SEO & Layout Helper Classes */
+.seo-section {
+    margin-top: 48px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+.seo-section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+.seo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    text-align: left;
+}
+.seo-card {
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--card-border);
+}
+.seo-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 8px;
+}
+.seo-card-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+.faq-container {
+    text-align: left;
+}
+.faq-item {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 12px;
+    padding: 16px 20px;
+}
+.faq-summary {
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+.faq-answer {
+    margin-top: 12px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+.hero-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    margin-top: 20px;
+}
+.btn-feedback {
+    margin-top: 32px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
