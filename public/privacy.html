@@ -28,26 +28,13 @@
     <script src="theme.js"></script>
     <script src="navbar.js"></script>
     <style>
-        .page-container { width: 100%; max-width: 900px; margin: 20px auto 40px auto; padding: 0 20px; }
-        .card { 
-            background: var(--card-bg); 
-            backdrop-filter: var(--backdrop-blur);
-            -webkit-backdrop-filter: var(--backdrop-blur);
-            border: 1px solid var(--card-border); 
-            border-radius: var(--radius-xl); 
-            padding: 40px; 
-            box-shadow: var(--shadow-glass); 
-            line-height: 1.7; 
-            color: var(--text-secondary); 
-        }
-        h1 { font-weight: 800; font-size: 2.2rem; color: var(--text-primary); margin-bottom: 20px; letter-spacing: -0.8px; }
-        h2 { font-weight: 700; font-size: 1.3rem; color: var(--text-primary); margin-top: 32px; margin-bottom: 12px; }
-        p { margin-bottom: 16px; font-size: 1rem; }
+        .legal-card h2 { margin-top: 32px; margin-bottom: 12px; }
+        .legal-card p { margin-bottom: 16px; font-size: 1rem; }
     </style>
 </head>
-<body style="display: flex; flex-direction: column; min-height: 100vh;">
-    <div class="page-container">
-        <div class="card">
+<body>
+    <div class="legal-page">
+        <div class="legal-card">
             <h1>Privacy Policy</h1>
             <p>Your privacy is paramount to us. This Privacy Policy explains how DropConnect collects, uses, and safeguards your information when you use our universal clipboard service.</p>
 
@@ -64,7 +51,7 @@
             <p>We use local storage strictly to maintain user authentication tokens, theme preferences, and Zero-Knowledge session key parameters.</p>
 
             <h2>5. Contact Us</h2>
-            <p>For privacy inquiries or account requests, please reach out to <a href="mailto:support@dropconnect.com" style="color: var(--accent-primary); font-weight: 600;">support@dropconnect.com</a>.</p>
+            <p>For privacy inquiries or account requests, please reach out to <a href="mailto:support@dropconnect.com">support@dropconnect.com</a>.</p>
         </div>
     </div>
 </body>
