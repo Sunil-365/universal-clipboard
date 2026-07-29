@@ -18,6 +18,23 @@ app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'public/priv
 app.get('/refund', (req, res) => res.sendFile(path.join(__dirname, 'public/refund.html')));
 app.get('/demo', (req, res) => res.sendFile(path.join(__dirname, 'public/demo.html')));
 
+app.get('/sitemap.xml', (req, res) => {
+    res.header('Content-Type', 'application/xml');
+    res.sendFile(path.join(__dirname, 'public/sitemap.xml'));
+});
+app.get('/robots.txt', (req, res) => {
+    res.header('Content-Type', 'text/plain');
+    res.sendFile(path.join(__dirname, 'public/robots.txt'));
+});
+app.get('/llms.txt', (req, res) => {
+    res.header('Content-Type', 'text/plain');
+    res.sendFile(path.join(__dirname, 'public/llms.txt'));
+});
+app.get('/llms-full.txt', (req, res) => {
+    res.header('Content-Type', 'text/plain');
+    res.sendFile(path.join(__dirname, 'public/llms-full.txt'));
+});
+
 // Catch-all route to serve index.html for undefined endpoints
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
