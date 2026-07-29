@@ -3,7 +3,7 @@
 
 <head>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#18181b">
     <link rel="apple-touch-icon" href="/favicon.svg">
     <meta name="google-adsense-account" content="ca-pub-4223443909078451">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RSVYPTE9QZ"></script>
@@ -129,9 +129,9 @@
             gap: 8px;
             padding: 8px 18px;
             border-radius: 50px;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(59, 130, 246, 0.05));
-            border: 1px solid rgba(37, 99, 235, 0.25);
-            color: var(--accent-primary);
+            background: rgba(24, 24, 27, 0.06);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
             font-size: 0.82rem;
             font-weight: 700;
             margin-bottom: 24px;
@@ -139,7 +139,7 @@
             backdrop-filter: blur(4px);
         }
         body.dark-theme .hero-badge {
-            background: rgba(59, 130, 246, 0.15);
+            background: rgba(250, 250, 250, 0.08);
         }
 
         .hero-title {
@@ -183,19 +183,20 @@
         }
         .particle-1 {
             width: 8px; height: 8px;
-            background: var(--accent-primary);
+            background: var(--text-muted);
             top: 15%; left: 8%;
             animation: float 6s ease-in-out infinite;
         }
         .particle-2 {
             width: 12px; height: 12px;
-            background: #10b981;
+            background: var(--text-muted);
             top: 60%; right: 12%;
             animation: float 8s ease-in-out infinite 2s;
+            opacity: 0.35;
         }
         .particle-3 {
             width: 6px; height: 6px;
-            background: #d97706;
+            background: var(--card-border);
             bottom: 25%; left: 20%;
             animation: float 5s ease-in-out infinite 1s;
         }
@@ -264,17 +265,17 @@
         }
 
         .action-card:hover {
-            box-shadow: 0 24px 48px -12px rgba(37, 99, 235, 0.18);
+            box-shadow: 0 24px 48px -12px rgba(24, 24, 27, 0.10);
             transform: translateY(-5px);
         }
 
         .action-card.receive:hover {
-            border-color: rgba(16, 185, 129, 0.4);
-            box-shadow: 0 24px 48px -12px rgba(16, 185, 129, 0.18);
+            border-color: rgba(24, 24, 27, 0.4);
+            box-shadow: 0 24px 48px -12px rgba(24, 24, 27, 0.10);
         }
 
         .action-card.send:hover {
-            border-color: rgba(37, 99, 235, 0.4);
+            border-color: rgba(24, 24, 27, 0.4);
         }
 
         .icon-wrapper {
@@ -294,21 +295,21 @@
         }
 
         .action-card.receive .icon-wrapper {
-            background: rgba(16, 185, 129, 0.12);
-            color: #059669;
+            background: rgba(24, 24, 27, 0.08);
+            color: var(--text-primary);
         }
         body.dark-theme .action-card.receive .icon-wrapper {
-            background: rgba(16, 185, 129, 0.2);
-            color: #34d399;
+            background: rgba(250, 250, 250, 0.12);
+            color: var(--text-primary);
         }
 
         .action-card.send .icon-wrapper {
-            background: rgba(37, 99, 235, 0.12);
+            background: rgba(24, 24, 27, 0.08);
             color: var(--accent-primary);
         }
         body.dark-theme .action-card.send .icon-wrapper {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
+            background: rgba(250, 250, 250, 0.12);
+            color: var(--accent-primary);
         }
 
         .action-card h2 {
@@ -354,17 +355,17 @@
             border-radius: var(--radius-lg);
             padding: 28px 32px;
             text-align: center;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
-            border: 1px solid rgba(124, 58, 237, 0.25);
+            background: rgba(24, 24, 27, 0.04);
+            border: 1px solid var(--card-border);
             backdrop-filter: var(--backdrop-blur);
             transition: box-shadow 0.3s ease, border-color 0.3s ease;
         }
         .premium-banner:hover {
-            border-color: rgba(124, 58, 237, 0.4);
-            box-shadow: 0 8px 30px -8px rgba(124, 58, 237, 0.15);
+            border-color: var(--text-primary);
+            box-shadow: 0 8px 30px -8px rgba(24, 24, 27, 0.08);
         }
         body.dark-theme .premium-banner {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+            background: rgba(250, 250, 250, 0.04);
         }
         .premium-banner-title {
             font-weight: 800;
@@ -423,9 +424,12 @@
         .btn-feedback:hover {
             border-color: var(--accent-primary);
             color: var(--accent-primary);
-            background: rgba(37, 99, 235, 0.05);
+            background: rgba(24, 24, 27, 0.04);
             transform: translateY(-2px);
             box-shadow: 0 8px 20px -8px var(--accent-glow);
+        }
+        body.dark-theme .btn-feedback:hover {
+            background: rgba(250, 250, 250, 0.06);
         }
 
         /* ── SEO / How It Works / Features / FAQ Sections ── */
@@ -457,9 +461,12 @@
             transition: all 0.3s ease;
         }
         .seo-card:hover {
-            border-color: rgba(37, 99, 235, 0.2);
-            box-shadow: 0 8px 24px -8px rgba(37, 99, 235, 0.08);
+            border-color: var(--accent-primary);
+            box-shadow: 0 8px 24px -8px rgba(24, 24, 27, 0.04);
             transform: translateY(-2px);
+        }
+        body.dark-theme .seo-card:hover {
+            box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.3);
         }
         .seo-card-icon {
             width: 40px;
@@ -472,35 +479,35 @@
             font-size: 1.2rem;
         }
         .seo-card-icon.blue {
-            background: rgba(37, 99, 235, 0.12);
-            color: var(--accent-primary);
+            background: rgba(24, 24, 27, 0.06);
+            color: var(--text-primary);
         }
         .seo-card-icon.green {
-            background: rgba(16, 185, 129, 0.12);
-            color: #059669;
+            background: rgba(24, 24, 27, 0.06);
+            color: var(--text-primary);
         }
         .seo-card-icon.amber {
-            background: rgba(217, 119, 6, 0.12);
-            color: #d97706;
+            background: rgba(24, 24, 27, 0.06);
+            color: var(--text-primary);
         }
         .seo-card-icon.purple {
-            background: rgba(124, 58, 237, 0.12);
-            color: #7c3aed;
+            background: rgba(24, 24, 27, 0.06);
+            color: var(--text-primary);
         }
         .seo-card-icon.rose {
-            background: rgba(244, 63, 94, 0.12);
-            color: #f43f5e;
+            background: rgba(24, 24, 27, 0.06);
+            color: var(--text-primary);
         }
         .seo-card-icon.teal {
-            background: rgba(20, 184, 166, 0.12);
-            color: #14b8a6;
+            background: rgba(24, 24, 27, 0.06);
+            color: var(--text-primary);
         }
-        body.dark-theme .seo-card-icon.blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        body.dark-theme .seo-card-icon.green { background: rgba(52, 211, 153, 0.2); color: #34d399; }
-        body.dark-theme .seo-card-icon.amber { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
-        body.dark-theme .seo-card-icon.purple { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
-        body.dark-theme .seo-card-icon.rose { background: rgba(251, 113, 133, 0.2); color: #fb7185; }
-        body.dark-theme .seo-card-icon.teal { background: rgba(45, 212, 191, 0.2); color: #2dd4bf; }
+        body.dark-theme .seo-card-icon.blue { background: rgba(250, 250, 250, 0.1); color: var(--text-primary); }
+        body.dark-theme .seo-card-icon.green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        body.dark-theme .seo-card-icon.amber { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+        body.dark-theme .seo-card-icon.purple { background: rgba(250, 250, 250, 0.1); color: var(--text-primary); }
+        body.dark-theme .seo-card-icon.rose { background: rgba(251, 113, 133, 0.15); color: #fb7185; }
+        body.dark-theme .seo-card-icon.teal { background: rgba(45, 212, 191, 0.15); color: #2dd4bf; }
         .seo-card-title {
             font-size: 1rem;
             font-weight: 700;
@@ -557,8 +564,8 @@
             margin-bottom: 8px;
         }
         body.dark-theme .step-circle {
-            border-color: #60a5fa;
-            color: #60a5fa;
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
         }
         .step-label {
             font-size: 0.78rem;
@@ -583,10 +590,10 @@
             transition: border-color 0.3s ease;
         }
         .faq-item:hover {
-            border-color: rgba(37, 99, 235, 0.2);
+            border-color: var(--accent-primary);
         }
         .faq-item[open] {
-            border-color: rgba(37, 99, 235, 0.3);
+            border-color: var(--text-primary);
         }
         .faq-summary {
             font-weight: 700;

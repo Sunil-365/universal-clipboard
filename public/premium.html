@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#18181b">
     <link rel="apple-touch-icon" href="/favicon.svg">
     <meta name="google-adsense-account" content="ca-pub-4223443909078451">
     <meta charset="UTF-8">
@@ -65,7 +65,7 @@
             gap: 12px; 
         }
         .badge { 
-            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            background: var(--accent-gradient); 
             color: white; 
             padding: 5px 12px; 
             border-radius: 50px; 
@@ -73,7 +73,10 @@
             font-weight: 800; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
-            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+        body.dark-theme .badge {
+            color: #09090b;
         }
         
         .dashboard-grid { 
